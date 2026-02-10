@@ -1,0 +1,82 @@
+{
+  "events": [
+    {
+      "type": "access",
+      "fileId": "market-analysis-q1",
+      "userId": "user1",
+      "timestamp": 1770725412495,
+      "context": {
+        "source": "search",
+        "query": "market trends",
+        "sessionId": null,
+        "device": "unknown"
+      }
+    },
+    {
+      "type": "record",
+      "data": {
+        "id": "roi_1770725412495_5y9bc3ict",
+        "fileId": "market-analysis-q1",
+        "createdAt": 1770725412495,
+        "metadata": {
+          "title": "Q1 Market Analysis",
+          "category": "market-research",
+          "estimatedReadTime": 15,
+          "tags": [],
+          "readTime": 15
+        },
+        "accessLog": [
+          {
+            "timestamp": 1770725412495,
+            "userId": "user1",
+            "context": {
+              "source": "search",
+              "query": "market trends",
+              "sessionId": null,
+              "device": "unknown"
+            }
+          }
+        ],
+        "totalAccesses": 1,
+        "uniqueUsers": {},
+        "feedback": {
+          "wasUseful": true,
+          "usefulnessRating": 4,
+          "usedFor": [
+            "unknown"
+          ],
+          "timeToAction": 1,
+          "comments": []
+        },
+        "conversion": {
+          "status": "converted",
+          "actionTaken": "strategy-update",
+          "actionTimestamp": 1770725412496,
+          "actionValue": 5000,
+          "timeToAction": 1,
+          "details": {
+            "actionType": "strategy-update",
+            "estimatedValue": 5000
+          }
+        },
+        "metrics": {
+          "roiScore": 71.49999999652779,
+          "engagementScore": 54.99999998842593,
+          "decayFactor": 0.9999999996141975
+        }
+      },
+      "timestamp": 1770725412495
+    }
+  ],
+  "queue": [
+    {
+      "fileId": "market-analysis-q1",
+      "userId": "user1",
+      "accessTimestamp": 1770725412495,
+      "feedbackDue": 1770726312495,
+      "status": "pending",
+      "attempts": 0
+    }
+  ],
+  "lastUpdated": 1770725412496
+}

@@ -1,0 +1,59 @@
+{
+  "interactions": [
+    {
+      "type": "promise-made",
+      "data": {
+        "interactionId": "int1",
+        "promiseId": "m_1770725415136_opn5a7gts",
+        "timestamp": 1770725415136,
+        "type": "delivery",
+        "description": "Deliver market analysis",
+        "deadline": 1770729015136,
+        "deliverable": "market-report.pdf",
+        "status": "fulfilled",
+        "fulfilledAt": 1770725415136,
+        "variance": -3600000,
+        "onTime": true,
+        "fulfillmentDetails": {
+          "delivered": true
+        }
+      }
+    },
+    {
+      "type": "insight",
+      "queryId": "q1",
+      "query": "market trends",
+      "startedAt": 1770725415137,
+      "completedAt": 1770725415137,
+      "timeToInsight": 0,
+      "resultType": "research",
+      "userSatisfaction": 5,
+      "relatedQueryId": null,
+      "isReask": false,
+      "reaskReason": null,
+      "followUpsRequired": 0,
+      "iterations": 1,
+      "valueDelivered": null
+    },
+    {
+      "type": "resource-usage",
+      "interactionId": "int1",
+      "timestamp": 1770725415138,
+      "tokens": {
+        "input": 500,
+        "output": 1500,
+        "total": 2000
+      },
+      "apiCalls": 3,
+      "toolsUsed": [
+        "web_search",
+        "file_read"
+      ],
+      "redundantOperations": [],
+      "contextTokens": 0,
+      "contextUtilization": null,
+      "estimatedCost": null
+    }
+  ],
+  "lastUpdated": 1770725415138
+}

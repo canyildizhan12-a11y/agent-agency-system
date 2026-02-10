@@ -1,0 +1,982 @@
+{
+  "pendingApprovals": [
+    {
+      "id": 3,
+      "createdAt": "2026-02-10T12:08:03.950Z",
+      "status": "PENDING_APPROVAL",
+      "task": {
+        "title": "Fix Auth Middleware Bug",
+        "description": "Users getting 401 on valid tokens after 1 hour",
+        "type": "fix",
+        "deliverables": []
+      },
+      "estimation": {
+        "baseHours": 1.5,
+        "complexity": "Low",
+        "complexityMultiplier": 1,
+        "bufferPercentage": 50,
+        "bufferedHours": 2.25,
+        "finalEstimateHours": 2.5,
+        "confidence": "HIGH"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Bug is reproducibly fixed",
+          "Root cause documented",
+          "Regression tests pass",
+          "Fix verified in target environment"
+        ],
+        "niceToHave": [
+          "Performance optimized beyond requirements",
+          "Additional edge cases covered",
+          "Bonus features added"
+        ],
+        "explicitDeliverables": [],
+        "antiGoals": [
+          "Do NOT refactor unrelated code",
+          "Do NOT add scope beyond specified requirements",
+          "Do NOT perfect what is good enough"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 4,
+        "intervalMinutes": 33,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 33,
+            "scheduledTimeFormatted": "33m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 66,
+            "scheduledTimeFormatted": "1h 6m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 99,
+            "scheduledTimeFormatted": "1h 39m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 135,
+            "scheduledTimeFormatted": "2h 15m",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:08:03.950Z",
+        "approvedAt": null,
+        "approvedBy": null,
+        "notes": null,
+        "modifications": []
+      },
+      "execution": {
+        "startedAt": null,
+        "completedAt": null,
+        "actualHours": null,
+        "checkpointLogs": []
+      }
+    },
+    {
+      "id": 7,
+      "createdAt": "2026-02-10T12:14:19.999Z",
+      "status": "PENDING_APPROVAL",
+      "task": {
+        "title": "Fix Auth Middleware Bug",
+        "description": "Users getting 401 on valid tokens after 1 hour",
+        "type": "fix",
+        "deliverables": []
+      },
+      "estimation": {
+        "baseHours": 1.5,
+        "complexity": "Low",
+        "complexityMultiplier": 1,
+        "bufferPercentage": 50,
+        "bufferedHours": 2.25,
+        "finalEstimateHours": 2.5,
+        "confidence": "HIGH"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Bug is reproducibly fixed",
+          "Root cause documented",
+          "Regression tests pass",
+          "Fix verified in target environment"
+        ],
+        "niceToHave": [
+          "Performance optimized beyond requirements",
+          "Additional edge cases covered",
+          "Bonus features added"
+        ],
+        "explicitDeliverables": [],
+        "antiGoals": [
+          "Do NOT refactor unrelated code",
+          "Do NOT add scope beyond specified requirements",
+          "Do NOT perfect what is good enough"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 4,
+        "intervalMinutes": 33,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 33,
+            "scheduledTimeFormatted": "33m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 66,
+            "scheduledTimeFormatted": "1h 6m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 99,
+            "scheduledTimeFormatted": "1h 39m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 135,
+            "scheduledTimeFormatted": "2h 15m",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:14:20.000Z",
+        "approvedAt": null,
+        "approvedBy": null,
+        "notes": null,
+        "modifications": []
+      },
+      "execution": {
+        "startedAt": null,
+        "completedAt": null,
+        "actualHours": null,
+        "checkpointLogs": []
+      }
+    }
+  ],
+  "completedChecks": [
+    {
+      "id": 1,
+      "createdAt": "2026-02-10T12:08:03.946Z",
+      "status": "APPROVED",
+      "task": {
+        "title": "Research Vector Database Options",
+        "description": "Evaluate Pinecone vs Weaviate vs pgvector for our use case",
+        "type": "research",
+        "deliverables": [
+          "Comparison matrix",
+          "Recommendation doc",
+          "Implementation plan"
+        ]
+      },
+      "estimation": {
+        "baseHours": 3,
+        "complexity": "Medium",
+        "complexityMultiplier": 1.5,
+        "bufferPercentage": 50,
+        "bufferedHours": 4.5,
+        "finalEstimateHours": 7,
+        "confidence": "MEDIUM"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Key findings documented",
+          "Recommendations provided",
+          "Sources/references noted",
+          "Decision points clearly marked"
+        ],
+        "niceToHave": [
+          "Performance optimized beyond requirements",
+          "Additional edge cases covered",
+          "Bonus features added"
+        ],
+        "explicitDeliverables": [
+          "Comparison matrix created and saved",
+          "Recommendation doc created and saved",
+          "Implementation plan created and saved"
+        ],
+        "antiGoals": [
+          "Do NOT implement anything yet",
+          "Do NOT get lost in feature comparisons - focus on OUR needs",
+          "Do NOT spend more than 30 min on pricing research"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 10,
+        "intervalMinutes": 40,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 40,
+            "scheduledTimeFormatted": "40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 80,
+            "scheduledTimeFormatted": "1h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 120,
+            "scheduledTimeFormatted": "2h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 160,
+            "scheduledTimeFormatted": "2h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 5,
+            "scheduledAtMinutes": 200,
+            "scheduledTimeFormatted": "3h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 6,
+            "scheduledAtMinutes": 240,
+            "scheduledTimeFormatted": "4h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 7,
+            "scheduledAtMinutes": 280,
+            "scheduledTimeFormatted": "4h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 8,
+            "scheduledAtMinutes": 320,
+            "scheduledTimeFormatted": "5h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 9,
+            "scheduledAtMinutes": 360,
+            "scheduledTimeFormatted": "6h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 10,
+            "scheduledAtMinutes": 405,
+            "scheduledTimeFormatted": "6h 45m",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:08:03.947Z",
+        "approvedAt": "2026-02-10T12:08:03.947Z",
+        "approvedBy": "Can",
+        "notes": "Looks good, but limit to 2 hours if possible",
+        "modifications": []
+      },
+      "execution": {
+        "startedAt": null,
+        "completedAt": null,
+        "actualHours": null,
+        "checkpointLogs": []
+      }
+    },
+    {
+      "id": 2,
+      "createdAt": "2026-02-10T12:08:03.947Z",
+      "status": "APPROVED",
+      "task": {
+        "title": "Implement WebSocket Notification System",
+        "description": "Real-time notifications for task updates using Socket.io",
+        "type": "build",
+        "deliverables": [
+          "WebSocket server",
+          "Client integration",
+          "Fallback polling"
+        ]
+      },
+      "estimation": {
+        "baseHours": 4,
+        "complexity": "High",
+        "complexityMultiplier": 2.5,
+        "bufferPercentage": 50,
+        "bufferedHours": 6,
+        "finalEstimateHours": 6,
+        "confidence": "LOW"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Feature works as specified",
+          "Edge cases handled",
+          "Documentation updated",
+          "Code reviewed (if applicable)"
+        ],
+        "niceToHave": [
+          "Message persistence",
+          "Delivery receipts"
+        ],
+        "explicitDeliverables": [
+          "WebSocket server created and saved",
+          "Client integration created and saved",
+          "Fallback polling created and saved"
+        ],
+        "antiGoals": [
+          "Do NOT refactor unrelated code",
+          "Do NOT add scope beyond specified requirements",
+          "Do NOT perfect what is good enough"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 9,
+        "intervalMinutes": 40,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 40,
+            "scheduledTimeFormatted": "40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 80,
+            "scheduledTimeFormatted": "1h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 120,
+            "scheduledTimeFormatted": "2h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 160,
+            "scheduledTimeFormatted": "2h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 5,
+            "scheduledAtMinutes": 200,
+            "scheduledTimeFormatted": "3h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 6,
+            "scheduledAtMinutes": 240,
+            "scheduledTimeFormatted": "4h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 7,
+            "scheduledAtMinutes": 280,
+            "scheduledTimeFormatted": "4h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 8,
+            "scheduledAtMinutes": 320,
+            "scheduledTimeFormatted": "5h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 9,
+            "scheduledAtMinutes": 360,
+            "scheduledTimeFormatted": "6h",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:08:03.947Z",
+        "approvedAt": "2026-02-10T12:08:03.948Z",
+        "approvedBy": "Can",
+        "notes": null,
+        "modifications": [
+          {
+            "type": "time_adjustment",
+            "original": 15,
+            "modified": 6,
+            "reason": "Need to add Redis adapter for multi-server setup"
+          }
+        ]
+      },
+      "execution": {
+        "startedAt": null,
+        "completedAt": null,
+        "actualHours": null,
+        "checkpointLogs": []
+      }
+    },
+    {
+      "id": 4,
+      "createdAt": "2026-02-10T12:08:28.898Z",
+      "status": "COMPLETED",
+      "task": {
+        "title": "Build CSV Import Feature",
+        "description": "Allow users to bulk import contacts via CSV upload",
+        "type": "build",
+        "deliverables": [
+          "CSV parser",
+          "Validation logic",
+          "Progress indicator",
+          "Error reporting"
+        ]
+      },
+      "estimation": {
+        "baseHours": 2,
+        "complexity": "Medium",
+        "complexityMultiplier": 1.5,
+        "bufferPercentage": 50,
+        "bufferedHours": 3,
+        "finalEstimateHours": 4.5,
+        "confidence": "MEDIUM"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Feature works as specified",
+          "Edge cases handled",
+          "Documentation updated",
+          "Code reviewed (if applicable)"
+        ],
+        "niceToHave": [
+          "Performance optimized beyond requirements",
+          "Additional edge cases covered",
+          "Bonus features added"
+        ],
+        "explicitDeliverables": [
+          "CSV parser created and saved",
+          "Validation logic created and saved",
+          "Progress indicator created and saved",
+          "Error reporting created and saved"
+        ],
+        "antiGoals": [
+          "Do NOT support Excel files yet",
+          "Do NOT build template builder"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 7,
+        "intervalMinutes": 38,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 38,
+            "scheduledTimeFormatted": "38m",
+            "status": "COMPLETED",
+            "completedAt": "2026-02-10T12:08:28.902Z",
+            "notes": "CSV parsing complete, moving to validation",
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 76,
+            "scheduledTimeFormatted": "1h 16m",
+            "status": "COMPLETED",
+            "completedAt": "2026-02-10T12:08:28.903Z",
+            "notes": "Validation logic working, testing edge cases",
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 114,
+            "scheduledTimeFormatted": "1h 54m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 152,
+            "scheduledTimeFormatted": "2h 32m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 5,
+            "scheduledAtMinutes": 190,
+            "scheduledTimeFormatted": "3h 10m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 6,
+            "scheduledAtMinutes": 228,
+            "scheduledTimeFormatted": "3h 48m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 7,
+            "scheduledAtMinutes": 270,
+            "scheduledTimeFormatted": "4h 30m",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:08:28.898Z",
+        "approvedAt": "2026-02-10T12:08:28.899Z",
+        "approvedBy": "Can",
+        "notes": "Approved - focus on validation first",
+        "modifications": []
+      },
+      "execution": {
+        "startedAt": "2026-02-10T12:08:28.900Z",
+        "completedAt": "2026-02-10T12:08:28.904Z",
+        "actualHours": 3,
+        "checkpointLogs": [
+          {
+            "checkpointNumber": 1,
+            "timestamp": "2026-02-10T12:08:28.902Z",
+            "notes": "CSV parsing complete, moving to validation",
+            "blockers": []
+          },
+          {
+            "checkpointNumber": 2,
+            "timestamp": "2026-02-10T12:08:28.903Z",
+            "notes": "Validation logic working, testing edge cases",
+            "blockers": []
+          }
+        ],
+        "retrospective": {
+          "estimateAccuracy": 0.6666666666666666,
+          "whatWentWell": [
+            "Parser was simpler than expected"
+          ],
+          "whatWasHard": [
+            "UTF-8 encoding edge cases"
+          ],
+          "lessonsLearned": [
+            "Always test with real user CSVs, not just generated ones"
+          ]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "createdAt": "2026-02-10T12:14:19.995Z",
+      "status": "APPROVED",
+      "task": {
+        "title": "Research Vector Database Options",
+        "description": "Evaluate Pinecone vs Weaviate vs pgvector for our use case",
+        "type": "research",
+        "deliverables": [
+          "Comparison matrix",
+          "Recommendation doc",
+          "Implementation plan"
+        ]
+      },
+      "estimation": {
+        "baseHours": 3,
+        "complexity": "Medium",
+        "complexityMultiplier": 1.5,
+        "bufferPercentage": 50,
+        "bufferedHours": 4.5,
+        "finalEstimateHours": 7,
+        "confidence": "MEDIUM"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Key findings documented",
+          "Recommendations provided",
+          "Sources/references noted",
+          "Decision points clearly marked"
+        ],
+        "niceToHave": [
+          "Performance optimized beyond requirements",
+          "Additional edge cases covered",
+          "Bonus features added"
+        ],
+        "explicitDeliverables": [
+          "Comparison matrix created and saved",
+          "Recommendation doc created and saved",
+          "Implementation plan created and saved"
+        ],
+        "antiGoals": [
+          "Do NOT implement anything yet",
+          "Do NOT get lost in feature comparisons - focus on OUR needs",
+          "Do NOT spend more than 30 min on pricing research"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 10,
+        "intervalMinutes": 40,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 40,
+            "scheduledTimeFormatted": "40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 80,
+            "scheduledTimeFormatted": "1h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 120,
+            "scheduledTimeFormatted": "2h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 160,
+            "scheduledTimeFormatted": "2h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 5,
+            "scheduledAtMinutes": 200,
+            "scheduledTimeFormatted": "3h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 6,
+            "scheduledAtMinutes": 240,
+            "scheduledTimeFormatted": "4h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 7,
+            "scheduledAtMinutes": 280,
+            "scheduledTimeFormatted": "4h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 8,
+            "scheduledAtMinutes": 320,
+            "scheduledTimeFormatted": "5h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 9,
+            "scheduledAtMinutes": 360,
+            "scheduledTimeFormatted": "6h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 10,
+            "scheduledAtMinutes": 405,
+            "scheduledTimeFormatted": "6h 45m",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:14:19.995Z",
+        "approvedAt": "2026-02-10T12:14:19.995Z",
+        "approvedBy": "Can",
+        "notes": "Looks good, but limit to 2 hours if possible",
+        "modifications": []
+      },
+      "execution": {
+        "startedAt": null,
+        "completedAt": null,
+        "actualHours": null,
+        "checkpointLogs": []
+      }
+    },
+    {
+      "id": 6,
+      "createdAt": "2026-02-10T12:14:19.997Z",
+      "status": "APPROVED",
+      "task": {
+        "title": "Implement WebSocket Notification System",
+        "description": "Real-time notifications for task updates using Socket.io",
+        "type": "build",
+        "deliverables": [
+          "WebSocket server",
+          "Client integration",
+          "Fallback polling"
+        ]
+      },
+      "estimation": {
+        "baseHours": 4,
+        "complexity": "High",
+        "complexityMultiplier": 2.5,
+        "bufferPercentage": 50,
+        "bufferedHours": 6,
+        "finalEstimateHours": 6,
+        "confidence": "LOW"
+      },
+      "doneCriteria": {
+        "mustHave": [
+          "Code is written and functional",
+          "Basic testing completed",
+          "Changes committed to version control",
+          "Feature works as specified",
+          "Edge cases handled",
+          "Documentation updated",
+          "Code reviewed (if applicable)"
+        ],
+        "niceToHave": [
+          "Message persistence",
+          "Delivery receipts"
+        ],
+        "explicitDeliverables": [
+          "WebSocket server created and saved",
+          "Client integration created and saved",
+          "Fallback polling created and saved"
+        ],
+        "antiGoals": [
+          "Do NOT refactor unrelated code",
+          "Do NOT add scope beyond specified requirements",
+          "Do NOT perfect what is good enough"
+        ]
+      },
+      "checkpoints": {
+        "totalCheckpoints": 9,
+        "intervalMinutes": 40,
+        "items": [
+          {
+            "number": 1,
+            "scheduledAtMinutes": 40,
+            "scheduledTimeFormatted": "40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 2,
+            "scheduledAtMinutes": 80,
+            "scheduledTimeFormatted": "1h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 3,
+            "scheduledAtMinutes": 120,
+            "scheduledTimeFormatted": "2h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 4,
+            "scheduledAtMinutes": 160,
+            "scheduledTimeFormatted": "2h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 5,
+            "scheduledAtMinutes": 200,
+            "scheduledTimeFormatted": "3h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 6,
+            "scheduledAtMinutes": 240,
+            "scheduledTimeFormatted": "4h",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 7,
+            "scheduledAtMinutes": 280,
+            "scheduledTimeFormatted": "4h 40m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 8,
+            "scheduledAtMinutes": 320,
+            "scheduledTimeFormatted": "5h 20m",
+            "status": "PENDING",
+            "completedAt": null,
+            "notes": null,
+            "blockers": []
+          },
+          {
+            "number": 9,
+            "scheduledAtMinutes": 360,
+            "scheduledTimeFormatted": "6h",
+            "status": "PENDING",
+            "isFinal": true,
+            "notes": null
+          }
+        ]
+      },
+      "approval": {
+        "requestedAt": "2026-02-10T12:14:19.997Z",
+        "approvedAt": "2026-02-10T12:14:19.998Z",
+        "approvedBy": "Can",
+        "notes": null,
+        "modifications": [
+          {
+            "type": "time_adjustment",
+            "original": 15,
+            "modified": 6,
+            "reason": "Need to add Redis adapter for multi-server setup"
+          }
+        ]
+      },
+      "execution": {
+        "startedAt": null,
+        "completedAt": null,
+        "actualHours": null,
+        "checkpointLogs": []
+      }
+    }
+  ],
+  "lastId": 7
+}
