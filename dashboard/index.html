@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦉 Agent Agency Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        /* Office View */
+        .office-view {
+            flex: 2;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .office-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+        
+        .office-floor {
+            background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 500px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .meeting-table {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(145deg, #3a3a4e, #2a2a3e);
+            border-radius: 60px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .agent-avatar {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid;
+            font-size: 32px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .agent-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .agent-avatar.awake {
+            background: linear-gradient(145deg, #2d5a3d, #1a3a2a);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .agent-avatar.sleeping {
+            background: linear-gradient(145deg, #3a3a4e, #2a2a3e);
+            border-color: #666;
+            opacity: 0.7;
+        }
+        
+        .agent-avatar.working {
+            background: linear-gradient(145deg, #5a4a2d, #3a2a1a);
+            border-color: #ffaa00;
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+            animation: working 2s infinite;
+        }
+        
+        @keyframes working {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .agent-name {
+            font-size: 11px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        .agent-status {
+            font-size: 9px;
+            color: #aaa;
+        }
+        
+        /* Position agents around the table */
+        .agent-avatar:nth-child(2) { top: 10%; left: 50%; transform: translateX(-50%); }
+        .agent-avatar:nth-child(3) { top: 30%; right: 10%; }
+        .agent-avatar:nth-child(4) { bottom: 30%; right: 10%; }
+        .agent-avatar:nth-child(5) { bottom: 10%; left: 50%; transform: translateX(-50%); }
+        .agent-avatar:nth-child(6) { bottom: 30%; left: 10%; }
+        .agent-avatar:nth-child(7) { top: 30%; left: 10%; }
+        .agent-avatar:nth-child(8) { top: 50%; left: 50%; transform: translate(-50%, -50%); margin-top: -100px; }
+        
+        /* Side Panel */
+        .side-panel {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel-tab {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .panel-tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        
+        .panel-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-bottom: 2px solid #00ff88;
+        }
+        
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        /* Agent List */
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .agent-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .agent-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .agent-card.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .agent-card-emoji {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+        }
+        
+        .agent-card-info {
+            flex: 1;
+        }
+        
+        .agent-card-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .agent-card-role {
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .agent-card-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .status-badge.awake {
+            background: #00ff88;
+            color: #000;
+        }
+        
+        .status-badge.sleeping {
+            background: #666;
+            color: #fff;
+        }
+        
+        .status-badge.working {
+            background: #ffaa00;
+            color: #000;
+        }
+        
+        .wake-button {
+            background: linear-gradient(145deg, #00ff88, #00cc6a);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .wake-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .wake-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chat-message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .chat-message.user {
+            align-self: flex-end;
+            background: linear-gradient(145deg, #0084ff, #0066cc);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-message.agent {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-message .sender {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+        
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .chat-input::placeholder {
+            color: #666;
+        }
+        
+        .chat-send {
+            background: #00ff88;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .chat-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        /* Work Tracking */
+        .work-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .work-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 3px solid #00ff88;
+        }
+        
+        .work-item.pending {
+            border-left-color: #ffaa00;
+        }
+        
+        .work-item.completed {
+            border-left-color: #00ff88;
+        }
+        
+        .work-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .work-agent {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+        
+        .work-time {
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .work-task {
+            font-size: 14px;
+            color: #ddd;
+        }
+        
+        .work-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+        
+        .work-status.pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+        
+        .work-status.completed {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .office-view {
+                flex: none;
+                height: 400px;
+            }
+            
+            .side-panel {
+                flex: none;
+                height: 400px;
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦉 Agent Agency Dashboard</h1>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>System Online</span>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <!-- Office View -->
+        <div class="office-view">
+            <div class="office-title">🏢 Office Floor - Meeting Room</div>
+            <div class="office-floor" id="officeFloor">
+                <div class="meeting-table">🦉</div>
+                <!-- Agents will be positioned here -->
+            </div>
+        </div>
+        
+        <!-- Side Panel -->
+        <div class="side-panel">
+            <div class="panel-tabs">
+                <button class="panel-tab active" onclick="showTab('agents')">Agents</button>
+                <button class="panel-tab" onclick="showTab('chat')">Chat</button>
+                <button class="panel-tab" onclick="showTab('work')">Work</button>
+            </div>
+            
+            <div class="panel-content" id="panelContent">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Agent data
+        const agents = [
+            { id: 'henry', name: 'Henry', emoji: '🦉', role: 'Team Lead', status: 'sleeping', color: '#FFD700' },
+            { id: 'scout', name: 'Scout', emoji: '🔍', role: 'Researcher', status: 'sleeping', color: '#87CEEB' },
+            { id: 'pixel', name: 'Pixel', emoji: '🎨', role: 'Creative', status: 'sleeping', color: '#FF69B4' },
+            { id: 'echo', name: 'Echo', emoji: '💻', role: 'Developer', status: 'sleeping', color: '#00CED1' },
+            { id: 'quill', name: 'Quill', emoji: '✍️', role: 'Copywriter', status: 'sleeping', color: '#DDA0DD' },
+            { id: 'codex', name: 'Codex', emoji: '🏗️', role: 'Architect', status: 'sleeping', color: '#F4A460' },
+            { id: 'alex', name: 'Alex', emoji: '📊', role: 'Analyst', status: 'sleeping', color: '#98FB98' }
+        ];
+        
+        let selectedAgent = null;
+        let chatHistory = [];
+        let currentTab = 'agents';
+        
+        // Initialize
+        function init() {
+            renderOffice();
+            renderAgents();
+            startStatusPolling();
+        }
+        
+        // Render office with agents
+        function renderOffice() {
+            const floor = document.getElementById('officeFloor');
+            // Keep the meeting table, remove old agents
+            const table = floor.querySelector('.meeting-table');
+            floor.innerHTML = '';
+            floor.appendChild(table);
+            
+            agents.forEach((agent, index) => {
+                const avatar = document.createElement('div');
+                avatar.className = `agent-avatar ${agent.status}`;
+                avatar.innerHTML = `
+                    ${agent.emoji}
+                    <div class="agent-name">${agent.name}</div>
+                    <div class="agent-status">${agent.status}</div>
+                `;
+                avatar.onclick = () => selectAgent(agent.id);
+                floor.appendChild(avatar);
+            });
+        }
+        
+        // Render agent list
+        function renderAgents() {
+            const content = document.getElementById('panelContent');
+            if (currentTab !== 'agents') return;
+            
+            content.innerHTML = `
+                <div class="agent-list">
+                    ${agents.map(agent => `
+                        <div class="agent-card ${selectedAgent === agent.id ? 'selected' : ''}" onclick="selectAgent('${agent.id}')">
+                            <div class="agent-card-emoji">${agent.emoji}</div>
+                            <div class="agent-card-info">
+                                <div class="agent-card-name">${agent.name}</div>
+                                <div class="agent-card-role">${agent.role}</div>
+                                <div class="agent-card-status">
+                                    <span class="status-badge ${agent.status}">${agent.status.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <button class="wake-button" ${agent.status === 'awake' ? 'disabled' : ''} onclick="wakeAgent('${agent.id}', event)">
+                                ${agent.status === 'awake' ? 'Awake' : 'Wake Up'}
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        // Select agent
+        function selectAgent(agentId) {
+            selectedAgent = agentId;
+            const agent = agents.find(a => a.id === agentId);
+            
+            if (currentTab === 'agents') {
+                renderAgents();
+            } else if (currentTab === 'chat') {
+                renderChat();
+            }
+            
+            // Visual feedback in office
+            document.querySelectorAll('.agent-avatar').forEach((el, idx) => {
+                el.style.transform = agents[idx].id === agentId ? 'scale(1.2)' : '';
+                el.style.zIndex = agents[idx].id === agentId ? '10' : '';
+            });
+        }
+        
+        // Wake agent
+        async function wakeAgent(agentId, event) {
+            event.stopPropagation();
+            const agent = agents.find(a => a.id === agentId);
+            
+            // Simulate waking
+            agent.status = 'awake';
+            renderOffice();
+            renderAgents();
+            
+            // In real implementation, this would call the backend
+            alert(`🚀 Waking up ${agent.emoji} ${agent.name}...\n\nIn full implementation, this would spawn a real sub-agent session.`);
+        }
+        
+        // Show tab
+        function showTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'agents') renderAgents();
+            else if (tab === 'chat') renderChat();
+            else if (tab === 'work') renderWork();
+        }
+        
+        // Render chat
+        function renderChat() {
+            const content = document.getElementById('panelContent');
+            
+            content.innerHTML = `
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        ${chatHistory.length === 0 ? `
+                            <div style="text-align: center; color: #666; padding: 40px;">
+                                ${selectedAgent ? `Select an agent and start chatting!` : `Select an agent from the Agents tab first`}
+                            </div>
+                        ` : chatHistory.map(msg => `
+                            <div class="chat-message ${msg.sender === 'user' ? 'user' : 'agent'}">
+                                ${msg.sender !== 'user' ? `<div class="sender">${msg.agentName}</div>` : ''}
+                                ${msg.text}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="chatInput" 
+                            placeholder="${selectedAgent ? `Message ${selectedAgent}...` : 'Select an agent first...'}"
+                            ${selectedAgent ? '' : 'disabled'}
+                            onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button class="chat-send" onclick="sendMessage()" ${selectedAgent ? '' : 'disabled'}>
+                            ➤
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !selectedAgent) return;
+            
+            const agent = agents.find(a => a.id === selectedAgent);
+            
+            // Add user message
+            chatHistory.push({ sender: 'user', text });
+            renderChat();
+            input.value = '';
+            
+            // Simulate agent response
+            setTimeout(() => {
+                chatHistory.push({
+                    sender: 'agent',
+                    agentName: `${agent.emoji} ${agent.name}`,
+                    text: `[This is where ${agent.name}'s real response would appear from the sub-agent session]`
+                });
+                renderChat();
+                scrollToBottom();
+            }, 1000);
+        }
+        
+        // Scroll chat to bottom
+        function scrollToBottom() {
+            const messages = document.getElementById('chatMessages');
+            if (messages) messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // Render work tracker
+        function renderWork() {
+            const content = document.getElementById('panelContent');
+            
+            const workItems = [
+                { agent: 'henry', task: 'Pre-Flight Protocol', status: 'completed', time: '12:08 UTC' },
+                { agent: 'scout', task: 'Intelligence Monitor', status: 'completed', time: '12:08 UTC' },
+                { agent: 'pixel', task: 'Visual Output System', status: 'completed', time: '12:09 UTC' },
+                { agent: 'echo', task: 'Smart Cron + Semantic Memory', status: 'completed', time: '12:10 UTC' },
+                { agent: 'quill', task: 'Communication Framework', status: 'completed', time: '12:08 UTC' },
+                { agent: 'codex', task: 'Context Router + Architecture', status: 'completed', time: '12:10 UTC' },
+                { agent: 'alex', task: 'Metrics + ROI Tracker', status: 'completed', time: '12:11 UTC' }
+            ];
+            
+            content.innerHTML = `
+                <div class="work-tracker">
+                    <h3 style="margin-bottom: 20px;">📋 Recent Work</h3>
+                    ${workItems.map(work => {
+                        const agent = agents.find(a => a.id === work.agent);
+                        return `
+                            <div class="work-item ${work.status}">
+                                <div class="work-header">
+                                    <div class="work-agent">
+                                        ${agent.emoji} ${agent.name}
+                                    </div>
+                                    <div class="work-time">${work.time}</div>
+                                </div>
+                                <div class="work-task">${work.task}</div>
+                                <span class="work-status ${work.status}">${work.status.toUpperCase()}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        // Poll for status updates
+        function startStatusPolling() {
+            // In real implementation, this would fetch from backend
+            // For now, just refresh the UI periodically
+            setInterval(() => {
+                if (currentTab === 'agents') renderAgents();
+            }, 5000);
+        }
+        
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>
