@@ -1,0 +1,10 @@
+{
+  "agent_id": "echo",
+  "status": "sleeping",
+  "since": "2026-02-10T11:34:01.071Z",
+  "wakes_for": [
+    "09:00 meeting",
+    "17:00 meeting",
+    "manual_wake"
+  ]
+}

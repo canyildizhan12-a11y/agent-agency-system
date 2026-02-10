@@ -1,0 +1,29 @@
+{
+  "id": "work-1770722548033",
+  "agent_id": "alex",
+  "agent_name": "Alex",
+  "task": "SWOT analysis presentation",
+  "status": "completed",
+  "started_at": "2026-02-10T11:22:28.033Z",
+  "context": {
+    "assigned_in_meeting": "meeting-1770721206792",
+    "priority": "medium"
+  },
+  "output": {
+    "output": "Analysis completed for: SWOT analysis presentation",
+    "metrics": {
+      "ctr": 3.2,
+      "conversion": 2.1
+    },
+    "insights": [
+      "Pattern A discovered",
+      "Trend B identified"
+    ],
+    "recommendations": [
+      "Action X",
+      "Action Y"
+    ],
+    "confidence": 87
+  },
+  "completed_at": "2026-02-10T11:22:28.033Z"
+}

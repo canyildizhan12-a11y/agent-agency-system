@@ -1,0 +1,33 @@
+{
+  "id": "work-1770722548037",
+  "agent_id": "henry",
+  "agent_name": "Henry",
+  "task": "Schedule and facilitate stakeholder alignment meeting",
+  "status": "completed",
+  "started_at": "2026-02-10T11:22:28.037Z",
+  "context": {
+    "assigned_in_meeting": "meeting-1770722474558",
+    "priority": "high"
+  },
+  "output": {
+    "output": "Plan created for: Schedule and facilitate stakeholder alignment meeting",
+    "roadmap": [
+      "Phase 1",
+      "Phase 2",
+      "Phase 3"
+    ],
+    "milestones": [
+      "M1 - Week 1",
+      "M2 - Week 4"
+    ],
+    "resource_allocation": {
+      "scout": 20,
+      "echo": 40
+    },
+    "risks": [
+      "Risk A mitigation",
+      "Risk B monitoring"
+    ]
+  },
+  "completed_at": "2026-02-10T11:22:28.040Z"
+}

@@ -7,7 +7,19 @@
       "current_focus": "Deep dive on top 3 competitor strategies",
       "recent_discoveries": [],
       "research_queue": [],
-      "insights": []
+      "insights": [],
+      "recent_achievements": [
+        {
+          "task": "Compile competitor feature comparison",
+          "completed_at": "2026-02-10T11:22:28.045Z",
+          "summary": "Research completed on: Compile competitor feature comparison"
+        },
+        {
+          "task": "Deep dive on top 3 competitor strategies",
+          "completed_at": "2026-02-10T11:22:28.045Z",
+          "summary": "Research completed on: Deep dive on top 3 competitor strategies"
+        }
+      ]
     },
     "research_tracking": {
       "trending_topics": [],
@@ -27,16 +39,22 @@
         "task": "Compile competitor feature comparison",
         "priority": "high",
         "due": "24 hours",
-        "status": "pending",
-        "assigned_in_meeting": "meeting-1770719542067"
+        "status": "completed",
+        "assigned_in_meeting": "meeting-1770719542067",
+        "completed_at": "2026-02-10T11:22:28.045Z",
+        "work_session_id": "work-1770722548043",
+        "result_summary": "Research completed on: Compile competitor feature comparison"
       },
       {
         "id": "task-1770721206795-0",
         "task": "Deep dive on top 3 competitor strategies",
         "priority": "high",
         "due": "48 hours",
-        "status": "pending",
-        "assigned_in_meeting": "meeting-1770721206792"
+        "status": "completed",
+        "assigned_in_meeting": "meeting-1770721206792",
+        "completed_at": "2026-02-10T11:22:28.045Z",
+        "work_session_id": "work-1770722548045",
+        "result_summary": "Research completed on: Deep dive on top 3 competitor strategies"
       }
     ],
     "lessons_learned": []

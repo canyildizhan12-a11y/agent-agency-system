@@ -1,0 +1,30 @@
+{
+  "id": "work-1770722548043",
+  "agent_id": "scout",
+  "agent_name": "Scout",
+  "task": "Compile competitor feature comparison",
+  "status": "completed",
+  "started_at": "2026-02-10T11:22:28.043Z",
+  "context": {
+    "assigned_in_meeting": "meeting-1770719542067",
+    "priority": "high"
+  },
+  "output": {
+    "output": "Research completed on: Compile competitor feature comparison",
+    "findings": [
+      "Competitor launched feature X",
+      "Trend Y is gaining traction",
+      "Audience sentiment is positive"
+    ],
+    "sources": [
+      "Twitter",
+      "Reddit",
+      "News"
+    ],
+    "recommendations": [
+      "Focus on differentiation",
+      "Address feature gap"
+    ]
+  },
+  "completed_at": "2026-02-10T11:22:28.044Z"
+}

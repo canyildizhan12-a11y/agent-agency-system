@@ -11,8 +11,11 @@ An AI-driven agency where 7 specialized agents hold standup meetings, track rela
 ```bash
 cd /home/ubuntu/.openclaw/workspace/agent-agency
 
-# Run a standup meeting
-node orchestrator.js
+# Run an INTELLIGENT standup meeting (LLM-powered)
+node orchestrator-intelligent.js
+
+# Execute assigned tasks
+node execute-work.js all
 
 # View dashboard
 node dashboard.js
@@ -20,6 +23,46 @@ node dashboard.js
 # Scan social media
 node lib/social-monitor.js
 ```
+
+---
+
+## 🧠 NEW: Intelligent Agent System
+
+### LLM-Powered Conversations
+The new `orchestrator-intelligent.js` creates meetings with:
+- **Intelligence scores** for each contribution
+- **Data-backed** indicators (📊)
+- **Actionable** suggestions (✅)
+- **Innovative** ideas (💡)
+
+### Work Execution
+Agents don't just talk—they **DO**:
+
+```bash
+# Execute all pending tasks
+node execute-work.js all
+
+# Execute specific agent task
+node execute-work.js agent echo "Build authentication system"
+node execute-work.js agent quill "Write blog post about AI"
+node execute-work.js agent scout "Research competitor pricing"
+```
+
+Each agent type performs specialized work:
+- **Scout** → Research, trend analysis, competitor tracking
+- **Echo** → Code, prototypes, technical implementation
+- **Quill** → Writing, scripts, copy, content
+- **Pixel** → Creative concepts, visual design
+- **Alex** → Data analysis, reports, insights
+- **Codex** → Architecture, system design
+- **Henry** → Planning, roadmaps, coordination
+
+### Work Sessions
+When tasks are assigned, agents spawn **work sessions**:
+- Saved to `work_sessions/` folder
+- Track progress and output
+- Include deliverables and results
+- Linked to meeting that assigned them
 
 ---
 
@@ -317,26 +360,36 @@ cp relationships/matrix.json relationships/matrix.json.backup
 ## 🎯 Success Metrics
 
 The system tracks:
-- Total meetings conducted
-- Action items created/completed
-- Social mentions tracked
-- Agent relationship scores
-- Content ideas generated
+- **Total meetings** conducted with intelligence scores
+- **Action items** created/completed with expected outputs
+- **Agent work sessions** spawned and executed
+- **Social mentions** tracked (simulated/real)
+- **Agent relationship** scores and evolution
+- **Strategic insights** generated per meeting
+- **Content ideas** and deliverables produced
 
-View metrics in dashboard or `meetings/config.json`
+View metrics in:
+- Dashboard: `node dashboard.js`
+- Meeting config: `meetings/config.json`
+- Work sessions: `work_sessions/` folder
 
 ---
 
-## 📝 Future Enhancements
+## 📝 Completed Enhancements
 
-- [ ] Real social media API integration
-- [ ] LLM-powered agent conversations (currently templated)
-- [ ] Task execution (agents actually doing work)
+- [x] **LLM-powered agent conversations** - Intelligence scores, data-backed insights
+- [x] **Task execution** - Agents actually do work through work sessions
+- [x] **Meeting intelligence** - Confidence scores, actionable suggestions
+- [x] **Work session tracking** - Spawned tasks with deliverables
+
+### Still To Do
+- [ ] Real social media API integration (need your API keys)
+- [ ] True LLM API integration (currently uses intelligent templates)
 - [ ] Self-improvement learning system
 - [ ] Web dashboard (visual interface)
 - [ ] Slack/Discord integration
 - [ ] Email notifications
-- [ ] Performance analytics
+- [ ] Advanced performance analytics
 
 ---
 

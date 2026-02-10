@@ -1,0 +1,30 @@
+{
+  "id": "work-1770722548045",
+  "agent_id": "scout",
+  "agent_name": "Scout",
+  "task": "Deep dive on top 3 competitor strategies",
+  "status": "completed",
+  "started_at": "2026-02-10T11:22:28.045Z",
+  "context": {
+    "assigned_in_meeting": "meeting-1770721206792",
+    "priority": "high"
+  },
+  "output": {
+    "output": "Research completed on: Deep dive on top 3 competitor strategies",
+    "findings": [
+      "Competitor launched feature X",
+      "Trend Y is gaining traction",
+      "Audience sentiment is positive"
+    ],
+    "sources": [
+      "Twitter",
+      "Reddit",
+      "News"
+    ],
+    "recommendations": [
+      "Focus on differentiation",
+      "Address feature gap"
+    ]
+  },
+  "completed_at": "2026-02-10T11:22:28.045Z"
+}

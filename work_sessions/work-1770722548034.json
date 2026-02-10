@@ -1,0 +1,29 @@
+{
+  "id": "work-1770722548034",
+  "agent_id": "alex",
+  "agent_name": "Alex",
+  "task": "Extract and provide user behavior data for design decisions",
+  "status": "completed",
+  "started_at": "2026-02-10T11:22:28.034Z",
+  "context": {
+    "assigned_in_meeting": "meeting-1770722474558",
+    "priority": "high"
+  },
+  "output": {
+    "output": "Analysis completed for: Extract and provide user behavior data for design decisions",
+    "metrics": {
+      "ctr": 3.2,
+      "conversion": 2.1
+    },
+    "insights": [
+      "Pattern A discovered",
+      "Trend B identified"
+    ],
+    "recommendations": [
+      "Action X",
+      "Action Y"
+    ],
+    "confidence": 87
+  },
+  "completed_at": "2026-02-10T11:22:28.034Z"
+}
