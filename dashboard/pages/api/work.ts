@@ -1,51 +1,39 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '../../lib/supabase';
 
-const AGENCY_DIR = path.join(process.cwd(), '..');
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const { data: workItems, error } = await supabase
+      .from('work_items')
+      .select(`
+        *,
+        agents (
+          agent_id,
+          name,
+          emoji
+        )
+      `)
+      .order('completed_at', { ascending: false })
+      .limit(50);
 
-interface WorkItem {
-  agent: string;
-  task: string;
-  status: string;
-  time: string;
-  file: string;
-}
+    if (error) throw error;
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const workDir = path.join(AGENCY_DIR, 'implementation');
-  const workItems: WorkItem[] = [];
-  
-  const workMap: Record<string, { agent: string; task: string }> = {
-    'pre-flight-protocol.js': { agent: 'henry', task: 'Pre-Flight Protocol' },
-    'intelligence-monitor.js': { agent: 'scout', task: 'Intelligence Monitor' },
-    'visual-output-system.js': { agent: 'pixel', task: 'Visual Output System' },
-    'smart-cron-system.js': { agent: 'echo', task: 'Smart Cron System' },
-    'semantic-memory.js': { agent: 'echo', task: 'Semantic Memory' },
-    'communication-framework.js': { agent: 'quill', task: 'Communication Framework' },
-    'context-router.js': { agent: 'codex', task: 'Context Router' },
-    'memory-architecture.js': { agent: 'codex', task: 'Memory Architecture' },
-    'escalation-system.js': { agent: 'codex', task: 'Escalation System' },
-    'metrics-framework.js': { agent: 'alex', task: 'Metrics Framework' },
-    'research-roi-tracker.js': { agent: 'alex', task: 'Research ROI Tracker' },
-    'weekly-reports.js': { agent: 'alex', task: 'Weekly Reports' }
-  };
-  
-  if (fs.existsSync(workDir)) {
-    const files = fs.readdirSync(workDir).filter(f => f.endsWith('.js'));
-    
-    files.forEach(file => {
-      if (workMap[file]) {
-        const stats = fs.statSync(path.join(workDir, file));
-        workItems.push({
-          ...workMap[file],
-          status: 'completed',
-          time: stats.mtime.toISOString(),
-          file: file
-        });
-      }
-    });
+    // Transform data
+    const transformedWork = workItems?.map(item => ({
+      agent: item.agents?.agent_id,
+      agentName: item.agents?.name,
+      agentEmoji: item.agents?.emoji,
+      task: item.task,
+      description: item.description,
+      status: item.status,
+      time: item.completed_at || item.created_at,
+      file: item.file_path,
+      linesOfCode: item.lines_of_code
+    })) || [];
+
+    res.status(200).json(transformedWork);
+  } catch (err: any) {
+    console.error('Error fetching work:', err);
+    res.status(500).json({ error: err.message });
   }
-  
-  res.status(200).json(workItems.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()));
 }
