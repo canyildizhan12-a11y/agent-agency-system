@@ -1,72 +1,115 @@
-# Agent Agency Dashboard
+# 🦉 Agent Agency Dashboard
 
 Visual dashboard for managing 7 AI agents with real-time status, chat, and work tracking.
 
-## Features
+## 🚀 Deploy to Vercel
 
-- 🏢 **Visual Office** - See all agents in a meeting room layout
-- 👁️ **Real-time Status** - Track who's awake, sleeping, or working
-- 🔔 **Wake Controls** - One-click to wake up any agent
-- 💬 **Direct Chat** - Talk to agents individually
-- 📋 **Work Tracker** - Monitor what each agent is building
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/canyildizhan12-a11y/agent-agency)
 
-## Quick Start
+Or manually:
 
 ```bash
+# 1. Clone the repo
+git clone https://github.com/canyildizhan12-a11y/agent-agency.git
+
+# 2. Navigate to dashboard
 cd agent-agency/dashboard
+
+# 3. Install dependencies
 npm install
-node server.js
+
+# 4. Deploy to Vercel
+vercel --prod
 ```
 
-Then open http://localhost:3001
+## 📁 Project Structure
 
-## Dashboard Sections
+```
+dashboard/
+├── pages/
+│   ├── index.tsx          # Main dashboard UI
+│   └── api/
+│       ├── agents.ts      # Get agent status
+│       ├── work.ts        # Get work history
+│       └── wake.ts        # Wake up agent
+├── package.json
+├── next.config.js
+├── tsconfig.json
+└── vercel.json
+```
+
+## ✨ Features
+
+- 🏢 **Visual Office** - See all 7 agents in a meeting room
+- 👁️ **Real-time Status** - Who's awake, sleeping, or working
+- 🔔 **Wake Controls** - One-click to wake any agent
+- 💬 **Direct Chat** - Talk to agents individually
+- 📋 **Work Tracker** - Monitor what each agent built
+
+## 🔌 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/agents` | GET | List all agents with status |
+| `/api/work` | GET | Get recent work items |
+| `/api/wake?id={agent}` | POST | Wake up specific agent |
+
+## 🎨 Dashboard Sections
 
 ### Office View
-Visual representation of the meeting room with all 7 agents positioned around the central table. Agents show:
-- 🟢 Green border = Awake
-- ⚪ Gray border = Sleeping
-- 🟠 Orange pulse = Working
+Visual meeting room with agents positioned around the central table:
+- 🟢 **Green border** = Awake
+- ⚪ **Gray border** = Sleeping  
+- 🟠 **Orange pulse** = Working
 
 Click any agent to select them.
 
 ### Agent Panel
-List view with wake buttons:
-- See status, role, and current activity
+- See all agents with status and roles
 - Wake up sleeping agents
-- Select agents for chat
+- Select agents for direct chat
 
-### Chat
-Direct messaging interface:
-- Select an agent first
-- Send messages
+### Chat Interface
+- Send messages to selected agents
 - View conversation history
-- Real responses from sub-agents (in full implementation)
+- Real-time responses
 
 ### Work Tracker
-Recent activity feed:
-- See what each agent built
+- Recent builds by each agent
 - Completion timestamps
 - Status indicators
 
-## API Endpoints
+## 🛠️ Development
 
-- `GET /api/agents` - List all agents with status
-- `GET /api/work` - Get recent work items
-- `POST /api/wake/:agentId` - Wake up specific agent
+```bash
+npm run dev      # Start dev server
+npm run build    # Build for production
+npm start        # Start production server
+```
 
-## Integration
+## 📱 Responsive
 
-This dashboard connects to the actual agent-agency system:
-- Reads from `sleeping_agents/` folder for status
-- Can spawn sub-agents via `real-orchestrator.js`
-- Tracks work from `implementation/` folder
+Dashboard works on desktop and tablet. Mobile layout stacks the panels vertically.
 
-## Agents
+## 🔗 Integration
+
+The dashboard reads from the agent-agency system:
+- `sleeping_agents/` folder for current status
+- `implementation/` folder for work history
+- Can spawn sub-agents via API routes
+
+## 📝 Environment Variables
+
+None required for basic deployment. The dashboard reads agent data from the filesystem.
+
+For production with persistent storage, you may want to configure:
+- `AGENCY_DIR` - Path to agent-agency data
+
+## 👥 Agents
 
 | Agent | Emoji | Role | Specialty |
 |-------|-------|------|-----------|
-| Henry | 🦉 | Team Lead | Facilitation, Strategy |
+| Henry | 🦉 | Team Lead | Strategy, Facilitation |
 | Scout | 🔍 | Researcher | Intelligence, Trends |
 | Pixel | 🎨 | Creative | Visual Design, UX |
 | Echo | 💻 | Developer | Automation, Code |
