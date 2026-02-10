@@ -1,0 +1,125 @@
+{
+  "id": "meeting-1770721206792",
+  "timestamp": "2026-02-10T11:00:06.792Z",
+  "type": "daily_standup",
+  "participants": [
+    "henry",
+    "scout",
+    "pixel",
+    "echo",
+    "quill",
+    "codex",
+    "alex"
+  ],
+  "transcript": [
+    {
+      "turn": 1,
+      "agent": "henry",
+      "message": "As Team Lead / Planner, I think we should consider the strategic implications.",
+      "type": "opening"
+    },
+    {
+      "turn": 2,
+      "agent": "echo",
+      "message": "From my perspective, this aligns with our goals.",
+      "type": "contribution"
+    },
+    {
+      "turn": 3,
+      "agent": "pixel",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 4,
+      "agent": "codex",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 5,
+      "agent": "scout",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 6,
+      "agent": "alex",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 7,
+      "agent": "quill",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 8,
+      "agent": "quill",
+      "message": "From my perspective, this aligns with our goals.",
+      "type": "contribution"
+    },
+    {
+      "turn": 9,
+      "agent": "codex",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 10,
+      "agent": "alex",
+      "message": "This is interesting. Let me add my thoughts...",
+      "type": "contribution"
+    },
+    {
+      "turn": 11,
+      "agent": "echo",
+      "message": "As Developer / Builder, I think we should consider the strategic implications.",
+      "type": "contribution"
+    },
+    {
+      "turn": 12,
+      "agent": "pixel",
+      "message": "As Creative Director / Visual, I think we should consider the strategic implications.",
+      "type": "contribution"
+    },
+    {
+      "turn": 13,
+      "agent": "scout",
+      "message": "As Researcher / Intelligence, I think we should consider the strategic implications.",
+      "type": "contribution"
+    },
+    {
+      "turn": 14,
+      "agent": "henry",
+      "message": "Let's execute on these action items. Same time tomorrow!",
+      "type": "closing"
+    }
+  ],
+  "topics_discussed": [
+    "competitor_analysis"
+  ],
+  "action_items": [
+    {
+      "task": "Deep dive on top 3 competitor strategies",
+      "assignee": "scout",
+      "priority": "high",
+      "due": "48 hours"
+    },
+    {
+      "task": "SWOT analysis presentation",
+      "assignee": "alex",
+      "priority": "medium",
+      "due": "72 hours"
+    },
+    {
+      "task": "Differentiation strategy document",
+      "assignee": "henry",
+      "priority": "high",
+      "due": "72 hours"
+    }
+  ],
+  "insights_generated": [],
+  "relationship_changes": []
+}

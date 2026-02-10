@@ -62,12 +62,25 @@
       "timestamp": "2026-02-10T10:32:22.067Z",
       "topic": "social_media_monitoring",
       "action_items_count": 3
+    },
+    {
+      "id": "meeting-1770721206792",
+      "timestamp": "2026-02-10T11:00:06.792Z",
+      "topic": "competitor_analysis",
+      "action_items_count": 3
+    },
+    {
+      "id": "meeting-1770722474558",
+      "timestamp": "2026-02-10T11:21:14.558Z",
+      "topic": "blockers_and_support",
+      "action_items_count": 3,
+      "intelligence_score": 88
     }
   ],
   "stats": {
-    "total_meetings": 1,
+    "total_meetings": 3,
     "average_duration": 0,
-    "action_items_created": 3,
+    "action_items_created": 9,
     "action_items_completed": 0
   }
 }

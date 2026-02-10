@@ -4,7 +4,7 @@
   "created": "2026-02-10T10:15:00Z",
   "memory": {
     "personal": {
-      "current_focus": "Compile competitor feature comparison",
+      "current_focus": "Deep dive on top 3 competitor strategies",
       "recent_discoveries": [],
       "research_queue": [],
       "insights": []
@@ -29,6 +29,14 @@
         "due": "24 hours",
         "status": "pending",
         "assigned_in_meeting": "meeting-1770719542067"
+      },
+      {
+        "id": "task-1770721206795-0",
+        "task": "Deep dive on top 3 competitor strategies",
+        "priority": "high",
+        "due": "48 hours",
+        "status": "pending",
+        "assigned_in_meeting": "meeting-1770721206792"
       }
     ],
     "lessons_learned": []

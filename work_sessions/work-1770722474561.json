@@ -1,0 +1,14 @@
+{
+  "id": "work-1770722474561",
+  "agent_id": "echo",
+  "agent_name": "Echo",
+  "task": "Resolve API rate limit issue and implement caching strategy",
+  "status": "in_progress",
+  "started_at": "2026-02-10T11:21:14.561Z",
+  "context": {
+    "expected_output": "Working solution with rate limiting, caching, and fallback mechanisms",
+    "meeting_id": "meeting-1770722474558"
+  },
+  "output": null,
+  "completed_at": null
+}

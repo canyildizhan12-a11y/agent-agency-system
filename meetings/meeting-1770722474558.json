@@ -1,0 +1,221 @@
+{
+  "id": "meeting-1770722474558",
+  "timestamp": "2026-02-10T11:21:14.558Z",
+  "type": "intelligent_standup",
+  "participants": [
+    "henry",
+    "scout",
+    "pixel",
+    "echo",
+    "quill",
+    "codex",
+    "alex"
+  ],
+  "transcript": [
+    {
+      "turn": 1,
+      "agent": "henry",
+      "message": "Everyone, update the task board with your blockers so we can track them.",
+      "intelligence": {
+        "confidence": 92,
+        "data_backed": true,
+        "actionable": true,
+        "innovative": true
+      },
+      "type": "opening"
+    },
+    {
+      "turn": 2,
+      "agent": "codex",
+      "message": "Need stakeholder alignment on technical direction.",
+      "intelligence": {
+        "confidence": 90,
+        "data_backed": true,
+        "actionable": false,
+        "innovative": true
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 3,
+      "agent": "quill",
+      "message": "Need Scout's trend insights to write relevant content.",
+      "intelligence": {
+        "confidence": 80,
+        "data_backed": false,
+        "actionable": true,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 4,
+      "agent": "echo",
+      "message": "Need Scout's research on API alternatives. Current provider is unstable.",
+      "intelligence": {
+        "confidence": 85,
+        "data_backed": true,
+        "actionable": true,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 5,
+      "agent": "pixel",
+      "message": "Waiting: Echo's component library to maintain consistency.",
+      "intelligence": {
+        "confidence": 90,
+        "data_backed": false,
+        "actionable": true,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 6,
+      "agent": "scout",
+      "message": "Need access to premium analytics tool. Current plan is limited.",
+      "intelligence": {
+        "confidence": 95,
+        "data_backed": true,
+        "actionable": true,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 7,
+      "agent": "alex",
+      "message": "Support: Scout's competitor data for benchmark analysis.",
+      "intelligence": {
+        "confidence": 94,
+        "data_backed": false,
+        "actionable": false,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 8,
+      "agent": "codex",
+      "message": "Support: Echo's input on implementation complexity.",
+      "intelligence": {
+        "confidence": 90,
+        "data_backed": false,
+        "actionable": true,
+        "innovative": true
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 9,
+      "agent": "quill",
+      "message": "Blocked: Waiting for product feature to be built before I can document it.",
+      "intelligence": {
+        "confidence": 94,
+        "data_backed": false,
+        "actionable": false,
+        "innovative": true
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 10,
+      "agent": "scout",
+      "message": "Support: Echo's help to automate the social listening reports.",
+      "intelligence": {
+        "confidence": 94,
+        "data_backed": true,
+        "actionable": false,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 11,
+      "agent": "alex",
+      "message": "Need Echo to fix the tracking pixel. Data is incomplete.",
+      "intelligence": {
+        "confidence": 80,
+        "data_backed": true,
+        "actionable": true,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 12,
+      "agent": "pixel",
+      "message": "Waiting: Echo's component library to maintain consistency.",
+      "intelligence": {
+        "confidence": 86,
+        "data_backed": false,
+        "actionable": true,
+        "innovative": true
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 13,
+      "agent": "echo",
+      "message": "Need Scout's research on API alternatives. Current provider is unstable.",
+      "intelligence": {
+        "confidence": 81,
+        "data_backed": true,
+        "actionable": true,
+        "innovative": false
+      },
+      "type": "contribution"
+    },
+    {
+      "turn": 14,
+      "agent": "henry",
+      "message": "Work sessions spawned. Results will be available in 1-2 hours. Next standup tomorrow!",
+      "type": "closing"
+    }
+  ],
+  "topics_discussed": [
+    "blockers_and_support"
+  ],
+  "action_items": [
+    {
+      "task": "Resolve API rate limit issue and implement caching strategy",
+      "assignee": "echo",
+      "priority": "critical",
+      "due": "24 hours",
+      "expected_output": "Working solution with rate limiting, caching, and fallback mechanisms",
+      "intelligence_score": 96
+    },
+    {
+      "task": "Extract and provide user behavior data for design decisions",
+      "assignee": "alex",
+      "priority": "high",
+      "due": "24 hours",
+      "expected_output": "User analytics report with funnel analysis and pain point identification",
+      "intelligence_score": 91
+    },
+    {
+      "task": "Schedule and facilitate stakeholder alignment meeting",
+      "assignee": "henry",
+      "priority": "high",
+      "due": "48 hours",
+      "expected_output": "Meeting scheduled with agenda, pre-reads, and decision framework",
+      "intelligence_score": 88
+    }
+  ],
+  "insights_generated": [
+    {
+      "text": "Team is highly data-driven, prioritizing metrics over intuition",
+      "confidence": 85,
+      "source": "multiple data references"
+    },
+    {
+      "text": "Technical infrastructure and automation are key enablers",
+      "confidence": 80,
+      "source": "automation mentions"
+    }
+  ],
+  "relationship_changes": [],
+  "intelligence_score": 88
+}

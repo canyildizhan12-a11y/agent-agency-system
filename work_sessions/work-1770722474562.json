@@ -1,0 +1,14 @@
+{
+  "id": "work-1770722474562",
+  "agent_id": "henry",
+  "agent_name": "Henry",
+  "task": "Schedule and facilitate stakeholder alignment meeting",
+  "status": "in_progress",
+  "started_at": "2026-02-10T11:21:14.562Z",
+  "context": {
+    "expected_output": "Meeting scheduled with agenda, pre-reads, and decision framework",
+    "meeting_id": "meeting-1770722474558"
+  },
+  "output": null,
+  "completed_at": null
+}
