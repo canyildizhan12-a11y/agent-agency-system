@@ -1,0 +1,145 @@
+{
+  "id": "meeting-1770719542067",
+  "timestamp": "2026-02-10T10:32:22.067Z",
+  "type": "daily_standup",
+  "participants": [
+    "henry",
+    "scout",
+    "pixel",
+    "echo",
+    "quill",
+    "codex",
+    "alex"
+  ],
+  "transcript": [
+    {
+      "turn": 1,
+      "agent": "henry",
+      "message": "Scout and Alex, can you prioritize the competitor analysis?",
+      "type": "opening"
+    },
+    {
+      "turn": 2,
+      "agent": "quill",
+      "message": "People are quoting our 'AI should amplify humans' line everywhere.",
+      "type": "contribution"
+    },
+    {
+      "turn": 3,
+      "agent": "scout",
+      "message": "Competitor X just launched a new feature. Our community is asking if we'll do the same.",
+      "type": "contribution"
+    },
+    {
+      "turn": 4,
+      "agent": "pixel",
+      "message": "The 'day in the life' aesthetic is peaking on Instagram.",
+      "type": "contribution"
+    },
+    {
+      "turn": 5,
+      "agent": "codex",
+      "message": "The monitoring architecture can scale to 10x current volume.",
+      "type": "contribution"
+    },
+    {
+      "turn": 6,
+      "agent": "alex",
+      "message": "Sentiment analysis: 73% positive mentions, up from 65% last week.",
+      "type": "contribution"
+    },
+    {
+      "turn": 7,
+      "agent": "echo",
+      "message": "I can integrate sentiment analysis directly into our dashboard.",
+      "type": "contribution"
+    },
+    {
+      "turn": 8,
+      "agent": "quill",
+      "message": "The community loves our behind-the-scenes content. More of that?",
+      "type": "contribution"
+    },
+    {
+      "turn": 9,
+      "agent": "codex",
+      "message": "The monitoring architecture can scale to 10x current volume.",
+      "type": "contribution"
+    },
+    {
+      "turn": 10,
+      "agent": "scout",
+      "message": "Competitor X just launched a new feature. Our community is asking if we'll do the same.",
+      "type": "contribution"
+    },
+    {
+      "turn": 11,
+      "agent": "echo",
+      "message": "The social listening API is set up and feeding data to Scout.",
+      "type": "contribution"
+    },
+    {
+      "turn": 12,
+      "agent": "pixel",
+      "message": "The 'day in the life' aesthetic is peaking on Instagram.",
+      "type": "contribution"
+    },
+    {
+      "turn": 13,
+      "agent": "alex",
+      "message": "Share of voice in our niche increased 8% this month.",
+      "type": "contribution"
+    },
+    {
+      "turn": 14,
+      "agent": "henry",
+      "message": "Let's execute on these action items. Same time tomorrow!",
+      "type": "closing"
+    }
+  ],
+  "topics_discussed": [
+    "social_media_monitoring"
+  ],
+  "action_items": [
+    {
+      "task": "Compile competitor feature comparison",
+      "assignee": "scout",
+      "priority": "high",
+      "due": "24 hours"
+    },
+    {
+      "task": "Draft response templates for trending topics",
+      "assignee": "quill",
+      "priority": "medium",
+      "due": "48 hours"
+    },
+    {
+      "task": "Update social monitoring dashboard",
+      "assignee": "echo",
+      "priority": "medium",
+      "due": "48 hours"
+    }
+  ],
+  "insights_generated": [
+    {
+      "text": "Team is highly data-driven, prioritizing metrics over intuition",
+      "confidence": 85,
+      "source": "multiple data references"
+    },
+    {
+      "text": "User-centric approach driving content and product decisions",
+      "confidence": 75,
+      "source": "audience focus"
+    }
+  ],
+  "relationship_changes": [
+    {
+      "agents": [
+        "quill",
+        "echo"
+      ],
+      "change": 0.2,
+      "reason": "Agreement expressed"
+    }
+  ]
+}

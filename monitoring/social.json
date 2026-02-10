@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "created": "2026-02-10T10:15:00Z",
+  "platforms": {
+    "twitter": {
+      "enabled": true,
+      "keywords": ["AI tools", "content creation", "SaaS"],
+      "mentions": [],
+      "sentiment": "neutral"
+    },
+    "reddit": {
+      "enabled": true,
+      "subreddits": ["SaaS", "Entrepreneur", "ContentCreation"],
+      "mentions": []
+    }
+  },
+  "competitors": {
+    "tracked": [],
+    "mentions": {}
+  },
+  "trending_topics": [],
+  "last_scan": null,
+  "stats": {
+    "total_mentions": 0,
+    "positive_mentions": 0,
+    "negative_mentions": 0,
+    "trending_alerts": 0
+  }
+}

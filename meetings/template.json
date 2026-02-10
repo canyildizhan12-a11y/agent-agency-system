@@ -1,0 +1,12 @@
+{
+  "id": null,
+  "timestamp": null,
+  "type": "daily_standup",
+  "participants": ["henry", "scout", "pixel", "echo", "quill", "codex", "alex"],
+  "transcript": [],
+  "topics_discussed": [],
+  "action_items": [],
+  "insights_generated": [],
+  "relationship_changes": [],
+  "status": "template"
+}

@@ -1,0 +1,26 @@
+{
+  "agent_id": "alex",
+  "name": "Alex",
+  "created": "2026-02-10T10:15:00Z",
+  "memory": {
+    "personal": {
+      "current_focus": "Analyzing performance metrics and extracting insights",
+      "key_metrics": {},
+      "trends_identified": [],
+      "predictions": []
+    },
+    "analytics": {
+      "reports": [],
+      "ab_tests": [],
+      "forecasts": []
+    },
+    "team_observations": {
+      "scout": "Perfect research partner! We find the best insights together.",
+      "pixel": "Creative but dismisses data. Working on showing value of metrics.",
+      "quill": "Appreciates knowing what content performs. Helps focus efforts."
+    },
+    "conversations": [],
+    "action_items": [],
+    "lessons_learned": []
+  }
+}

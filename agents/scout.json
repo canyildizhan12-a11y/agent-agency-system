@@ -1,0 +1,36 @@
+{
+  "agent_id": "scout",
+  "name": "Scout",
+  "created": "2026-02-10T10:15:00Z",
+  "memory": {
+    "personal": {
+      "current_focus": "Compile competitor feature comparison",
+      "recent_discoveries": [],
+      "research_queue": [],
+      "insights": []
+    },
+    "research_tracking": {
+      "trending_topics": [],
+      "competitor_mentions": {},
+      "sentiment_analysis": {},
+      "audience_feedback": []
+    },
+    "team_observations": {
+      "alex": "Perfect analytical partner! We make a great data duo.",
+      "pixel": "Creative but sometimes dismisses data. Working on bridging that gap.",
+      "quill": "Appreciates my research for content ideas."
+    },
+    "conversations": [],
+    "action_items": [
+      {
+        "id": "task-1770719542069-0",
+        "task": "Compile competitor feature comparison",
+        "priority": "high",
+        "due": "24 hours",
+        "status": "pending",
+        "assigned_in_meeting": "meeting-1770719542067"
+      }
+    ],
+    "lessons_learned": []
+  }
+}

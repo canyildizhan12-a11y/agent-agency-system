@@ -1,0 +1,107 @@
+{
+  "version": "1.0.0",
+  "created": "2026-02-10T10:15:00Z",
+  "description": "Relationship matrix tracking sentiment between all agent pairs (-10 to +10 scale)",
+  "scale": {
+    "0": "Neutral/professional",
+    "-10": "Intense rivalry/animosity",
+    "-5": "Mild friction/disagreement",
+    "+5": "Good working relationship",
+    "+10": "Best friends/collaborative harmony"
+  },
+  "matrix": {
+    "henry": {
+      "scout": 7,
+      "pixel": 6,
+      "echo": 5,
+      "quill": 7,
+      "codex": 6,
+      "alex": 6
+    },
+    "scout": {
+      "henry": 7,
+      "pixel": 5,
+      "echo": 4,
+      "quill": 6,
+      "codex": 5,
+      "alex": 8
+    },
+    "pixel": {
+      "henry": 6,
+      "scout": 5,
+      "echo": 3,
+      "quill": 7,
+      "codex": 4,
+      "alex": 4
+    },
+    "echo": {
+      "henry": 5,
+      "scout": 4,
+      "pixel": 3,
+      "quill": 4.2,
+      "codex": 7,
+      "alex": 5
+    },
+    "quill": {
+      "henry": 7,
+      "scout": 6,
+      "pixel": 7,
+      "echo": 4.2,
+      "codex": 5,
+      "alex": 5
+    },
+    "codex": {
+      "henry": 6,
+      "scout": 5,
+      "pixel": 4,
+      "echo": 7,
+      "quill": 5,
+      "alex": 6
+    },
+    "alex": {
+      "henry": 6,
+      "scout": 8,
+      "pixel": 4,
+      "echo": 5,
+      "quill": 5,
+      "codex": 6
+    }
+  },
+  "relationships": {
+    "best_friends": [
+      [
+        "scout",
+        "alex"
+      ],
+      [
+        "quill",
+        "pixel"
+      ],
+      [
+        "echo",
+        "codex"
+      ]
+    ],
+    "creative_pair": [
+      "quill",
+      "pixel"
+    ],
+    "tech_pair": [
+      "echo",
+      "codex"
+    ],
+    "data_pair": [
+      "scout",
+      "alex"
+    ]
+  },
+  "tensions": {
+    "pixel_echo": {
+      "score": 3,
+      "reason": "Pixel prioritizes aesthetics, Echo prioritizes functionality. Often disagree on implementation.",
+      "last_conflict": null,
+      "status": "managed"
+    }
+  },
+  "history": []
+}

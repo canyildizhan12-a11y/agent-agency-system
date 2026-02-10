@@ -1,0 +1,26 @@
+{
+  "agent_id": "pixel",
+  "name": "Pixel",
+  "created": "2026-02-10T10:15:00Z",
+  "memory": {
+    "personal": {
+      "current_focus": "Creating bold visual concepts for content",
+      "design_ideas": [],
+      "inspiration_sources": [],
+      "portfolio": []
+    },
+    "creative_projects": {
+      "active": [],
+      "completed": [],
+      "backlog": []
+    },
+    "team_observations": {
+      "quill": "My creative soulmate! We vibe so well on visual storytelling.",
+      "echo": "Great at building but doesn't always get the vision. Working on communication.",
+      "alex": "Too focused on numbers. Beauty isn't always quantifiable!"
+    },
+    "conversations": [],
+    "action_items": [],
+    "lessons_learned": []
+  }
+}

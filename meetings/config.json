@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "created": "2026-02-10T10:15:00Z",
+  "meeting_structure": {
+    "frequency": "2x daily",
+    "times": [
+      "09:00",
+      "17:00"
+    ],
+    "duration_minutes": 15,
+    "format": "turn_based_conversation",
+    "participants": [
+      "henry",
+      "scout",
+      "pixel",
+      "echo",
+      "quill",
+      "codex",
+      "alex"
+    ]
+  },
+  "agenda_template": {
+    "opening": {
+      "speaker": "henry",
+      "duration_turns": 1,
+      "content": "Welcome and set meeting tone"
+    },
+    "status_updates": {
+      "duration_turns_per_agent": 1,
+      "content": "What I accomplished since last meeting"
+    },
+    "topic_discussion": {
+      "duration_turns": 8,
+      "topics": [
+        "content_performance_review",
+        "social_media_monitoring",
+        "new_ideas_brainstorm",
+        "task_assignments",
+        "blockers_support"
+      ]
+    },
+    "action_items": {
+      "speaker": "henry",
+      "duration_turns": 2,
+      "content": "Summarize tasks and next steps"
+    },
+    "closing": {
+      "speaker": "henry",
+      "duration_turns": 1,
+      "content": "Meeting adjourned"
+    }
+  },
+  "conversation_rules": {
+    "turn_order": "round_robin",
+    "max_turns_per_agent": 3,
+    "relationship_impact": true,
+    "sentiment_tracking": true
+  },
+  "meetings": [
+    {
+      "id": "meeting-1770719542067",
+      "timestamp": "2026-02-10T10:32:22.067Z",
+      "topic": "social_media_monitoring",
+      "action_items_count": 3
+    }
+  ],
+  "stats": {
+    "total_meetings": 1,
+    "average_duration": 0,
+    "action_items_created": 3,
+    "action_items_completed": 0
+  }
+}

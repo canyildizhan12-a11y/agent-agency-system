@@ -1,0 +1,35 @@
+{
+  "agent_id": "echo",
+  "name": "Echo",
+  "created": "2026-02-10T10:15:00Z",
+  "memory": {
+    "personal": {
+      "current_focus": "Update social monitoring dashboard",
+      "code_snippets": [],
+      "technical_learnings": [],
+      "architecture_notes": []
+    },
+    "projects": {
+      "building": [],
+      "completed": [],
+      "backlog": []
+    },
+    "team_observations": {
+      "codex": "Excellent architect. We speak the same language.",
+      "pixel": "Creative but vague on requirements. Needs clearer specs.",
+      "scout": "Great research but sometimes irrelevant to technical work."
+    },
+    "conversations": [],
+    "action_items": [
+      {
+        "id": "task-1770719542069-2",
+        "task": "Update social monitoring dashboard",
+        "priority": "medium",
+        "due": "48 hours",
+        "status": "pending",
+        "assigned_in_meeting": "meeting-1770719542067"
+      }
+    ],
+    "lessons_learned": []
+  }
+}

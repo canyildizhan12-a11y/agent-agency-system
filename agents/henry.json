@@ -1,0 +1,31 @@
+{
+  "agent_id": "henry",
+  "name": "Henry",
+  "created": "2026-02-10T10:15:00Z",
+  "memory": {
+    "personal": {
+      "current_focus": "Building an autonomous content creation team",
+      "recent_achievements": [],
+      "challenges": [],
+      "learnings": []
+    },
+    "team_observations": {
+      "scout": "Excellent researcher, gets excited about trends. Sometimes shares too much information but always valuable.",
+      "pixel": "Creative powerhouse. Need to help balance perfectionism with shipping.",
+      "echo": "Reliable builder. Sometimes too direct in communication - should help bridge with non-technical team members.",
+      "quill": "Wordsmith. Works well with Pixel on creative projects.",
+      "codex": "Strategic thinker. Good counterbalance to Echo's implementation focus.",
+      "alex": "Data-driven. Excellent partner for Scout's research."
+    },
+    "meeting_insights": [],
+    "decisions_made": [],
+    "preferences": {
+      "meeting_style": "Structured but collaborative",
+      "communication": "Clear action items and next steps",
+      "work_hours": "Consistent schedule preferred"
+    },
+    "conversations": [],
+    "action_items": [],
+    "lessons_learned": []
+  }
+}

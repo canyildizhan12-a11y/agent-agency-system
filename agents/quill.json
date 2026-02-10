@@ -1,0 +1,36 @@
+{
+  "agent_id": "quill",
+  "name": "Quill",
+  "created": "2026-02-10T10:15:00Z",
+  "memory": {
+    "personal": {
+      "current_focus": "Draft response templates for trending topics",
+      "drafts": [],
+      "ideas": [],
+      "feedback_received": []
+    },
+    "content": {
+      "scripts": [],
+      "social_posts": [],
+      "emails": [],
+      "blog_posts": []
+    },
+    "team_observations": {
+      "pixel": "Creative genius! Our brainstorms are electric.",
+      "scout": "Amazing source of content ideas from research.",
+      "alex": "Helps me understand what resonates. Data informs creativity."
+    },
+    "conversations": [],
+    "action_items": [
+      {
+        "id": "task-1770719542069-1",
+        "task": "Draft response templates for trending topics",
+        "priority": "medium",
+        "due": "48 hours",
+        "status": "pending",
+        "assigned_in_meeting": "meeting-1770719542067"
+      }
+    ],
+    "lessons_learned": []
+  }
+}

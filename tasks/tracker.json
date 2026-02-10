@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "created": "2026-02-10T10:15:00Z",
+  "task_counter": 0,
+  "tasks": [],
+  "priorities": {
+    "critical": { "color": "#ef4444", "weight": 10 },
+    "high": { "color": "#f97316", "weight": 7 },
+    "medium": { "color": "#eab308", "weight": 5 },
+    "low": { "color": "#22c55e", "weight": 3 }
+  },
+  "statuses": ["pending", "in_progress", "blocked", "completed", "cancelled"],
+  "categories": ["research", "creative", "development", "writing", "analysis", "meeting"],
+  "stats": {
+    "total_created": 0,
+    "total_completed": 0,
+    "average_completion_time_hours": 0
+  }
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-02-10T10:32:22.067Z",
+    "meeting_id": "meeting-1770719542067",
+    "changes": [
+      {
+        "agents": [
+          "quill",
+          "echo"
+        ],
+        "change": 0.2,
+        "reason": "Agreement expressed"
+      }
+    ]
+  }
+]
