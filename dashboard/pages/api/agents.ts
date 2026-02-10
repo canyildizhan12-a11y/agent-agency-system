@@ -1,43 +1,89 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabase } from '../../lib/supabase';
+import { spawnAgent, isAgentActive } from '../../lib/openclaw';
+import fs from 'fs';
+import path from 'path';
+
+const AGENCY_DIR = '/home/ubuntu/.openclaw/workspace/agent-agency';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { data: agents, error } = await supabase
-      .from('agents')
-      .select(`
-        *,
-        agent_status (
+  if (req.method === 'GET') {
+    // Get agent status
+    try {
+      const agentsFile = path.join(AGENCY_DIR, 'agents.json');
+      const agents = JSON.parse(fs.readFileSync(agentsFile, 'utf8')).agents;
+      
+      // Check actual status from OpenClaw
+      const agentsWithStatus = agents.map((agent: any) => {
+        const isActive = isAgentActive(agent.id);
+        
+        // Also check sleeping_agents folder
+        const sleepFile = path.join(AGENCY_DIR, 'sleeping_agents', `${agent.id}.json`);
+        let status = 'sleeping';
+        let lastTask = null;
+        
+        if (fs.existsSync(sleepFile)) {
+          const data = JSON.parse(fs.readFileSync(sleepFile, 'utf8'));
+          status = data.status || 'sleeping';
+          lastTask = data.last_task;
+          
+          // Override if actually active in OpenClaw
+          if (isActive) {
+            status = 'working';
+          }
+        }
+        
+        return {
+          id: agent.id,
+          name: agent.name,
+          emoji: agent.emoji,
+          role: agent.role,
+          color: agent.color,
           status,
-          last_task,
-          woken_at,
-          woken_by,
-          sleep_started_at,
-          updated_at
-        )
-      `)
-      .order('name');
-
-    if (error) throw error;
-
-    // Transform data to match expected format
-    const transformedAgents = agents?.map(agent => ({
-      id: agent.agent_id,
-      name: agent.name,
-      emoji: agent.emoji,
-      role: agent.role,
-      status: agent.agent_status?.[0]?.status || 'sleeping',
-      color: agent.color,
-      lastTask: agent.agent_status?.[0]?.last_task,
-      wokenAt: agent.agent_status?.[0]?.woken_at,
-      wokenBy: agent.agent_status?.[0]?.woken_by,
-      sleepStartedAt: agent.agent_status?.[0]?.sleep_started_at,
-      updatedAt: agent.agent_status?.[0]?.updated_at
-    })) || [];
-
-    res.status(200).json(transformedAgents);
-  } catch (err: any) {
-    console.error('Error fetching agents:', err);
-    res.status(500).json({ error: err.message });
+          lastTask,
+          isActive
+        };
+      });
+      
+      res.status(200).json(agentsWithStatus);
+    } catch (err: any) {
+      console.error('Error fetching agents:', err);
+      res.status(500).json({ error: err.message });
+    }
+  } else if (req.method === 'POST') {
+    // Wake/spawn an agent
+    const { agentId, task } = req.body;
+    
+    if (!agentId) {
+      return res.status(400).json({ error: 'Agent ID required' });
+    }
+    
+    try {
+      // ACTUALLY spawn the agent via OpenClaw
+      const result = await spawnAgent(agentId, task || 'Wake up and standby');
+      
+      // Update status file
+      const sleepFile = path.join(AGENCY_DIR, 'sleeping_agents', `${agentId}.json`);
+      if (fs.existsSync(sleepFile)) {
+        const data = JSON.parse(fs.readFileSync(sleepFile, 'utf8'));
+        data.status = 'awake';
+        data.woken_at = new Date().toISOString();
+        data.woken_by = 'dashboard';
+        data.current_task = task;
+        data.openclaw_session = result.sessionId || result.childSessionKey;
+        fs.writeFileSync(sleepFile, JSON.stringify(data, null, 2));
+      }
+      
+      res.status(200).json({
+        success: true,
+        agentId,
+        message: `🚀 ${agentId} is now awake and working`,
+        openclawResult: result
+      });
+    } catch (err: any) {
+      console.error('Error spawning agent:', err);
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
   }
 }
