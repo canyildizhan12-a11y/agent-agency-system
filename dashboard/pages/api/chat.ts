@@ -1,183 +1,180 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { queueMessage, getLatestResponse } from '../../lib/chatQueue';
-import { getAgentSession } from '../../lib/subagentManager';
-import { queueMessageForSubagent } from '../../lib/chatBridge';
+import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
 const AGENCY_DIR = '/home/ubuntu/.openclaw/workspace/agent-agency';
 
+const AGENT_IDENTITIES: Record<string, { name: string; emoji: string }> = {
+  henry: { name: 'Henry', emoji: '🦉' },
+  scout: { name: 'Scout', emoji: '🔍' },
+  pixel: { name: 'Pixel', emoji: '🎨' },
+  echo: { name: 'Echo', emoji: '💾' },
+  quill: { name: 'Quill', emoji: '✍️' },
+  codex: { name: 'Codex', emoji: '🏗️' },
+  alex: { name: 'Alex', emoji: '🛡️' },
+  vega: { name: 'Vega', emoji: '📊' }
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    return handleSendMessage(req, res);
+    return handleChat(req, res);
   } else if (req.method === 'GET') {
-    return handleGetResponse(req, res);
+    return handleGetHistory(req, res);
   }
-  
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-/**
- * POST /api/chat - Send message to agent
- * If subagent session exists, route to it. Otherwise queue for main agent.
- */
-async function handleSendMessage(req: NextApiRequest, res: NextApiResponse) {
+async function handleChat(req: NextApiRequest, res: NextApiResponse) {
   const { agentId, message } = req.body;
   
   if (!agentId || !message) {
     return res.status(400).json({ error: 'Agent ID and message required' });
   }
-  
+
+  const identity = AGENT_IDENTITIES[agentId.toLowerCase()];
+  if (!identity) {
+    return res.status(400).json({ error: `Unknown agent: ${agentId}` });
+  }
+
   try {
-    // Check if there's an active subagent session
     const session = getAgentSession(agentId);
-    
-    if (session && session.status === 'active') {
-      // Route to active subagent session
-      const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
-      const chatDir = path.dirname(chatFile);
-      
-      if (!fs.existsSync(chatDir)) {
-        fs.mkdirSync(chatDir, { recursive: true });
-      }
-      
-      let history = [];
-      if (fs.existsSync(chatFile)) {
-        history = JSON.parse(fs.readFileSync(chatFile, 'utf8'));
-      }
-      
-      const messageId = generateUUID();
-      
-      history.push({
-        sender: 'user',
-        message,
-        timestamp: new Date().toISOString(),
-        messageId,
-        sessionKey: session.sessionKey
-      });
-      
-      history.push({
-        sender: 'agent',
-        message: null,
-        timestamp: new Date().toISOString(),
-        messageId,
-        sessionKey: session.sessionKey,
-        status: 'pending'
-      });
-      
-      fs.writeFileSync(chatFile, JSON.stringify(history, null, 2));
-      
-      // Send to subagent session
-      sendToSubagentSession(session.sessionKey, agentId, message, messageId);
-      
-      res.status(200).json({
-        success: true,
-        agentId,
-        messageId,
-        sessionKey: session.sessionKey,
-        status: 'sent_to_subagent',
-        message: `Message sent to ${agentId} via subagent session`
-      });
-    } else {
-      // No active subagent - queue for main agent to spawn
-      const queued = queueMessage(agentId, message);
-      
-      res.status(202).json({
-        success: true,
-        agentId,
-        messageId: queued.id,
-        status: 'queued_for_spawn',
-        message: `${agentId} is sleeping. Message queued - wake the agent to process.`
+    if (!session || session.status !== 'active') {
+      return res.status(400).json({
+        error: `${identity.name} is sleeping. Wake them up first.`,
+        status: 'sleeping'
       });
     }
-  } catch (err: any) {
-    console.error('Error sending message:', err);
-    res.status(500).json({ error: err.message });
-  }
-}
 
-/**
- * Send message to subagent session
- */
-async function sendToSubagentSession(
-  sessionKey: string, 
-  agentId: string, 
-  message: string,
-  messageId: string
-) {
-  try {
-    const identity = getAgentIdentity(agentId);
-    const fullMessage = `${identity.emoji} [${identity.name}] Can says: "${message}"`;
+    const messageId = generateUUID();
+    const timestamp = new Date().toISOString();
     
-    // Queue message for the bridge (main agent will poll and send via sessions_send)
-    queueMessageForSubagent(agentId, sessionKey, fullMessage);
-    
-    // Update status
-    const { updateMessageStatus } = await import('../../lib/chatQueue');
-    updateMessageStatus(messageId, 'processing');
-    
-    console.log(`[Chat] Queued message for ${sessionKey}: ${message.substring(0, 50)}...`);
-    
-  } catch (err) {
-    console.error('Error sending to subagent:', err);
-  }
-}
-
-/**
- * GET /api/chat?agentId=xxx - Poll for response
- */
-async function handleGetResponse(req: NextApiRequest, res: NextApiResponse) {
-  const { agentId } = req.query;
-  
-  if (!agentId || typeof agentId !== 'string') {
-    return res.status(400).json({ error: 'Agent ID required' });
-  }
-  
-  try {
-    const response = getLatestResponse(agentId);
+    // Save user message
     const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
-    const session = getAgentSession(agentId);
+    const history = loadHistory(chatFile);
     
-    let history = [];
-    if (fs.existsSync(chatFile)) {
-      history = JSON.parse(fs.readFileSync(chatFile, 'utf8'));
-    }
+    history.push({
+      sender: 'user',
+      message,
+      timestamp,
+      messageId,
+      sessionKey: session.sessionKey
+    });
+
+    // === CALL OPENCLAW CLI DIRECTLY ===
+    const fullMessage = `${identity.emoji} [${identity.name}] Can says: "${message}"`;
+    const uuid = session.sessionKey.split(':').pop(); // Extract UUID from session key
     
+    console.log(`[Chat] Calling openclaw agent --session-id ${uuid} -m "${message.substring(0, 50)}..."`);
+    
+    const response = await callOpenClawCLI(uuid, fullMessage);
+    
+    // Save agent response
+    history.push({
+      sender: 'agent',
+      message: response,
+      timestamp: new Date().toISOString(),
+      messageId,
+      sessionKey: session.sessionKey,
+      status: 'completed'
+    });
+    
+    saveHistory(chatFile, history);
+
+    // Return immediately with response
     res.status(200).json({
       success: true,
       agentId,
-      response: response || null,
-      history: history.slice(-20),
-      session: session ? {
-        sessionKey: session.sessionKey,
-        status: session.status,
-        initialized: session.initialized
-      } : null
+      agentName: identity.name,
+      agentEmoji: identity.emoji,
+      message,
+      response,
+      sessionKey: session.sessionKey,
+      timestamp: new Date().toISOString()
     });
+
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error('Error in chat:', err);
+    res.status(500).json({ 
+      error: err.message,
+      details: 'Failed to process message'
+    });
   }
 }
 
-function getAgentIdentity(agentId: string): { name: string; emoji: string } {
-  const identities: Record<string, { name: string; emoji: string }> = {
-    henry: { name: 'Henry', emoji: '🦉' },
-    scout: { name: 'Scout', emoji: '🔍' },
-    pixel: { name: 'Pixel', emoji: '🎨' },
-    echo: { name: 'Echo', emoji: '💾' },
-    quill: { name: 'Quill', emoji: '✍️' },
-    codex: { name: 'Codex', emoji: '🏗️' },
-    alex: { name: 'Alex', emoji: '🛡️' },
-    vega: { name: 'Vega', emoji: '📊' }
-  };
+function callOpenClawCLI(sessionUuid: string, message: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log(`[CLI] openclaw agent --session-id ${sessionUuid} -m "${message.substring(0, 50)}..."`);
+      
+      const result = execSync(
+        `openclaw agent --session-id ${sessionUuid} --message "${message.replace(/"/g, '\\"')}" --json`,
+        {
+          encoding: 'utf8',
+          timeout: 70000, // 70 second timeout
+          cwd: '/home/ubuntu/.openclaw/workspace'
+        }
+      );
+      
+      // Parse JSON response
+      const data = JSON.parse(result);
+      
+      if (data.status === 'ok' && data.result && data.result.payloads) {
+        // Extract text from first payload
+        const text = data.result.payloads[0]?.text || 'No response';
+        resolve(text);
+      } else {
+        resolve('Error: Unexpected response format');
+      }
+      
+    } catch (err: any) {
+      console.error('CLI error:', err);
+      reject(new Error(`CLI failed: ${err.message}`));
+    }
+  });
+}
+
+async function handleGetHistory(req: NextApiRequest, res: NextApiResponse) {
+  const { agentId } = req.query;
+  if (!agentId || typeof agentId !== 'string') {
+    return res.status(400).json({ error: 'Agent ID required' });
+  }
+
+  const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
+  const history = loadHistory(chatFile);
+  const session = getAgentSession(agentId);
   
-  return identities[agentId.toLowerCase()] || { name: agentId, emoji: '🤖' };
+  res.status(200).json({
+    success: true,
+    agentId,
+    history: history.slice(-50),
+    session
+  });
+}
+
+function getAgentSession(agentId: string): any {
+  const sessionsFile = path.join(AGENCY_DIR, 'active_sessions.json');
+  if (!fs.existsSync(sessionsFile)) return null;
+  try {
+    const sessions = JSON.parse(fs.readFileSync(sessionsFile, 'utf8'));
+    return sessions.find((s: any) => s.agentId === agentId.toLowerCase() && s.status === 'active');
+  } catch { return null; }
+}
+
+function loadHistory(chatFile: string): any[] {
+  if (!fs.existsSync(chatFile)) return [];
+  try { return JSON.parse(fs.readFileSync(chatFile, 'utf8')); } catch { return []; }
+}
+
+function saveHistory(chatFile: string, history: any[]): void {
+  const dir = path.dirname(chatFile);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(chatFile, JSON.stringify(history, null, 2));
 }
 
 function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
   });
 }

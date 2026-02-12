@@ -21,3 +21,16 @@
 [2026-02-12 19:00:11] Ran git garbage collection
 [2026-02-12 19:00:11] Cleanup complete. Total freed: 40MB
 [2026-02-12 19:00:11] Disk usage: 86% → 86%
+[2026-02-12 20:00:10] Current disk usage: 86%
+[2026-02-12 20:00:10] WARNING: Disk usage 86% exceeds threshold. Starting cleanup...
+[2026-02-12 20:00:10] Removed Next.js build artifacts: 40MB freed
+[2026-02-12 20:00:10] Ran git garbage collection
+[2026-02-12 20:00:10] Cleanup complete. Total freed: 40MB
+[2026-02-12 20:00:10] Disk usage: 86% → 86%
+[2026-02-12 21:00:04] Current disk usage: 90%
+[2026-02-12 21:00:04] WARNING: Disk usage 90% exceeds threshold. Starting cleanup...
+[2026-02-12 21:00:04] Cleaned npm cache: 140MB freed
+[2026-02-12 21:00:04] Removed Next.js build artifacts: 39MB freed
+[2026-02-12 21:00:04] Ran git garbage collection
+[2026-02-12 21:00:04] Cleanup complete. Total freed: 179MB
+[2026-02-12 21:00:04] Disk usage: 90% → 88%

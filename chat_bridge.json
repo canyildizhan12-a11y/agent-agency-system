@@ -5,7 +5,43 @@
     "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5",
     "message": "🦉 [Henry] Can says: \"hey henry, what is your subagent id?\"",
     "timestamp": "2026-02-12T19:49:53.143Z",
-    "status": "responded",
+    "status": "archived",
     "response": "🦉 My subagent session ID is: **agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5**\n\nI am Henry 🦉, your Team Lead, currently operating in this isolated session. How can I assist you?"
+  },
+  {
+    "id": "23000688-f182-4bf4-ab4b-57cd183c30cf",
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5",
+    "message": "🦉 [Henry] Can says: \"hey henry, what is your subagent id?\"",
+    "timestamp": "2026-02-12T20:10:32.926Z",
+    "status": "responded",
+    "response": "🦉 My subagent session ID is: **agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5**\n\nI am Henry 🦉, your Team Lead, operating in this isolated session. How can I help?"
+  },
+  {
+    "id": "177e61f4-5311-4f02-87e1-3a43ee85515b",
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:ebcaa33c-c8a0-44ec-b52b-146aaa5f9f63",
+    "message": "🦉 [Henry] Can says: \"hey henry, what is your session id?\"",
+    "timestamp": "2026-02-12T20:36:33.387Z",
+    "status": "responded",
+    "response": "🦉 My session ID is: `agent:main:subagent:ebcaa33c-c8a0-44ec-b52b-146aaa5f9f63`"
+  },
+  {
+    "id": "48483b39-6146-41a8-be8e-ce8745f72db1",
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:ebcaa33c-c8a0-44ec-b52b-146aaa5f9f63",
+    "message": "🦉 [Henry] Can says: \"what is your subagent id\"",
+    "timestamp": "2026-02-12T20:45:40.199Z",
+    "status": "responded",
+    "response": "🦉 My subagent ID is: `agent:main:subagent:ebcaa33c-c8a0-44ec-b52b-146aaa5f9f63`"
+  },
+  {
+    "id": "d2caedfe-9f16-407d-b875-b07c87c17896",
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:ebcaa33c-c8a0-44ec-b52b-146aaa5f9f63",
+    "message": "🦉 [Henry] Can says: \"how you doin\"",
+    "timestamp": "2026-02-12T20:50:58.496Z",
+    "status": "responded",
+    "response": "🦉 I'm doing well, thank you for asking. Systems are operational and I'm ready to facilitate whatever the team needs. Whether it's strategic planning, coordinating our next initiative, or just keeping things organized—I'm here and alert. How can I assist the Agency today?"
   }
 ]

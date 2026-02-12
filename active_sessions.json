@@ -1,11 +1,11 @@
 [
   {
     "agentId": "henry",
-    "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5",
-    "uuid": "967f7444-3910-48da-bb98-ab25a183cfd5",
-    "spawnedAt": "2026-02-12T19:27:00.000Z",
-    "expiresAt": "2026-02-12T20:27:00.000Z",
-    "task": "Check in and report status",
+    "sessionKey": "agent:main:subagent:1c45e020-ec6c-4482-a6a7-deb79e300f7a",
+    "uuid": "1c45e020-ec6c-4482-a6a7-deb79e300f7a",
+    "spawnedAt": "2026-02-12T21:23:00.000Z",
+    "expiresAt": "2026-02-12T22:23:00.000Z",
+    "task": "General availability",
     "status": "active",
     "initialized": true
   }

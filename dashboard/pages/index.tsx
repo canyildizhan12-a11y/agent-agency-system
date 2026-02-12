@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 
-interface AgentSession {
-  sessionKey: string;
-  uuid: string;
-  spawnedAt: string;
-  expiresAt: string;
-  task: string;
-  initialized?: boolean;
-}
-
 interface Agent {
   id: string;
   name: string;
@@ -17,16 +8,20 @@ interface Agent {
   role: string;
   status: 'awake' | 'sleeping' | 'working';
   color: string;
-  session: AgentSession | null;
+  session: {
+    sessionKey: string;
+    uuid: string;
+    spawnedAt: string;
+    expiresAt: string;
+  } | null;
 }
 
-interface ChatMessage {
-  sender: string;
-  text: string;
-  agentName?: string;
-  loading?: boolean;
-  messageId?: string;
-  status?: 'pending' | 'completed' | 'error';
+interface Metrics {
+  cronJobs: any[];
+  tokenUsage: { today: number; sessions: any[] };
+  immuneStatus: any;
+  recentWork: any[];
+  systemHealth: any;
 }
 
 export default function Dashboard() {
@@ -42,12 +37,10 @@ export default function Dashboard() {
   ]);
   
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'agents' | 'chat' | 'work'>('agents');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
+  const [activeTab, setActiveTab] = useState<'agents' | 'metrics' | 'system'>('agents');
   const [isLoading, setIsLoading] = useState(false);
-  const [taskInput, setTaskInput] = useState('');
-  const [agentResponse, setAgentResponse] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
 
   const fetchData = async () => {
     try {
@@ -61,34 +54,46 @@ export default function Dashboard() {
     }
   };
 
+  const fetchMetrics = async () => {
+    try {
+      const res = await fetch('/api/metrics');
+      if (res.ok) {
+        const data = await res.json();
+        setMetrics(data.metrics);
+      }
+    } catch (err) {
+      console.error('Failed to fetch metrics:', err);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5000);
+    fetchMetrics();
+    const interval = setInterval(() => {
+      fetchData();
+      fetchMetrics();
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  const [sessionDetails, setSessionDetails] = useState<any>(null);
-
   const wakeAgent = async (agentId: string) => {
-    const task = taskInput.trim() || 'Check in and report status';
     setIsLoading(true);
-    setSessionDetails(null);
     
     try {
       const res = await fetch(`/api/wake?id=${agentId}`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task })
+        body: JSON.stringify({ task: 'Stand by for instructions' })
       });
       
       if (res.ok) {
         const data = await res.json();
-        setAgentResponse(`${data.agentEmoji} ${data.agentName} is now awake!`);
-        setSessionDetails(data.session);
+        setNotification(`${data.agentEmoji} ${data.agentName} is now awake`);
         fetchData();
+        setTimeout(() => setNotification(null), 5000);
       }
     } catch (err) {
-      setAgentResponse('Error waking agent');
+      setNotification('Error waking agent');
     }
     setIsLoading(false);
   };
@@ -104,75 +109,24 @@ export default function Dashboard() {
       
       if (res.ok) {
         const data = await res.json();
-        setAgentResponse(`${data.agentEmoji} ${data.agentName} is now sleeping`);
+        setNotification(`${data.agentEmoji} ${data.agentName} is now sleeping`);
         fetchData();
+        setTimeout(() => setNotification(null), 5000);
       }
     } catch (err) {
-      setAgentResponse('Error putting agent to sleep');
+      setNotification('Error putting agent to sleep');
     }
     setIsLoading(false);
   };
 
-  const sendMessage = async () => {
-    if (!chatInput.trim() || !selectedAgent) return;
-    
-    const agent = agents.find(a => a.id === selectedAgent);
-    if (!agent) return;
-
-    const userMessage = chatInput;
-    setChatInput('');
-
-    setChatMessages(prev => [...prev, { 
-      sender: 'user', 
-      text: userMessage 
-    }]);
-
-    setChatMessages(prev => [...prev, { 
-      sender: 'agent', 
-      agentName: `${agent.emoji} ${agent.name}`,
-      text: '...',
-      loading: true,
-      status: 'pending'
-    }]);
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ agentId: selectedAgent, message: userMessage })
-      });
-
-      if (res.ok) {
-        setTimeout(async () => {
-          const pollRes = await fetch(`/api/chat?agentId=${selectedAgent}`);
-          if (pollRes.ok) {
-            const data = await pollRes.json();
-            if (data.history && data.history.length > 0) {
-              const lastMsg = data.history[data.history.length - 1];
-              if (lastMsg.sender === 'agent' && lastMsg.message) {
-                setChatMessages(prev => prev.map((msg, idx) => 
-                  idx === prev.length - 1 && msg.loading
-                    ? { ...msg, text: lastMsg.message, loading: false, status: 'completed' }
-                    : msg
-                ));
-              }
-            }
-          }
-        }, 3000);
-      }
-    } catch (err) {
-      setChatMessages(prev => prev.map((msg, idx) => 
-        idx === prev.length - 1 && msg.loading
-          ? { ...msg, text: 'Error sending message', loading: false, status: 'error' }
-          : msg
-      ));
-    }
-  };
+  const awakeCount = agents.filter(a => a.status === 'awake').length;
+  const workingCount = agents.filter(a => a.status === 'working').length;
+  const sleepingCount = agents.filter(a => a.status === 'sleeping').length;
 
   return (
     <>
       <Head>
-        <title>🦉 Agent Agency Dashboard</title>
+        <title>🦉 Agent Agency - Monitoring Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       
@@ -181,31 +135,35 @@ export default function Dashboard() {
         <header className="header">
           <div className="header-content">
             <h1>🦉 Agent Agency</h1>
-            <div className="status-badge">
-              <span className="status-dot"></span>
-              <span>System Online</span>
+            <div className="status-overview">
+              <div className="status-pill awake">{awakeCount} Awake</div>
+              <div className="status-pill working">{workingCount} Working</div>
+              <div className="status-pill sleeping">{sleepingCount} Sleeping</div>
             </div>
           </div>
         </header>
+
+        {notification && (
+          <div className="notification-banner">
+            {notification}
+          </div>
+        )}
 
         <div className="main-content">
           {/* Meeting Room */}
           <div className="meeting-room-container">
             <div className="room-header">
               <h2>🏢 Agency Meeting Room</h2>
-              <p>Select an agent to interact</p>
+              <p>Select an agent to view details</p>
             </div>
             
             <div className="meeting-room">
-              {/* Center Table */}
               <div className="conference-table">
                 <div className="table-surface">
                   <span className="table-logo">🦉</span>
-                  <div className="table-glow"></div>
                 </div>
               </div>
               
-              {/* Agent Positions - Around the table */}
               <div className="agents-around-table">
                 {agents.slice(0, 4).map((agent, idx) => (
                   <div
@@ -228,7 +186,6 @@ export default function Dashboard() {
                 ))}
               </div>
               
-              {/* More agents on the other side */}
               <div className="agents-around-table bottom-row">
                 {agents.slice(4, 8).map((agent, idx) => (
                   <div
@@ -257,40 +214,16 @@ export default function Dashboard() {
           <div className="side-panel">
             <div className="tabs">
               <button className={activeTab === 'agents' ? 'active' : ''} onClick={() => setActiveTab('agents')}>👥 Agents</button>
-              <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>💬 Chat</button>
-              <button className={activeTab === 'work' ? 'active' : ''} onClick={() => setActiveTab('work')}>📋 Work</button>
+              <button className={activeTab === 'metrics' ? 'active' : ''} onClick={() => setActiveTab('metrics')}>📊 Metrics</button>
+              <button className={activeTab === 'system' ? 'active' : ''} onClick={() => setActiveTab('system')}>⚙️ System</button>
             </div>
 
             <div className="panel-content">
               {activeTab === 'agents' && (
                 <div className="agents-panel">
-                  {agentResponse && (
-                    <div className="response-banner">
-                      {agentResponse}
-                    </div>
-                  )}
-                  
-                  {sessionDetails && (
-                    <div className="session-details">
-                      <div className="session-header">📋 Session Details</div>
-                      <div className="session-info">
-                        <div><strong>Session Key:</strong> <code>{sessionDetails.sessionKey}</code></div>
-                        <div><strong>UUID:</strong> <code>{sessionDetails.uuid}</code></div>
-                        <div><strong>Spawned:</strong> {new Date(sessionDetails.spawnedAt).toLocaleString('tr-TR')}</div>
-                        <div><strong>Expires:</strong> {new Date(sessionDetails.expiresAt).toLocaleString('tr-TR')}</div>
-                        <div><strong>Task:</strong> {sessionDetails.task}</div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="task-input-section">
-                    <input
-                      type="text"
-                      placeholder="Enter task for agent..."
-                      value={taskInput}
-                      onChange={(e) => setTaskInput(e.target.value)}
-                    />
-                    <p className="input-hint">💡 Token-optimized prompts enabled</p>
+                  <div className="panel-header">
+                    <h3>Agent Control</h3>
+                    <p className="panel-hint">Click an agent in the room to select</p>
                   </div>
 
                   <div className="agents-list">
@@ -302,7 +235,7 @@ export default function Dashboard() {
                           <div className="card-role">{agent.role}</div>
                           <div className={`card-status ${agent.status}`}>{agent.status}</div>
                           {agent.session && (
-                            <div className="session-hint">
+                            <div className="session-expiry">
                               ⏱️ Expires: {new Date(agent.session.expiresAt).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}
                             </div>
                           )}
@@ -319,50 +252,102 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
+
+                  {selectedAgent && (
+                    <div className="agent-details">
+                      {(() => {
+                        const agent = agents.find(a => a.id === selectedAgent);
+                        if (!agent) return null;
+                        return (
+                          <>
+                            <h4>Agent Details</h4>
+                            <div className="detail-row">
+                              <span className="detail-label">Session Key:</span>
+                              <code className="detail-value">{agent.session?.sessionKey || 'None'}</code>
+                            </div>
+                            <div className="detail-row">
+                              <span className="detail-label">UUID:</span>
+                              <code className="detail-value">{agent.session?.uuid || 'None'}</code>
+                            </div>
+                            <div className="detail-row">
+                              <span className="detail-label">Spawned:</span>
+                              <span className="detail-value">{agent.session ? new Date(agent.session.spawnedAt).toLocaleString('tr-TR') : 'N/A'}</span>
+                            </div>
+                            <div className="detail-row">
+                              <span className="detail-label">Expires:</span>
+                              <span className="detail-value">{agent.session ? new Date(agent.session.expiresAt).toLocaleString('tr-TR') : 'N/A'}</span>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               )}
 
-              {activeTab === 'chat' && (
-                <div className="chat-panel">
-                  <div className="chat-messages">
-                    {chatMessages.length === 0 ? (
-                      <div className="chat-empty">
-                        {selectedAgent 
-                          ? `Chat with ${agents.find(a => a.id === selectedAgent)?.name || selectedAgent}` 
-                          : 'Select an agent from the meeting room'}
+              {activeTab === 'metrics' && (
+                <div className="metrics-panel">
+                  <h3>📊 Agency Metrics</h3>
+                  
+                  {metrics ? (
+                    <div className="metrics-grid">
+                      <div className="metric-card">
+                        <div className="metric-value">{metrics.tokenUsage.today.toLocaleString()}</div>
+                        <div className="metric-label">Tokens Today</div>
                       </div>
-                    ) : (
-                      chatMessages.map((msg, idx) => (
-                        <div key={idx} className={`message ${msg.sender} ${msg.status || ''}`}>
-                          {msg.agentName && <div className="message-sender">{msg.agentName}</div>}
-                          <div className="message-text">{msg.loading ? 'Thinking...' : msg.text}</div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className="chat-input">
-                    <input
-                      type="text"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      placeholder={selectedAgent ? `Message ${agents.find(a => a.id === selectedAgent)?.name}...` : 'Select an agent...'}
-                      disabled={!selectedAgent}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    />
-                    <button onClick={sendMessage} disabled={!selectedAgent || !chatInput.trim()}>➤</button>
-                  </div>
+                      
+                      <div className="metric-card">
+                        <div className="metric-value">{metrics.cronJobs.length}</div>
+                        <div className="metric-label">Active Cron Jobs</div>
+                      </div>
+                      
+                      <div className="metric-card">
+                        <div className="metric-value">{metrics.recentWork.length}</div>
+                        <div className="metric-label">Recent Work Items</div>
+                      </div>
+                      
+                      <div className="metric-card">
+                        <div className="metric-value">{metrics.systemHealth.status || 'Unknown'}</div>
+                        <div className="metric-label">System Health</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="loading">Loading metrics...</p>
+                  )}
                 </div>
               )}
 
-              {activeTab === 'work' && (
-                <div className="work-panel">
-                  <h3>📋 Recent Activity</h3>
-                  <p className="empty-state">Work items will appear here</p>
+              {activeTab === 'system' && (
+                <div className="system-panel">
+                  <h3>⚙️ System Status</h3>
+                  
+                  <div className="system-section">
+                    <h4>🛡️ Immune System</h4>
+                    <p>Status: {metrics?.immuneStatus?.status || 'Checking...'}</p>
+                    <p>Last Check: {metrics?.immuneStatus?.lastCheck ? new Date(metrics.immuneStatus.lastCheck).toLocaleString('tr-TR') : 'N/A'}</p>
+                  </div>
+                  
+                  <div className="system-section">
+                    <h4>📅 Cron Jobs</h4>
+                    {metrics?.cronJobs.map((job: any) => (
+                      <div key={job.id} className="cron-job">
+                        <span className="cron-name">{job.name}</span>
+                        <span className={`cron-status ${job.enabled ? 'enabled' : 'disabled'}`}>
+                          {job.enabled ? '✅' : '❌'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="footer">
+          <p>🦉 Agent Agency Monitoring Dashboard | Communication via Telegram</p>
+        </footer>
       </div>
 
       <style jsx global>{`
@@ -381,7 +366,6 @@ export default function Dashboard() {
           flex-direction: column;
         }
         
-        /* Header */
         .header {
           background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, transparent 100%);
           border-bottom: 1px solid rgba(0,255,136,0.2);
@@ -404,29 +388,42 @@ export default function Dashboard() {
           -webkit-text-fill-color: transparent;
         }
         
-        .status-badge {
+        .status-overview {
           display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 14px;
+          gap: 12px;
+        }
+        
+        .status-pill {
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+        
+        .status-pill.awake {
+          background: rgba(0,255,136,0.2);
           color: #00ff88;
         }
         
-        .status-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #00ff88;
-          box-shadow: 0 0 10px #00ff88;
-          animation: pulse 2s infinite;
+        .status-pill.working {
+          background: rgba(255,170,0,0.2);
+          color: #ffaa00;
         }
         
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+        .status-pill.sleeping {
+          background: rgba(100,100,100,0.2);
+          color: #888;
         }
         
-        /* Main Layout */
+        .notification-banner {
+          background: rgba(0,255,136,0.15);
+          border: 1px solid rgba(0,255,136,0.3);
+          padding: 12px 32px;
+          text-align: center;
+          font-size: 14px;
+        }
+        
         .main-content {
           flex: 1;
           display: grid;
@@ -438,13 +435,11 @@ export default function Dashboard() {
           width: 100%;
         }
         
-        /* Meeting Room */
         .meeting-room-container {
           background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
           border-radius: 24px;
           border: 1px solid rgba(255,255,255,0.08);
           overflow: hidden;
-          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
         
         .room-header {
@@ -474,7 +469,6 @@ export default function Dashboard() {
           justify-content: center;
         }
         
-        /* Conference Table */
         .conference-table {
           position: relative;
           width: 320px;
@@ -491,11 +485,7 @@ export default function Dashboard() {
           display: flex;
           align-items: center;
           justify-content: center;
-          position: relative;
-          box-shadow: 
-            0 20px 60px rgba(0,0,0,0.5),
-            inset 0 2px 4px rgba(255,255,255,0.1),
-            0 0 40px rgba(0,255,136,0.1);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,255,136,0.1);
         }
         
         .table-logo {
@@ -503,15 +493,6 @@ export default function Dashboard() {
           filter: drop-shadow(0 0 20px rgba(0,255,136,0.5));
         }
         
-        .table-glow {
-          position: absolute;
-          inset: -20px;
-          border-radius: 120px;
-          background: radial-gradient(ellipse at center, rgba(0,255,136,0.15) 0%, transparent 70%);
-          pointer-events: none;
-        }
-        
-        /* Agents Around Table */
         .agents-around-table {
           display: flex;
           gap: 40px;
@@ -635,7 +616,6 @@ export default function Dashboard() {
           color: #888;
         }
         
-        /* Side Panel */
         .side-panel {
           background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
           border-radius: 24px;
@@ -643,7 +623,6 @@ export default function Dashboard() {
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
         
         .tabs {
@@ -680,80 +659,17 @@ export default function Dashboard() {
           padding: 20px;
         }
         
-        /* Agents Panel */
-        .agents-panel {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        
-        .response-banner {
-          background: rgba(0,255,136,0.15);
-          border: 1px solid rgba(0,255,136,0.3);
-          padding: 12px 16px;
-          border-radius: 12px;
-          font-size: 13px;
-        }
-        
-        .session-details {
-          background: rgba(0,100,255,0.1);
-          border: 1px solid rgba(0,100,255,0.3);
-          border-radius: 12px;
-          overflow: hidden;
+        .panel-header {
           margin-bottom: 16px;
         }
         
-        .session-header {
-          background: rgba(0,100,255,0.2);
-          padding: 10px 16px;
-          font-weight: 600;
-          font-size: 13px;
-          border-bottom: 1px solid rgba(0,100,255,0.2);
+        .panel-header h3 {
+          font-size: 16px;
+          margin-bottom: 4px;
         }
         
-        .session-info {
-          padding: 12px 16px;
+        .panel-hint {
           font-size: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        
-        .session-info code {
-          background: rgba(0,0,0,0.4);
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-family: monospace;
-          font-size: 11px;
-          color: #00ff88;
-        }
-        
-        .session-hint {
-          font-size: 10px;
-          color: #00ff88;
-          margin-top: 4px;
-        }
-        
-        .task-input-section {
-          background: rgba(255,255,255,0.03);
-          padding: 16px;
-          border-radius: 12px;
-          border: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .task-input-section input {
-          width: 100%;
-          padding: 12px;
-          border-radius: 8px;
-          border: 1px solid rgba(255,255,255,0.1);
-          background: rgba(0,0,0,0.3);
-          color: #fff;
-          font-size: 14px;
-          margin-bottom: 8px;
-        }
-        
-        .input-hint {
-          font-size: 11px;
           color: #666;
         }
         
@@ -836,6 +752,12 @@ export default function Dashboard() {
           color: #888;
         }
         
+        .session-expiry {
+          font-size: 10px;
+          color: #00ff88;
+          margin-top: 4px;
+        }
+        
         .btn-wake {
           background: linear-gradient(145deg, #00ff88, #00cc6a);
           border: none;
@@ -875,114 +797,123 @@ export default function Dashboard() {
           cursor: not-allowed;
         }
         
-        /* Chat Panel */
-        .chat-panel {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
+        .agent-details {
+          background: rgba(0,100,255,0.1);
+          border: 1px solid rgba(0,100,255,0.2);
+          border-radius: 12px;
+          padding: 16px;
+          margin-top: 16px;
         }
         
-        .chat-messages {
-          flex: 1;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          padding-bottom: 16px;
-        }
-        
-        .chat-empty {
-          text-align: center;
-          color: #666;
-          padding: 40px;
+        .agent-details h4 {
+          margin-bottom: 12px;
           font-size: 14px;
         }
         
-        .message {
-          max-width: 85%;
-          padding: 12px 16px;
-          border-radius: 16px;
-          font-size: 14px;
-          line-height: 1.5;
+        .detail-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 6px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          font-size: 12px;
         }
         
-        .message.user {
-          align-self: flex-end;
-          background: linear-gradient(145deg, #0084ff, #0066cc);
-          border-bottom-right-radius: 4px;
+        .detail-row:last-child {
+          border-bottom: none;
         }
         
-        .message.agent {
-          align-self: flex-start;
-          background: rgba(255,255,255,0.08);
-          border-bottom-left-radius: 4px;
+        .detail-label {
+          color: #888;
         }
         
-        .message-sender {
-          font-size: 11px;
-          font-weight: 600;
-          margin-bottom: 4px;
+        .detail-value {
           color: #00ff88;
+          font-family: monospace;
+          font-size: 11px;
         }
         
-        .chat-input {
-          display: flex;
-          gap: 10px;
-          padding-top: 16px;
-          border-top: 1px solid rgba(255,255,255,0.08);
-        }
-        
-        .chat-input input {
-          flex: 1;
-          padding: 12px 16px;
-          border-radius: 24px;
-          border: 1px solid rgba(255,255,255,0.1);
-          background: rgba(0,0,0,0.3);
-          color: #fff;
-          font-size: 14px;
-          outline: none;
-        }
-        
-        .chat-input input:focus {
-          border-color: rgba(0,255,136,0.3);
-        }
-        
-        .chat-input button {
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-          border: none;
-          background: linear-gradient(145deg, #00ff88, #00cc6a);
-          color: #000;
-          cursor: pointer;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        .chat-input button:hover:not(:disabled) {
-          transform: scale(1.1);
-        }
-        
-        .chat-input button:disabled {
-          background: #444;
-          color: #666;
-        }
-        
-        /* Work Panel */
-        .work-panel h3 {
+        .metrics-panel h3,
+        .system-panel h3 {
           margin-bottom: 16px;
-          font-weight: 600;
+          font-size: 16px;
         }
         
-        .empty-state {
+        .metrics-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        
+        .metric-card {
+          background: rgba(255,255,255,0.03);
+          border-radius: 12px;
+          padding: 16px;
+          text-align: center;
+          border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .metric-value {
+          font-size: 24px;
+          font-weight: 700;
+          color: #00ff88;
+          margin-bottom: 4px;
+        }
+        
+        .metric-label {
+          font-size: 11px;
+          color: #888;
+          text-transform: uppercase;
+        }
+        
+        .loading {
           text-align: center;
           color: #666;
           padding: 40px;
         }
         
-        /* Responsive */
+        .system-section {
+          background: rgba(255,255,255,0.03);
+          border-radius: 12px;
+          padding: 16px;
+          margin-bottom: 16px;
+        }
+        
+        .system-section h4 {
+          margin-bottom: 12px;
+          font-size: 14px;
+        }
+        
+        .system-section p {
+          font-size: 12px;
+          color: #888;
+          margin-bottom: 4px;
+        }
+        
+        .cron-job {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          font-size: 12px;
+        }
+        
+        .cron-name {
+          color: #ccc;
+        }
+        
+        .cron-status {
+          font-size: 14px;
+        }
+        
+        .footer {
+          background: rgba(0,0,0,0.3);
+          padding: 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+          border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
         @media (max-width: 1100px) {
           .main-content {
             grid-template-columns: 1fr;

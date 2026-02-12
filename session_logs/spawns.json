@@ -1,0 +1,8 @@
+[
+  {
+    "timestamp": "2026-02-12T21:22:59.197Z",
+    "event": "sleep",
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:ebcaa33c-c8a0-44ec-b52b-146aaa5f9f63"
+  }
+]

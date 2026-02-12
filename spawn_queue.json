@@ -14,5 +14,19 @@
     "requestedAt": "2026-02-12T19:27:08.944Z",
     "status": "completed",
     "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5"
+  },
+  {
+    "id": "320cb9c6-b3d0-4c12-bd8e-4f4ddfc3061b",
+    "agentId": "henry",
+    "task": "Check in and report status",
+    "requestedAt": "2026-02-12T20:34:56.445Z",
+    "status": "pending"
+  },
+  {
+    "id": "fda7c67d-bdf1-4d92-bb29-2a28820908cd",
+    "agentId": "henry",
+    "task": "Check in and report status",
+    "requestedAt": "2026-02-12T21:23:01.679Z",
+    "status": "pending"
   }
 ]
