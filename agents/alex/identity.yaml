@@ -59,9 +59,10 @@ wake_conditions:
   # Disk space regulation (hourly check)
   - disk_usage_threshold_exceeded: true  # > 85%
   - cleanup_required: true
-  # Heartbeat inspection
-  - heartbeat_report_received: true
-  - heartbeat_anomaly_detected: true
+  # Heartbeat monitoring (daily batch review, not per-check)
+  - heartbeat_daily_summary_review: true  # Part of 23:00 daily report
+  # Daily reporting
+  - daily_report_generation: true  # 23:00 TRT
 
 sleep_conditions:
   - never: true  # Immune system never sleeps

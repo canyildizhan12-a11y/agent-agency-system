@@ -4,3 +4,8 @@
 [2026-02-12 13:00:53] Removed Next.js build artifacts: 39MB freed
 [2026-02-12 13:01:50] Current disk usage: 84%
 [2026-02-12 13:01:50] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-12 17:00:08] Current disk usage: 85%
+[2026-02-12 17:00:08] WARNING: Disk usage 85% exceeds threshold. Starting cleanup...
+[2026-02-12 17:00:08] Ran git garbage collection
+[2026-02-12 17:00:08] Cleanup complete. Total freed: 0MB
+[2026-02-12 17:00:08] Disk usage: 85% → 85%
