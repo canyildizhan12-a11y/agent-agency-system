@@ -35,5 +35,18 @@
     "timestamp": "2026-02-12T18:14:40.822Z",
     "queuedId": "henry-1770920080821-p7ak4t078",
     "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "hey",
+    "timestamp": "2026-02-12T18:27:34.631Z",
+    "queuedId": "henry-1770920854631-2x8opgtb0"
+  },
+  {
+    "sender": "agent",
+    "message": "Error: Pass --to <E.164>, --session-id, or --agent to choose a session\n",
+    "timestamp": "2026-02-12T18:27:34.631Z",
+    "queuedId": "henry-1770920854631-2x8opgtb0",
+    "status": "completed"
   }
 ]

@@ -1,7 +1,7 @@
 {
-  "messageId": "henry-1770920080821-p7ak4t078",
+  "messageId": "henry-1770920854631-2x8opgtb0",
   "agentId": "henry",
-  "response": "error: unknown option '--model'\n",
-  "timestamp": "2026-02-12T18:14:43.204Z",
+  "response": "Error: Pass --to <E.164>, --session-id, or --agent to choose a session\n",
+  "timestamp": "2026-02-12T18:27:36.919Z",
   "status": "completed"
 }

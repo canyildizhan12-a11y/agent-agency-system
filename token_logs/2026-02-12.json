@@ -12,5 +12,12 @@
     "inputTokens": 1,
     "outputTokens": 8,
     "totalTokens": 9
+  },
+  {
+    "timestamp": "2026-02-12T18:27:36.919Z",
+    "agentId": "henry",
+    "inputTokens": 1,
+    "outputTokens": 18,
+    "totalTokens": 19
   }
 ]
