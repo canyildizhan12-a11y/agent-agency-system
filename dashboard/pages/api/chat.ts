@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { queueMessage, getLatestResponse } from '../../lib/chatQueue';
-import { spawnAgentCompressed } from '../../lib/openclaw';
+import { getAgentSession } from '../../lib/subagentManager';
+import { queueMessageForSubagent } from '../../lib/chatBridge';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 /**
- * POST /api/chat - Queue a message for processing
+ * POST /api/chat - Send message to agent
+ * If subagent session exists, route to it. Otherwise queue for main agent.
  */
 async function handleSendMessage(req: NextApiRequest, res: NextApiResponse) {
   const { agentId, message } = req.body;
@@ -27,52 +29,97 @@ async function handleSendMessage(req: NextApiRequest, res: NextApiResponse) {
   }
   
   try {
-    // Add to queue for async processing
-    const queued = queueMessage(agentId, message);
+    // Check if there's an active subagent session
+    const session = getAgentSession(agentId);
     
-    // Store in chat history for UI
-    const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
-    const chatDir = path.dirname(chatFile);
-    
-    if (!fs.existsSync(chatDir)) {
-      fs.mkdirSync(chatDir, { recursive: true });
+    if (session && session.status === 'active') {
+      // Route to active subagent session
+      const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
+      const chatDir = path.dirname(chatFile);
+      
+      if (!fs.existsSync(chatDir)) {
+        fs.mkdirSync(chatDir, { recursive: true });
+      }
+      
+      let history = [];
+      if (fs.existsSync(chatFile)) {
+        history = JSON.parse(fs.readFileSync(chatFile, 'utf8'));
+      }
+      
+      const messageId = generateUUID();
+      
+      history.push({
+        sender: 'user',
+        message,
+        timestamp: new Date().toISOString(),
+        messageId,
+        sessionKey: session.sessionKey
+      });
+      
+      history.push({
+        sender: 'agent',
+        message: null,
+        timestamp: new Date().toISOString(),
+        messageId,
+        sessionKey: session.sessionKey,
+        status: 'pending'
+      });
+      
+      fs.writeFileSync(chatFile, JSON.stringify(history, null, 2));
+      
+      // Send to subagent session
+      sendToSubagentSession(session.sessionKey, agentId, message, messageId);
+      
+      res.status(200).json({
+        success: true,
+        agentId,
+        messageId,
+        sessionKey: session.sessionKey,
+        status: 'sent_to_subagent',
+        message: `Message sent to ${agentId} via subagent session`
+      });
+    } else {
+      // No active subagent - queue for main agent to spawn
+      const queued = queueMessage(agentId, message);
+      
+      res.status(202).json({
+        success: true,
+        agentId,
+        messageId: queued.id,
+        status: 'queued_for_spawn',
+        message: `${agentId} is sleeping. Message queued - wake the agent to process.`
+      });
     }
-    
-    let history = [];
-    if (fs.existsSync(chatFile)) {
-      history = JSON.parse(fs.readFileSync(chatFile, 'utf8'));
-    }
-    
-    history.push({
-      sender: 'user',
-      message,
-      timestamp: new Date().toISOString(),
-      queuedId: queued.id
-    });
-    
-    history.push({
-      sender: 'agent',
-      message: null, // Will be filled when processed
-      timestamp: new Date().toISOString(),
-      queuedId: queued.id,
-      status: 'pending'
-    });
-    
-    fs.writeFileSync(chatFile, JSON.stringify(history, null, 2));
-    
-    // Trigger background processing
-    processQueueAsync(agentId, message, queued.id);
-    
-    res.status(200).json({
-      success: true,
-      agentId,
-      messageId: queued.id,
-      status: 'pending',
-      message: 'Message queued for processing'
-    });
   } catch (err: any) {
-    console.error('Error queuing message:', err);
+    console.error('Error sending message:', err);
     res.status(500).json({ error: err.message });
+  }
+}
+
+/**
+ * Send message to subagent session
+ */
+async function sendToSubagentSession(
+  sessionKey: string, 
+  agentId: string, 
+  message: string,
+  messageId: string
+) {
+  try {
+    const identity = getAgentIdentity(agentId);
+    const fullMessage = `${identity.emoji} [${identity.name}] Can says: "${message}"`;
+    
+    // Queue message for the bridge (main agent will poll and send via sessions_send)
+    queueMessageForSubagent(agentId, sessionKey, fullMessage);
+    
+    // Update status
+    const { updateMessageStatus } = await import('../../lib/chatQueue');
+    updateMessageStatus(messageId, 'processing');
+    
+    console.log(`[Chat] Queued message for ${sessionKey}: ${message.substring(0, 50)}...`);
+    
+  } catch (err) {
+    console.error('Error sending to subagent:', err);
   }
 }
 
@@ -89,6 +136,7 @@ async function handleGetResponse(req: NextApiRequest, res: NextApiResponse) {
   try {
     const response = getLatestResponse(agentId);
     const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
+    const session = getAgentSession(agentId);
     
     let history = [];
     if (fs.existsSync(chatFile)) {
@@ -99,69 +147,37 @@ async function handleGetResponse(req: NextApiRequest, res: NextApiResponse) {
       success: true,
       agentId,
       response: response || null,
-      history: history.slice(-20) // Last 20 messages
+      history: history.slice(-20),
+      session: session ? {
+        sessionKey: session.sessionKey,
+        status: session.status,
+        initialized: session.initialized
+      } : null
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 }
 
-/**
- * Background queue processor
- */
-async function processQueueAsync(agentId: string, message: string, messageId: string) {
-  const { updateMessageStatus } = await import('../../lib/chatQueue');
-  
-  try {
-    updateMessageStatus(messageId, 'processing');
-    
-    // Use compressed prompt for efficiency
-    const result = await spawnAgentCompressed(agentId, message);
-    
-    // Update with response
-    updateMessageStatus(messageId, 'completed', result.output || result.message);
-    
-    // Update chat history
-    const chatFile = path.join(AGENCY_DIR, 'chat_history', `${agentId}.json`);
-    if (fs.existsSync(chatFile)) {
-      const history = JSON.parse(fs.readFileSync(chatFile, 'utf8'));
-      const pendingMsg = history.find((h: any) => h.queuedId === messageId && h.sender === 'agent');
-      
-      if (pendingMsg) {
-        pendingMsg.message = result.output || result.message;
-        pendingMsg.status = 'completed';
-        fs.writeFileSync(chatFile, JSON.stringify(history, null, 2));
-      }
-    }
-    
-    // Log token usage
-    await logTokenUsage(agentId, message, result.output || result.message);
-    
-  } catch (err: any) {
-    console.error(`Error processing message ${messageId}:`, err);
-    updateMessageStatus(messageId, 'error', undefined, err.message);
-  }
-}
-
-/**
- * Log token usage for Alex's analytics
- */
-async function logTokenUsage(agentId: string, input: string, output: string) {
-  const tokenFile = path.join(AGENCY_DIR, 'token_logs', `${new Date().toISOString().split('T')[0]}.json`);
-  
-  const logEntry = {
-    timestamp: new Date().toISOString(),
-    agentId,
-    inputTokens: Math.ceil(input.length / 4), // Rough estimate
-    outputTokens: Math.ceil((output?.length || 0) / 4),
-    totalTokens: Math.ceil((input.length + (output?.length || 0)) / 4)
+function getAgentIdentity(agentId: string): { name: string; emoji: string } {
+  const identities: Record<string, { name: string; emoji: string }> = {
+    henry: { name: 'Henry', emoji: '🦉' },
+    scout: { name: 'Scout', emoji: '🔍' },
+    pixel: { name: 'Pixel', emoji: '🎨' },
+    echo: { name: 'Echo', emoji: '💾' },
+    quill: { name: 'Quill', emoji: '✍️' },
+    codex: { name: 'Codex', emoji: '🏗️' },
+    alex: { name: 'Alex', emoji: '🛡️' },
+    vega: { name: 'Vega', emoji: '📊' }
   };
   
-  let logs = [];
-  if (fs.existsSync(tokenFile)) {
-    logs = JSON.parse(fs.readFileSync(tokenFile, 'utf8'));
-  }
-  
-  logs.push(logEntry);
-  fs.writeFileSync(tokenFile, JSON.stringify(logs, null, 2));
+  return identities[agentId.toLowerCase()] || { name: agentId, emoji: '🤖' };
+}
+
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
