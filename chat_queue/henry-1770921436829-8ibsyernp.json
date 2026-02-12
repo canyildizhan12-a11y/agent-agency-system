@@ -1,0 +1,9 @@
+{
+  "id": "henry-1770921436829-8ibsyernp",
+  "agentId": "henry",
+  "message": "hey",
+  "timestamp": "2026-02-12T18:37:16.829Z",
+  "status": "completed",
+  "processedAt": "2026-02-12T18:37:19.274Z",
+  "response": "Error: Pass --to <E.164>, --session-id, or --agent to choose a session\n"
+}

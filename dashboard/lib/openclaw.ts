@@ -200,12 +200,11 @@ async function executeAgent(
       // For now, spawn fresh but track for next time
     }
     
-    // Spawn via openclaw CLI - use default "main" agent (OpenClaw only has main)
-    // Agent personas are simulated by prepending character context to prompt
+    // Spawn via openclaw CLI - use ACTUAL agent (not simulation)
     const startTime = Date.now();
     const escapedPrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ');
     const output = execSync(
-      `cd ${WORKSPACE_DIR} && openclaw agent --local -m "${escapedPrompt}" 2>&1`,
+      `cd ${WORKSPACE_DIR} && openclaw agent --agent ${agentId} -m "${escapedPrompt}" 2>&1`,
       {
         encoding: 'utf8',
         timeout: 120000,
