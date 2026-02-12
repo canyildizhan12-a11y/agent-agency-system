@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-02-12T18:04:44.065Z",
+    "agentId": "henry",
+    "inputTokens": 6,
+    "outputTokens": 15,
+    "totalTokens": 21
+  },
+  {
+    "timestamp": "2026-02-12T18:14:43.204Z",
+    "agentId": "henry",
+    "inputTokens": 1,
+    "outputTokens": 8,
+    "totalTokens": 9
+  }
+]

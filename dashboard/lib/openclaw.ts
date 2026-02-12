@@ -192,10 +192,11 @@ async function executeAgent(
       // For now, spawn fresh but track for next time
     }
     
-    // Spawn via openclaw CLI
+    // Spawn via openclaw CLI - use -m flag for message (NO --model flag!)
     const startTime = Date.now();
+    const escapedPrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ');
     const output = execSync(
-      `cd ${WORKSPACE_DIR} && cat ${tmpFile} | openclaw agent --local --model moonshot/kimi-k2.5 2>&1`,
+      `cd ${WORKSPACE_DIR} && openclaw agent --local -m "${escapedPrompt}" 2>&1`,
       {
         encoding: 'utf8',
         timeout: 120000,

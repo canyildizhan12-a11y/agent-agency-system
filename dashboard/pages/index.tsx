@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 
 interface Agent {
@@ -11,13 +11,6 @@ interface Agent {
   lastTask?: string;
 }
 
-interface WorkItem {
-  agent: string;
-  task: string;
-  status: string;
-  time: string;
-}
-
 interface ChatMessage {
   sender: string;
   text: string;
@@ -27,127 +20,47 @@ interface ChatMessage {
   status?: 'pending' | 'completed' | 'error';
 }
 
-interface TokenMetrics {
-  optimization: {
-    compressed: number;
-    full: number;
-    savings: number;
-    percentage: number;
-  };
-  usage: {
-    totalTokens: number;
-    totalInput: number;
-    totalOutput: number;
-    estimatedCost: { usd: number; local: string };
-    byAgent: Record<string, { tokens: number; requests: number }>;
-  };
-  performance: {
-    avgDuration: number;
-    totalRequests: number;
-    avgTokens: number;
-    last24h: number;
-  };
-}
-
 export default function Dashboard() {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [work, setWork] = useState<WorkItem[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([
+    { id: 'henry', name: 'Henry', emoji: '🦉', role: 'Team Lead', status: 'awake', color: '#00ff88' },
+    { id: 'scout', name: 'Scout', emoji: '🔍', role: 'Research', status: 'sleeping', color: '#00ff88' },
+    { id: 'pixel', name: 'Pixel', emoji: '🎨', role: 'Creative', status: 'awake', color: '#00ff88' },
+    { id: 'echo', name: 'Echo', emoji: '💾', role: 'Memory', status: 'sleeping', color: '#00ff88' },
+    { id: 'quill', name: 'Quill', emoji: '✍️', role: 'Documentation', status: 'sleeping', color: '#00ff88' },
+    { id: 'codex', name: 'Codex', emoji: '🏗️', role: 'Architecture', status: 'working', color: '#00ff88' },
+    { id: 'alex', name: 'Alex', emoji: '🛡️', role: 'Security', status: 'awake', color: '#00ff88' },
+    { id: 'vega', name: 'Vega', emoji: '📊', role: 'Analyst', status: 'sleeping', color: '#00ff88' },
+  ]);
+  
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'agents' | 'chat' | 'work' | 'tokens'>('agents');
+  const [activeTab, setActiveTab] = useState<'agents' | 'chat' | 'work'>('agents');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [taskInput, setTaskInput] = useState('');
   const [agentResponse, setAgentResponse] = useState<string | null>(null);
-  const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
-  const [tokenMetrics, setTokenMetrics] = useState<TokenMetrics | null>(null);
 
-  // Fetch agents and work data
+  const fetchData = async () => {
+    try {
+      const res = await fetch('/api/agents');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.length > 0) setAgents(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch agents:', err);
+    }
+  };
+
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Poll for chat responses when there's a pending message
-  useEffect(() => {
-    if (!pendingMessageId || !selectedAgent) return;
-    
-    const pollInterval = setInterval(async () => {
-      await pollForResponse();
-    }, 2000);
-    
-    return () => clearInterval(pollInterval);
-  }, [pendingMessageId, selectedAgent]);
-
-  // Fetch token metrics when on tokens tab
-  useEffect(() => {
-    if (activeTab === 'tokens') {
-      fetchTokenMetrics();
-      const interval = setInterval(fetchTokenMetrics, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [activeTab]);
-
-  const fetchData = async () => {
-    try {
-      const [agentsRes, workRes] = await Promise.all([
-        fetch('/api/agents'),
-        fetch('/api/work')
-      ]);
-      
-      if (agentsRes.ok) setAgents(await agentsRes.json());
-      if (workRes.ok) setWork(await workRes.json());
-    } catch (err) {
-      console.error('Failed to fetch data:', err);
-    }
-  };
-
-  const fetchTokenMetrics = async () => {
-    try {
-      const res = await fetch('/api/tokens');
-      if (res.ok) {
-        setTokenMetrics(await res.json());
-      }
-    } catch (err) {
-      console.error('Failed to fetch token metrics:', err);
-    }
-  };
-
-  const pollForResponse = async () => {
-    if (!selectedAgent) return;
-    
-    try {
-      const res = await fetch(`/api/chat?agentId=${selectedAgent}`);
-      if (!res.ok) return;
-      
-      const data = await res.json();
-      
-      if (data.response && data.response.messageId === pendingMessageId) {
-        // Update the loading message with actual response
-        setChatMessages(prev => prev.map(msg => {
-          if (msg.messageId === pendingMessageId) {
-            return {
-              ...msg,
-              text: data.response.response,
-              loading: false,
-              status: data.response.status
-            };
-          }
-          return msg;
-        }));
-        
-        setPendingMessageId(null);
-      }
-    } catch (err) {
-      console.error('Polling error:', err);
-    }
-  };
-
   const wakeAgent = async (agentId: string) => {
-    const task = taskInput.trim() || 'General task - analyze our current projects and suggest improvements';
+    const task = taskInput.trim() || 'Check in and report status';
     setIsLoading(true);
-    setAgentResponse(null);
     
     try {
       const res = await fetch(`/api/wake?id=${agentId}`, { 
@@ -158,13 +71,31 @@ export default function Dashboard() {
       
       if (res.ok) {
         const data = await res.json();
-        setAgentResponse(`${data.agentEmoji} ${data.agentName} is working on: ${task}`);
-        await fetchData();
-      } else {
-        setAgentResponse('Error: Failed to wake agent');
+        setAgentResponse(`${data.agentEmoji} ${data.agentName} is now awake and working on: ${task}`);
+        fetchData();
       }
     } catch (err) {
-      setAgentResponse('Error: ' + (err as Error).message);
+      setAgentResponse('Error waking agent');
+    }
+    setIsLoading(false);
+  };
+
+  const sleepAgent = async (agentId: string) => {
+    setIsLoading(true);
+    
+    try {
+      const res = await fetch(`/api/sleep?id=${agentId}`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAgentResponse(`${data.agentEmoji} ${data.agentName} is now sleeping`);
+        fetchData();
+      }
+    } catch (err) {
+      setAgentResponse('Error putting agent to sleep');
     }
     setIsLoading(false);
   };
@@ -178,23 +109,19 @@ export default function Dashboard() {
     const userMessage = chatInput;
     setChatInput('');
 
-    // Add user message
     setChatMessages(prev => [...prev, { 
       sender: 'user', 
       text: userMessage 
     }]);
 
-    // Add loading message
-    const loadingMsg: ChatMessage = { 
+    setChatMessages(prev => [...prev, { 
       sender: 'agent', 
       agentName: `${agent.emoji} ${agent.name}`,
-      text: 'Thinking...',
+      text: '...',
       loading: true,
       status: 'pending'
-    };
-    setChatMessages(prev => [...prev, loadingMsg]);
+    }]);
 
-    // Send to API
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -203,54 +130,29 @@ export default function Dashboard() {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        
-        // Update loading message with messageId for tracking
-        setChatMessages(prev => prev.map((msg, idx) => {
-          if (idx === prev.length - 1 && msg.loading) {
-            return {
-              ...msg,
-              messageId: data.messageId,
-              text: 'Processing...'
-            };
+        setTimeout(async () => {
+          const pollRes = await fetch(`/api/chat?agentId=${selectedAgent}`);
+          if (pollRes.ok) {
+            const data = await pollRes.json();
+            if (data.history && data.history.length > 0) {
+              const lastMsg = data.history[data.history.length - 1];
+              if (lastMsg.sender === 'agent' && lastMsg.message) {
+                setChatMessages(prev => prev.map((msg, idx) => 
+                  idx === prev.length - 1 && msg.loading
+                    ? { ...msg, text: lastMsg.message, loading: false, status: 'completed' }
+                    : msg
+                ));
+              }
+            }
           }
-          return msg;
-        }));
-        
-        setPendingMessageId(data.messageId);
-      } else {
-        setChatMessages(prev => prev.map((msg, idx) => {
-          if (idx === prev.length - 1 && msg.loading) {
-            return {
-              ...msg,
-              text: 'Failed to send message',
-              loading: false,
-              status: 'error'
-            };
-          }
-          return msg;
-        }));
+        }, 3000);
       }
     } catch (err) {
-      setChatMessages(prev => prev.map((msg, idx) => {
-        if (idx === prev.length - 1 && msg.loading) {
-          return {
-            ...msg,
-            text: 'Error: ' + (err as Error).message,
-            loading: false,
-            status: 'error'
-          };
-        }
-        return msg;
-      }));
-    }
-  };
-
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case 'awake': return 'awake';
-      case 'working': return 'working';
-      default: return 'sleeping';
+      setChatMessages(prev => prev.map((msg, idx) => 
+        idx === prev.length - 1 && msg.loading
+          ? { ...msg, text: 'Error sending message', loading: false, status: 'error' }
+          : msg
+      ));
     }
   };
 
@@ -261,207 +163,170 @@ export default function Dashboard() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       
-      <div className="container">
+      <div className="dashboard">
+        {/* Header */}
         <header className="header">
-          <h1>🦉 Agent Agency Dashboard</h1>
-          <div className="status-indicator">
-            <div className="status-dot"></div>
-            <span>System Online</span>
+          <div className="header-content">
+            <h1>🦉 Agent Agency</h1>
+            <div className="status-badge">
+              <span className="status-dot"></span>
+              <span>System Online</span>
+            </div>
           </div>
         </header>
 
-        <div className="main">
-          {/* Office View */}
-          <div className="office">
-            <div className="office-title">🏢 Office Floor - Meeting Room</div>
-            <div className="office-floor">
-              <div className="meeting-table">🦉</div>
-              {agents.map((agent, idx) => (
-                <div
-                  key={agent.id}
-                  className={`agent-avatar ${getStatusClass(agent.status)} ${selectedAgent === agent.id ? 'selected' : ''}`}
-                  style={getPositionStyle(idx)}
-                  onClick={() => setSelectedAgent(agent.id)}
-                >
-                  {agent.emoji}
-                  <div className="agent-name">{agent.name}</div>
-                  <div className="agent-status">{agent.status}</div>
+        <div className="main-content">
+          {/* Meeting Room */}
+          <div className="meeting-room-container">
+            <div className="room-header">
+              <h2>🏢 Agency Meeting Room</h2>
+              <p>Select an agent to interact</p>
+            </div>
+            
+            <div className="meeting-room">
+              {/* Center Table */}
+              <div className="conference-table">
+                <div className="table-surface">
+                  <span className="table-logo">🦉</span>
+                  <div className="table-glow"></div>
                 </div>
-              ))}
+              </div>
+              
+              {/* Agent Positions - Around the table */}
+              <div className="agents-around-table">
+                {agents.slice(0, 4).map((agent, idx) => (
+                  <div
+                    key={agent.id}
+                    className={`agent-seat position-${idx} ${agent.status} ${selectedAgent === agent.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedAgent(agent.id)}
+                  >
+                    <div className="seat-base">
+                      <div className="agent-avatar-large">
+                        <span className="agent-emoji">{agent.emoji}</span>
+                        <div className={`status-ring ${agent.status}`}></div>
+                      </div>
+                      <div className="agent-info-bubble">
+                        <span className="agent-name">{agent.name}</span>
+                        <span className="agent-role">{agent.role}</span>
+                        <span className={`status-badge ${agent.status}`}>{agent.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* More agents on the other side */}
+              <div className="agents-around-table bottom-row">
+                {agents.slice(4, 8).map((agent, idx) => (
+                  <div
+                    key={agent.id}
+                    className={`agent-seat position-${idx + 4} ${agent.status} ${selectedAgent === agent.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedAgent(agent.id)}
+                  >
+                    <div className="seat-base">
+                      <div className="agent-avatar-large">
+                        <span className="agent-emoji">{agent.emoji}</span>
+                        <div className={`status-ring ${agent.status}`}></div>
+                      </div>
+                      <div className="agent-info-bubble">
+                        <span className="agent-name">{agent.name}</span>
+                        <span className="agent-role">{agent.role}</span>
+                        <span className={`status-badge ${agent.status}`}>{agent.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Side Panel */}
           <div className="side-panel">
             <div className="tabs">
-              <button className={activeTab === 'agents' ? 'active' : ''} onClick={() => setActiveTab('agents')}>Agents</button>
-              <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>Chat</button>
-              <button className={activeTab === 'work' ? 'active' : ''} onClick={() => setActiveTab('work')}>Work</button>
-              <button className={activeTab === 'tokens' ? 'active' : ''} onClick={() => setActiveTab('tokens')}>📊 Tokens</button>
+              <button className={activeTab === 'agents' ? 'active' : ''} onClick={() => setActiveTab('agents')}>👥 Agents</button>
+              <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>💬 Chat</button>
+              <button className={activeTab === 'work' ? 'active' : ''} onClick={() => setActiveTab('work')}>📋 Work</button>
             </div>
 
             <div className="panel-content">
               {activeTab === 'agents' && (
-                <div className="agent-list">
-                  <div style={{ padding: '10px', marginBottom: '15px', background: 'rgba(0,255,136,0.1)', borderRadius: '8px' }}>
+                <div className="agents-panel">
+                  {agentResponse && (
+                    <div className="response-banner">
+                      {agentResponse}
+                    </div>
+                  )}
+                  
+                  <div className="task-input-section">
                     <input
                       type="text"
                       placeholder="Enter task for agent..."
                       value={taskInput}
                       onChange={(e) => setTaskInput(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        background: 'rgba(0,0,0,0.3)',
-                        color: '#fff',
-                        marginBottom: '10px'
-                      }}
                     />
-                    <p style={{ fontSize: '11px', color: '#888', margin: 0 }}>
-                      💡 Token-optimized prompts enabled (70% savings)
-                    </p>
+                    <p className="input-hint">💡 Token-optimized prompts enabled</p>
                   </div>
 
-                  {agentResponse && (
-                    <div style={{ padding: '12px', marginBottom: '15px', background: 'rgba(0,255,136,0.2)', borderRadius: '8px', fontSize: '13px' }}>
-                      {agentResponse}
-                    </div>
-                  )}
-
-                  {agents.map(agent => (
-                    <div key={agent.id} className={`agent-card ${selectedAgent === agent.id ? 'selected' : ''}`} onClick={() => setSelectedAgent(agent.id)}>
-                      <div className="agent-emoji">{agent.emoji}</div>
-                      <div className="agent-info">
-                        <div className="agent-name">{agent.name}</div>
-                        <div className="agent-role">{agent.role}</div>
-                        <div className="agent-status-badge">
-                          <span className={`badge ${agent.status}`}>{agent.status.toUpperCase()}</span>
+                  <div className="agents-list">
+                    {agents.map(agent => (
+                      <div key={agent.id} className={`agent-card ${selectedAgent === agent.id ? 'selected' : ''}`} onClick={() => setSelectedAgent(agent.id)}>
+                        <div className="card-emoji">{agent.emoji}</div>
+                        <div className="card-info">
+                          <div className="card-name">{agent.name}</div>
+                          <div className="card-role">{agent.role}</div>
+                          <div className={`card-status ${agent.status}`}>{agent.status}</div>
                         </div>
+                        {agent.status === 'sleeping' ? (
+                          <button className="btn-wake" disabled={isLoading} onClick={(e) => { e.stopPropagation(); wakeAgent(agent.id); }}>
+                            {isLoading ? '...' : 'Wake Up'}
+                          </button>
+                        ) : (
+                          <button className="btn-sleep" disabled={isLoading} onClick={(e) => { e.stopPropagation(); sleepAgent(agent.id); }}>
+                            {isLoading ? '...' : '💤 Sleep'}
+                          </button>
+                        )}
                       </div>
-                      <button 
-                        className="wake-btn" 
-                        disabled={isLoading}
-                        onClick={(e) => { e.stopPropagation(); wakeAgent(agent.id); }}
-                      >
-                        {isLoading ? '...' : 'Wake Up'}
-                      </button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
 
               {activeTab === 'chat' && (
-                <div className="chat-container">
+                <div className="chat-panel">
                   <div className="chat-messages">
                     {chatMessages.length === 0 ? (
-                      <div className="chat-placeholder">
-                        {selectedAgent ? `Chat with ${agents.find(a => a.id === selectedAgent)?.name || selectedAgent}` : 'Select an agent first'}
+                      <div className="chat-empty">
+                        {selectedAgent 
+                          ? `Chat with ${agents.find(a => a.id === selectedAgent)?.name || selectedAgent}` 
+                          : 'Select an agent from the meeting room'}
                       </div>
                     ) : (
                       chatMessages.map((msg, idx) => (
-                        <div key={idx} className={`chat-message ${msg.sender} ${msg.status || ''}`}>
-                          {msg.agentName && <div className="sender">{msg.agentName}</div>}
-                          {msg.loading ? (
-                            <span className="loading-dots">
-                              <span className="dot">.</span>
-                              <span className="dot">.</span>
-                              <span className="dot">.</span>
-                            </span>
-                          ) : (
-                            msg.text
-                          )}
+                        <div key={idx} className={`message ${msg.sender} ${msg.status || ''}`}>
+                          {msg.agentName && <div className="message-sender">{msg.agentName}</div>}
+                          <div className="message-text">{msg.loading ? 'Thinking...' : msg.text}</div>
                         </div>
                       ))
                     )}
                   </div>
-                  <div className="chat-input-area">
+                  <div className="chat-input">
                     <input
                       type="text"
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder={selectedAgent ? `Message ${agents.find(a => a.id === selectedAgent)?.name}...` : 'Select an agent...'}
-                      disabled={!selectedAgent || pendingMessageId !== null}
+                      disabled={!selectedAgent}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                     />
-                    <button onClick={sendMessage} disabled={!selectedAgent || !chatInput.trim() || pendingMessageId !== null}>➤</button>
+                    <button onClick={sendMessage} disabled={!selectedAgent || !chatInput.trim()}>➤</button>
                   </div>
                 </div>
               )}
 
               {activeTab === 'work' && (
-                <div className="work-list">
-                  <h3>📋 Recent Work</h3>
-                  {work.length === 0 ? (
-                    <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>No work items yet</p>
-                  ) : (
-                    work.map((item, idx) => {
-                      const agent = agents.find(a => a.id === item.agent);
-                      return (
-                        <div key={idx} className={`work-item ${item.status}`}>
-                          <div className="work-header">
-                            <span>{agent?.emoji} {agent?.name}</span>
-                            <span className="work-time">{new Date(item.time).toLocaleTimeString()}</span>
-                          </div>
-                          <div className="work-task">{item.task}</div>
-                          <span className={`work-status ${item.status}`}>{item.status.toUpperCase()}</span>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              )}
-
-              {activeTab === 'tokens' && tokenMetrics && (
-                <div className="token-metrics">
-                  <h3>📊 Token Analytics</h3>
-                  
-                  <div className="metric-card savings">
-                    <div className="metric-title">💰 Optimization Savings</div>
-                    <div className="metric-value">{tokenMetrics.optimization.percentage}%</div>
-                    <div className="metric-subtitle">
-                      {tokenMetrics.optimization.full} → {tokenMetrics.optimization.compressed} tokens
-                    </div>
-                  </div>
-
-                  <div className="metric-grid">
-                    <div className="metric-card">
-                      <div className="metric-title">📈 Total Tokens</div>
-                      <div className="metric-value">{tokenMetrics.usage.totalTokens.toLocaleString()}</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="metric-title">💵 Est. Cost</div>
-                      <div className="metric-value">{tokenMetrics.usage.estimatedCost.usd}</div>
-                      <div className="metric-subtitle">USD</div>
-                    </div>
-                  </div>
-
-                  <div className="metric-card">
-                    <div className="metric-title">⚡ Performance</div>
-                    <div className="metric-row">
-                      <span>Avg Response Time</span>
-                      <span>{tokenMetrics.performance.avgDuration}ms</span>
-                    </div>
-                    <div className="metric-row">
-                      <span>Total Requests</span>
-                      <span>{tokenMetrics.performance.totalRequests}</span>
-                    </div>
-                    <div className="metric-row">
-                      <span>Last 24h</span>
-                      <span>{tokenMetrics.performance.last24h}</span>
-                    </div>
-                  </div>
-
-                  <div className="metric-card">
-                    <div className="metric-title">👤 Usage by Agent</div>
-                    {Object.entries(tokenMetrics.usage.byAgent).map(([agentId, data]) => (
-                      <div key={agentId} className="metric-row">
-                        <span>{agentId}</span>
-                        <span>{data.tokens.toLocaleString()} tokens ({data.requests} req)</span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="work-panel">
+                  <h3>📋 Recent Activity</h3>
+                  <p className="empty-state">Work items will appear here</p>
                 </div>
               )}
             </div>
@@ -471,222 +336,593 @@ export default function Dashboard() {
 
       <style jsx global>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+          background: #0a0a0f;
           color: #fff;
           min-height: 100vh;
         }
-        .container { min-height: 100vh; display: flex; flex-direction: column; }
         
+        .dashboard {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        /* Header */
         .header {
-          background: rgba(0,0,0,0.3);
-          padding: 20px 40px;
+          background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, transparent 100%);
+          border-bottom: 1px solid rgba(0,255,136,0.2);
+          padding: 16px 32px;
+        }
+        
+        .header-content {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-bottom: 1px solid rgba(255,255,255,0.1);
+          max-width: 1600px;
+          margin: 0 auto;
         }
-        .header h1 { font-size: 28px; display: flex; align-items: center; gap: 10px; }
         
-        .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #aaa; }
+        .header h1 {
+          font-size: 24px;
+          font-weight: 700;
+          background: linear-gradient(90deg, #00ff88, #00cc6a);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        
+        .status-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          color: #00ff88;
+        }
+        
         .status-dot {
-          width: 10px; height: 10px; border-radius: 50%;
-          background: #00ff88; box-shadow: 0 0 10px #00ff88;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #00ff88;
+          box-shadow: 0 0 10px #00ff88;
           animation: pulse 2s infinite;
         }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
         
-        .main { display: flex; flex: 1; overflow: hidden; }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
         
-        .office { flex: 2; padding: 30px; }
-        .office-title { font-size: 20px; margin-bottom: 20px; color: #aaa; }
-        .office-floor {
-          background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
-          border-radius: 20px;
+        /* Main Layout */
+        .main-content {
+          flex: 1;
+          display: grid;
+          grid-template-columns: 1fr 400px;
+          gap: 24px;
+          padding: 24px;
+          max-width: 1600px;
+          margin: 0 auto;
+          width: 100%;
+        }
+        
+        /* Meeting Room */
+        .meeting-room-container {
+          background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.08);
+          overflow: hidden;
+          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        
+        .room-header {
+          background: linear-gradient(90deg, rgba(0,255,136,0.1), transparent);
+          padding: 20px 32px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .room-header h2 {
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+        
+        .room-header p {
+          font-size: 13px;
+          color: #888;
+        }
+        
+        .meeting-room {
           padding: 40px;
           min-height: 500px;
           position: relative;
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-        .meeting-table {
-          position: absolute;
-          top: 50%; left: 50%;
-          transform: translate(-50%, -50%);
-          width: 200px; height: 120px;
-          background: linear-gradient(145deg, #3a3a4e, #2a2a3e);
-          border-radius: 60px;
-          border: 3px solid rgba(255,255,255,0.2);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 40px;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
         }
         
-        .agent-avatar {
-          position: absolute;
-          width: 80px; height: 80px;
-          border-radius: 50%;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          border: 3px solid;
-          font-size: 32px;
-          box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        /* Conference Table */
+        .conference-table {
+          position: relative;
+          width: 320px;
+          height: 180px;
+          margin-bottom: 60px;
         }
-        .agent-avatar:hover { transform: scale(1.1); }
-        .agent-avatar.selected { transform: scale(1.2); z-index: 10; }
-        .agent-avatar.awake { background: linear-gradient(145deg, #2d5a3d, #1a3a2a); border-color: #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.3); }
-        .agent-avatar.sleeping { background: linear-gradient(145deg, #3a3a4e, #2a2a3e); border-color: #666; opacity: 0.7; }
-        .agent-avatar.working { background: linear-gradient(145deg, #5a4a2d, #3a2a1a); border-color: #ffaa00; box-shadow: 0 0 20px rgba(255,170,0,0.3); animation: working 2s infinite; }
-        @keyframes working { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .agent-avatar .agent-name { font-size: 11px; margin-top: 5px; font-weight: bold; }
-        .agent-avatar .agent-status { font-size: 9px; color: #aaa; }
         
-        .side-panel { flex: 1; background: rgba(0,0,0,0.2); border-left: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
-        .tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .tabs button { flex: 1; padding: 15px; background: transparent; border: none; color: #aaa; cursor: pointer; transition: all 0.3s; font-size: 14px; }
-        .tabs button:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .tabs button.active { background: rgba(255,255,255,0.1); color: #fff; border-bottom: 2px solid #00ff88; }
-        
-        .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
-        
-        .agent-list { display: flex; flex-direction: column; gap: 15px; }
-        .agent-card {
-          background: rgba(255,255,255,0.05);
-          border-radius: 12px;
-          padding: 15px;
+        .table-surface {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(145deg, #2a2a3e, #1e1e2e);
+          border-radius: 100px;
+          border: 2px solid rgba(0,255,136,0.3);
           display: flex;
           align-items: center;
-          gap: 15px;
+          justify-content: center;
+          position: relative;
+          box-shadow: 
+            0 20px 60px rgba(0,0,0,0.5),
+            inset 0 2px 4px rgba(255,255,255,0.1),
+            0 0 40px rgba(0,255,136,0.1);
+        }
+        
+        .table-logo {
+          font-size: 56px;
+          filter: drop-shadow(0 0 20px rgba(0,255,136,0.5));
+        }
+        
+        .table-glow {
+          position: absolute;
+          inset: -20px;
+          border-radius: 120px;
+          background: radial-gradient(ellipse at center, rgba(0,255,136,0.15) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        
+        /* Agents Around Table */
+        .agents-around-table {
+          display: flex;
+          gap: 40px;
+          justify-content: center;
+          margin-bottom: 40px;
+        }
+        
+        .agents-around-table.bottom-row {
+          margin-bottom: 0;
+        }
+        
+        .agent-seat {
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.3s ease;
+        }
+        
+        .agent-seat:hover {
+          transform: translateY(-8px);
+        }
+        
+        .agent-seat.selected .agent-avatar-large {
+          box-shadow: 0 0 30px rgba(0,255,136,0.5);
+          transform: scale(1.1);
+        }
+        
+        .seat-base {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .agent-avatar-large {
+          width: 72px;
+          height: 72px;
+          border-radius: 50%;
+          background: linear-gradient(145deg, #3a3a4e, #2a2a3e);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        
+        .agent-emoji {
+          font-size: 32px;
+        }
+        
+        .status-ring {
+          position: absolute;
+          inset: -3px;
+          border-radius: 50%;
+          border: 3px solid transparent;
+        }
+        
+        .status-ring.awake {
+          border-color: #00ff88;
+          box-shadow: 0 0 15px rgba(0,255,136,0.4);
+        }
+        
+        .status-ring.working {
+          border-color: #ffaa00;
+          box-shadow: 0 0 15px rgba(255,170,0,0.4);
+          animation: working-pulse 2s infinite;
+        }
+        
+        .status-ring.sleeping {
+          border-color: #555;
+          opacity: 0.5;
+        }
+        
+        @keyframes working-pulse {
+          0%, 100% { box-shadow: 0 0 15px rgba(255,170,0,0.4); }
+          50% { box-shadow: 0 0 25px rgba(255,170,0,0.7); }
+        }
+        
+        .agent-info-bubble {
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(10px);
+          padding: 6px 12px;
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .agent-name {
+          font-size: 13px;
+          font-weight: 600;
+        }
+        
+        .agent-role {
+          font-size: 10px;
+          color: #888;
+        }
+        
+        .status-badge {
+          font-size: 9px;
+          padding: 2px 8px;
+          border-radius: 10px;
+          text-transform: uppercase;
+          font-weight: 600;
+          margin-top: 2px;
+        }
+        
+        .status-badge.awake {
+          background: rgba(0,255,136,0.2);
+          color: #00ff88;
+        }
+        
+        .status-badge.working {
+          background: rgba(255,170,0,0.2);
+          color: #ffaa00;
+        }
+        
+        .status-badge.sleeping {
+          background: rgba(100,100,100,0.2);
+          color: #888;
+        }
+        
+        /* Side Panel */
+        .side-panel {
+          background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.08);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        
+        .tabs {
+          display: flex;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        
+        .tabs button {
+          flex: 1;
+          padding: 16px;
+          background: transparent;
+          border: none;
+          color: #888;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 14px;
+          font-weight: 500;
+        }
+        
+        .tabs button:hover {
+          color: #fff;
+          background: rgba(255,255,255,0.03);
+        }
+        
+        .tabs button.active {
+          color: #00ff88;
+          background: rgba(0,255,136,0.1);
+          border-bottom: 2px solid #00ff88;
+        }
+        
+        .panel-content {
+          flex: 1;
+          overflow-y: auto;
+          padding: 20px;
+        }
+        
+        /* Agents Panel */
+        .agents-panel {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        
+        .response-banner {
+          background: rgba(0,255,136,0.15);
+          border: 1px solid rgba(0,255,136,0.3);
+          padding: 12px 16px;
+          border-radius: 12px;
+          font-size: 13px;
+        }
+        
+        .task-input-section {
+          background: rgba(255,255,255,0.03);
+          padding: 16px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .task-input-section input {
+          width: 100%;
+          padding: 12px;
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+        
+        .input-hint {
+          font-size: 11px;
+          color: #666;
+        }
+        
+        .agents-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        
+        .agent-card {
+          background: rgba(255,255,255,0.03);
+          border-radius: 12px;
+          padding: 14px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          transition: all 0.2s;
           border: 1px solid transparent;
         }
-        .agent-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
-        .agent-card.selected { border-color: #00ff88; background: rgba(0,255,136,0.1); }
-        .agent-card .agent-emoji { font-size: 32px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 50%; }
-        .agent-card .agent-info { flex: 1; }
-        .agent-card .agent-name { font-weight: bold; font-size: 16px; }
-        .agent-card .agent-role { font-size: 12px; color: #aaa; }
-        .agent-card .agent-status-badge { margin-top: 5px; }
-        .badge { padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
-        .badge.awake { background: #00ff88; color: #000; }
-        .badge.sleeping { background: #666; color: #fff; }
-        .badge.working { background: #ffaa00; color: #000; }
-        .wake-btn {
+        
+        .agent-card:hover {
+          background: rgba(255,255,255,0.06);
+          border-color: rgba(255,255,255,0.1);
+        }
+        
+        .agent-card.selected {
+          background: rgba(0,255,136,0.1);
+          border-color: rgba(0,255,136,0.3);
+        }
+        
+        .card-emoji {
+          font-size: 28px;
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,0,0,0.3);
+          border-radius: 50%;
+        }
+        
+        .card-info {
+          flex: 1;
+        }
+        
+        .card-name {
+          font-weight: 600;
+          font-size: 15px;
+          margin-bottom: 2px;
+        }
+        
+        .card-role {
+          font-size: 12px;
+          color: #888;
+          margin-bottom: 4px;
+        }
+        
+        .card-status {
+          font-size: 10px;
+          padding: 3px 10px;
+          border-radius: 20px;
+          text-transform: uppercase;
+          font-weight: 600;
+          display: inline-block;
+        }
+        
+        .card-status.awake {
+          background: rgba(0,255,136,0.2);
+          color: #00ff88;
+        }
+        
+        .card-status.working {
+          background: rgba(255,170,0,0.2);
+          color: #ffaa00;
+        }
+        
+        .card-status.sleeping {
+          background: rgba(100,100,100,0.2);
+          color: #888;
+        }
+        
+        .btn-wake {
           background: linear-gradient(145deg, #00ff88, #00cc6a);
           border: none;
           padding: 8px 16px;
           border-radius: 20px;
           color: #000;
-          font-weight: bold;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.2s;
+          font-size: 12px;
         }
-        .wake-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,255,136,0.4); }
-        .wake-btn:disabled { background: #666; cursor: not-allowed; }
         
-        .chat-container { display: flex; flex-direction: column; height: 100%; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .chat-placeholder { text-align: center; color: #666; padding: 40px; }
-        .chat-message { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
-        .chat-message.user { align-self: flex-end; background: linear-gradient(145deg, #0084ff, #0066cc); border-bottom-right-radius: 4px; }
-        .chat-message.agent { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
-        .chat-message.agent.completed { border-left: 3px solid #00ff88; }
-        .chat-message.agent.error { border-left: 3px solid #ff4444; }
-        .chat-message .sender { font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #aaa; }
+        .btn-wake:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 12px rgba(0,255,136,0.4);
+        }
         
-        .loading-dots { display: inline-flex; }
-        .loading-dots .dot { animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px; }
-        .loading-dots .dot:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dots .dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        .btn-sleep {
+          background: linear-gradient(145deg, #555, #333);
+          border: none;
+          padding: 8px 16px;
+          border-radius: 20px;
+          color: #fff;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-size: 12px;
+        }
         
-        .chat-input-area { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
-        .chat-input-area input { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 10px 20px; color: #fff; font-size: 14px; outline: none; }
-        .chat-input-area input::placeholder { color: #666; }
-        .chat-input-area input:disabled { opacity: 0.5; }
-        .chat-input-area button { background: #00ff88; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-        .chat-input-area button:hover { transform: scale(1.1); }
-        .chat-input-area button:disabled { background: #666; cursor: not-allowed; }
+        .btn-sleep:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 12px rgba(100,100,100,0.4);
+        }
         
-        .work-list { display: flex; flex-direction: column; gap: 15px; }
-        .work-list h3 { margin-bottom: 10px; }
-        .work-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; border-left: 3px solid #00ff88; }
-        .work-item.pending { border-left-color: #ffaa00; }
-        .work-item.completed { border-left-color: #00ff88; }
-        .work-item .work-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .work-item .work-time { font-size: 12px; color: #aaa; }
-        .work-item .work-task { font-size: 14px; color: #ddd; }
-        .work-item .work-status { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; margin-top: 8px; }
-        .work-status.pending { background: rgba(255,170,0,0.2); color: #ffaa00; }
-        .work-status.completed { background: rgba(0,255,136,0.2); color: #00ff88; }
-
-        /* Token Metrics Styles */
-        .token-metrics { display: flex; flex-direction: column; gap: 15px; }
-        .token-metrics h3 { margin-bottom: 10px; color: #00ff88; }
-        .metric-card {
-          background: rgba(255,255,255,0.05);
-          border-radius: 12px;
-          padding: 15px;
+        button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          padding-bottom: 16px;
+        }
+        
+        .chat-empty {
+          text-align: center;
+          color: #666;
+          padding: 40px;
+          font-size: 14px;
+        }
+        
+        .message {
+          max-width: 85%;
+          padding: 12px 16px;
+          border-radius: 16px;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+        
+        .message.user {
+          align-self: flex-end;
+          background: linear-gradient(145deg, #0084ff, #0066cc);
+          border-bottom-right-radius: 4px;
+        }
+        
+        .message.agent {
+          align-self: flex-start;
+          background: rgba(255,255,255,0.08);
+          border-bottom-left-radius: 4px;
+        }
+        
+        .message-sender {
+          font-size: 11px;
+          font-weight: 600;
+          margin-bottom: 4px;
+          color: #00ff88;
+        }
+        
+        .chat-input {
+          display: flex;
+          gap: 10px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        
+        .chat-input input {
+          flex: 1;
+          padding: 12px 16px;
+          border-radius: 24px;
           border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(0,0,0,0.3);
+          color: #fff;
+          font-size: 14px;
+          outline: none;
         }
-        .metric-card.savings {
-          background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,200,100,0.05));
+        
+        .chat-input input:focus {
           border-color: rgba(0,255,136,0.3);
         }
-        .metric-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-        }
-        .metric-title {
-          font-size: 12px;
-          color: #888;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          margin-bottom: 8px;
-        }
-        .metric-value {
-          font-size: 28px;
-          font-weight: bold;
-          color: #fff;
-        }
-        .metric-subtitle {
-          font-size: 12px;
-          color: #888;
-          margin-top: 4px;
-        }
-        .metric-row {
-          display: flex;
-          justify-content: space-between;
-          padding: 8px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-          font-size: 13px;
-        }
-        .metric-row:last-child { border-bottom: none; }
         
-        @media (max-width: 900px) {
-          .main { flex-direction: column; }
-          .office { flex: none; height: 400px; }
-          .side-panel { flex: none; height: 400px; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
-          .metric-grid { grid-template-columns: 1fr; }
+        .chat-input button {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          border: none;
+          background: linear-gradient(145deg, #00ff88, #00cc6a);
+          color: #000;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .chat-input button:hover:not(:disabled) {
+          transform: scale(1.1);
+        }
+        
+        .chat-input button:disabled {
+          background: #444;
+          color: #666;
+        }
+        
+        /* Work Panel */
+        .work-panel h3 {
+          margin-bottom: 16px;
+          font-weight: 600;
+        }
+        
+        .empty-state {
+          text-align: center;
+          color: #666;
+          padding: 40px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1100px) {
+          .main-content {
+            grid-template-columns: 1fr;
+          }
+          
+          .side-panel {
+            max-height: 500px;
+          }
         }
       `}</style>
     </>
   );
-}
-
-function getPositionStyle(index: number): React.CSSProperties {
-  const positions = [
-    { top: '10%', left: '50%', transform: 'translateX(-50%)' },
-    { top: '30%', right: '10%' },
-    { bottom: '30%', right: '10%' },
-    { bottom: '10%', left: '50%', transform: 'translateX(-50%)' },
-    { bottom: '30%', left: '10%' },
-    { top: '30%', left: '10%' },
-    { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', marginTop: '-100px' },
-  ];
-  return positions[index] || {};
 }

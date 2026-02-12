@@ -1,0 +1,9 @@
+{
+  "id": "henry-1770919481712-vq640xu3u",
+  "agentId": "henry",
+  "message": "henry can you hear me?",
+  "timestamp": "2026-02-12T18:04:41.712Z",
+  "status": "completed",
+  "processedAt": "2026-02-12T18:04:44.065Z",
+  "response": "error: required option '-m, --message <text>' not specified\n"
+}

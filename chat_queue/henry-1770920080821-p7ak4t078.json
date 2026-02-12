@@ -1,0 +1,9 @@
+{
+  "id": "henry-1770920080821-p7ak4t078",
+  "agentId": "henry",
+  "message": "heyy",
+  "timestamp": "2026-02-12T18:14:40.821Z",
+  "status": "completed",
+  "processedAt": "2026-02-12T18:14:43.204Z",
+  "response": "error: unknown option '--model'\n"
+}

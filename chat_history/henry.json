@@ -9,5 +9,31 @@
     "message": "[Processing...]",
     "timestamp": "2026-02-11T20:49:51.153Z",
     "agentId": "henry"
+  },
+  {
+    "sender": "user",
+    "message": "henry can you hear me?",
+    "timestamp": "2026-02-12T18:04:41.712Z",
+    "queuedId": "henry-1770919481712-vq640xu3u"
+  },
+  {
+    "sender": "agent",
+    "message": "error: required option '-m, --message <text>' not specified\n",
+    "timestamp": "2026-02-12T18:04:41.712Z",
+    "queuedId": "henry-1770919481712-vq640xu3u",
+    "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "heyy",
+    "timestamp": "2026-02-12T18:14:40.822Z",
+    "queuedId": "henry-1770920080821-p7ak4t078"
+  },
+  {
+    "sender": "agent",
+    "message": "error: unknown option '--model'\n",
+    "timestamp": "2026-02-12T18:14:40.822Z",
+    "queuedId": "henry-1770920080821-p7ak4t078",
+    "status": "completed"
   }
 ]
