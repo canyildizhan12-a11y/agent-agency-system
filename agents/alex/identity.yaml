@@ -29,6 +29,8 @@ domain_expertise:
   - audit_logging
   - policy_enforcement
   - verification
+  - disk_space_regulation
+  - system_health_monitoring
 
 relationships:
   can:
@@ -52,6 +54,9 @@ wake_conditions:
   - security_policy_triggered: true
   - red_zone_alert: true
   - critical_decision_required: true  # Escalate to Can
+  # Disk space regulation
+  - disk_usage_threshold_exceeded: true  # > 85%
+  - cleanup_required: true
 
 sleep_conditions:
   - never: true  # Immune system never sleeps

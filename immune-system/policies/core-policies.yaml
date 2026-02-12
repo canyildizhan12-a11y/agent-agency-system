@@ -149,7 +149,55 @@ Override is logged but executed immediately.
 
 ---
 
-## 6. Policy Updates
+## 6. Disk Space Regulation System
+
+### 6.1 Automatic Cleanup Trigger
+**Monitored by:** Alex 🛡️  
+**Trigger:** Disk usage > 85%  
+**Action:** AUTO-CLEAN (no escalation needed)
+
+### 6.2 Cleanup Priority Order
+```
+1. npm cache (npm cache clean --force)
+2. Build artifacts (.next/, dist/, build/)
+3. Old log files (> 7 days)
+4. Temporary files (*.tmp, .temp/)
+5. Git garbage (git gc)
+6. Old package-lock backups
+```
+
+### 6.3 Protected Paths (Never Delete)
+- /home/ubuntu/.openclaw/workspace/agent-agency/agents/
+- /home/ubuntu/.openclaw/workspace/memory/
+- /home/ubuntu/.openclaw/workspace/USER.md
+- /home/ubuntu/.openclaw/workspace/SOUL.md
+- Any file modified within 24 hours
+
+### 6.4 Cleanup Log
+```json
+{
+  "timestamp": "2026-02-12T12:00:00+03:00",
+  "trigger": "disk_usage_87%",
+  "actions": [
+    {"action": "npm_cache_clean", "freed_mb": 924},
+    {"action": "remove_build_artifacts", "freed_mb": 74},
+    {"action": "clean_old_logs", "freed_mb": 12}
+  ],
+  "total_freed_mb": 1010,
+  "disk_after": "78%",
+  "notified_can": false
+}
+```
+
+### 6.5 Critical Threshold
+If disk > 95% and cleanup insufficient:
+- IMMEDIATE alert to Can
+- Pause non-essential operations
+- Request manual intervention
+
+---
+
+## 7. Policy Updates
 
 Only Can can update policies:
 

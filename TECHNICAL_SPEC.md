@@ -429,6 +429,35 @@ D) Let me handle it (routine)
 ⚠️ Note: You have ultimate authority. I only oversee routine tasks.
 ```
 
+### 6.4 Disk Space Regulation System
+
+**Managed by:** Alex 🛡️ (Immune System)  
+**Trigger:** Disk usage > 85%  
+**Action:** Automatic cleanup (no escalation)
+
+**Cleanup Priority:**
+1. npm cache (`npm cache clean --force`)
+2. Build artifacts (`.next/`, `dist/`, `build/`)
+3. Old log files (> 7 days)
+4. Temporary files (`*.tmp`, `.temp/`)
+5. Git garbage collection
+
+**Protected Paths (Never Deleted):**
+- Agent identity files
+- Memory files
+- Core system files
+- Files modified within 24 hours
+
+**Critical Threshold:**
+- If disk > 95% after cleanup → IMMEDIATE alert to Can
+- Pause non-essential operations
+- Request manual intervention
+
+**Monitoring:**
+- Check every 5 minutes via cron
+- Log all cleanup actions
+- Report freed space and new disk usage
+
 ---
 
 ## 7. Memory & Persistence System

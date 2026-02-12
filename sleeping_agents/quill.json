@@ -1,11 +1,11 @@
 {
   "agent_id": "quill",
   "status": "sleeping",
-  "since": "2026-02-12T03:00:45.063Z",
+  "since": "2026-02-12T11:00:17.019Z",
   "wakes_for": [
     "09:00 meeting",
     "17:00 meeting",
     "manual_wake"
   ],
-  "last_task_completed": "2026-02-12T03:00:45.063Z"
+  "last_task_completed": "2026-02-12T11:00:17.019Z"
 }
