@@ -33,5 +33,47 @@
     "inputTokens": 1,
     "outputTokens": 18,
     "totalTokens": 19
+  },
+  {
+    "timestamp": "2026-02-12T18:50:52.610Z",
+    "agentId": "henry",
+    "inputTokens": 1,
+    "outputTokens": 37,
+    "totalTokens": 38
+  },
+  {
+    "timestamp": "2026-02-12T18:51:06.118Z",
+    "agentId": "henry",
+    "inputTokens": 3,
+    "outputTokens": 58,
+    "totalTokens": 61
+  },
+  {
+    "timestamp": "2026-02-12T18:51:25.167Z",
+    "agentId": "henry",
+    "inputTokens": 7,
+    "outputTokens": 85,
+    "totalTokens": 92
+  },
+  {
+    "timestamp": "2026-02-12T18:52:08.764Z",
+    "agentId": "henry",
+    "inputTokens": 10,
+    "outputTokens": 55,
+    "totalTokens": 64
+  },
+  {
+    "timestamp": "2026-02-12T18:53:16.551Z",
+    "agentId": "scout",
+    "inputTokens": 7,
+    "outputTokens": 18,
+    "totalTokens": 25
+  },
+  {
+    "timestamp": "2026-02-12T18:53:48.349Z",
+    "agentId": "scout",
+    "inputTokens": 27,
+    "outputTokens": 111,
+    "totalTokens": 138
   }
 ]

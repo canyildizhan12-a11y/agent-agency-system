@@ -1,6 +1,6 @@
 {
   "agent_id": "henry",
-  "status": "awake",
+  "status": "working",
   "since": "2026-02-12T11:00:12.367Z",
   "wakes_for": [
     "09:00 meeting",
@@ -9,5 +9,6 @@
   ],
   "woken_at": "2026-02-12T18:04:31.213Z",
   "woken_by": "dashboard",
-  "current_task": "General task - analyze our current projects and suggest improvements"
+  "current_task": "how many agents are active right now?",
+  "updated_at": "2026-02-12T18:52:08.763Z"
 }

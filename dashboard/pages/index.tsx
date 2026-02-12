@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 
+interface AgentSession {
+  sessionKey: string;
+  uuid: string;
+  spawnedAt: string;
+  expiresAt: string;
+  task: string;
+}
+
 interface Agent {
   id: string;
   name: string;
@@ -8,7 +16,7 @@ interface Agent {
   role: string;
   status: 'awake' | 'sleeping' | 'working';
   color: string;
-  lastTask?: string;
+  session: AgentSession | null;
 }
 
 interface ChatMessage {
@@ -22,14 +30,14 @@ interface ChatMessage {
 
 export default function Dashboard() {
   const [agents, setAgents] = useState<Agent[]>([
-    { id: 'henry', name: 'Henry', emoji: '🦉', role: 'Team Lead', status: 'awake', color: '#00ff88' },
-    { id: 'scout', name: 'Scout', emoji: '🔍', role: 'Research', status: 'sleeping', color: '#00ff88' },
-    { id: 'pixel', name: 'Pixel', emoji: '🎨', role: 'Creative', status: 'awake', color: '#00ff88' },
-    { id: 'echo', name: 'Echo', emoji: '💾', role: 'Memory', status: 'sleeping', color: '#00ff88' },
-    { id: 'quill', name: 'Quill', emoji: '✍️', role: 'Documentation', status: 'sleeping', color: '#00ff88' },
-    { id: 'codex', name: 'Codex', emoji: '🏗️', role: 'Architecture', status: 'working', color: '#00ff88' },
-    { id: 'alex', name: 'Alex', emoji: '🛡️', role: 'Security Lead', status: 'awake', color: '#00ff88' },
-    { id: 'vega', name: 'Vega', emoji: '📊', role: 'Data Analyst', status: 'sleeping', color: '#00ff88' },
+    { id: 'henry', name: 'Henry', emoji: '🦉', role: 'Team Lead', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'scout', name: 'Scout', emoji: '🔍', role: 'Research', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'pixel', name: 'Pixel', emoji: '🎨', role: 'Creative', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'echo', name: 'Echo', emoji: '💾', role: 'Memory', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'quill', name: 'Quill', emoji: '✍️', role: 'Documentation', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'codex', name: 'Codex', emoji: '🏗️', role: 'Architecture', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'alex', name: 'Alex', emoji: '🛡️', role: 'Security Lead', status: 'sleeping', color: '#00ff88', session: null },
+    { id: 'vega', name: 'Vega', emoji: '📊', role: 'Data Analyst', status: 'sleeping', color: '#00ff88', session: null },
   ]);
   
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
@@ -58,9 +66,12 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  const [sessionDetails, setSessionDetails] = useState<any>(null);
+
   const wakeAgent = async (agentId: string) => {
     const task = taskInput.trim() || 'Check in and report status';
     setIsLoading(true);
+    setSessionDetails(null);
     
     try {
       const res = await fetch(`/api/wake?id=${agentId}`, { 
@@ -71,7 +82,8 @@ export default function Dashboard() {
       
       if (res.ok) {
         const data = await res.json();
-        setAgentResponse(`${data.agentEmoji} ${data.agentName} is now awake and working on: ${task}`);
+        setAgentResponse(`${data.agentEmoji} ${data.agentName} is now awake!`);
+        setSessionDetails(data.session);
         fetchData();
       }
     } catch (err) {
@@ -257,6 +269,19 @@ export default function Dashboard() {
                     </div>
                   )}
                   
+                  {sessionDetails && (
+                    <div className="session-details">
+                      <div className="session-header">📋 Session Details</div>
+                      <div className="session-info">
+                        <div><strong>Session Key:</strong> <code>{sessionDetails.sessionKey}</code></div>
+                        <div><strong>UUID:</strong> <code>{sessionDetails.uuid}</code></div>
+                        <div><strong>Spawned:</strong> {new Date(sessionDetails.spawnedAt).toLocaleString('tr-TR')}</div>
+                        <div><strong>Expires:</strong> {new Date(sessionDetails.expiresAt).toLocaleString('tr-TR')}</div>
+                        <div><strong>Task:</strong> {sessionDetails.task}</div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="task-input-section">
                     <input
                       type="text"
@@ -269,12 +294,17 @@ export default function Dashboard() {
 
                   <div className="agents-list">
                     {agents.map(agent => (
-                      <div key={agent.id} className={`agent-card ${selectedAgent === agent.id ? 'selected' : ''}`} onClick={() => setSelectedAgent(agent.id)}>
+                      <div key={agent.id} className={`agent-card ${selectedAgent === agent.id ? 'selected' : ''} ${agent.status}`} onClick={() => setSelectedAgent(agent.id)}>
                         <div className="card-emoji">{agent.emoji}</div>
                         <div className="card-info">
                           <div className="card-name">{agent.name}</div>
                           <div className="card-role">{agent.role}</div>
                           <div className={`card-status ${agent.status}`}>{agent.status}</div>
+                          {agent.session && (
+                            <div className="session-hint">
+                              ⏱️ Expires: {new Date(agent.session.expiresAt).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}
+                            </div>
+                          )}
                         </div>
                         {agent.status === 'sleeping' ? (
                           <button className="btn-wake" disabled={isLoading} onClick={(e) => { e.stopPropagation(); wakeAgent(agent.id); }}>
@@ -662,6 +692,45 @@ export default function Dashboard() {
           padding: 12px 16px;
           border-radius: 12px;
           font-size: 13px;
+        }
+        
+        .session-details {
+          background: rgba(0,100,255,0.1);
+          border: 1px solid rgba(0,100,255,0.3);
+          border-radius: 12px;
+          overflow: hidden;
+          margin-bottom: 16px;
+        }
+        
+        .session-header {
+          background: rgba(0,100,255,0.2);
+          padding: 10px 16px;
+          font-weight: 600;
+          font-size: 13px;
+          border-bottom: 1px solid rgba(0,100,255,0.2);
+        }
+        
+        .session-info {
+          padding: 12px 16px;
+          font-size: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        
+        .session-info code {
+          background: rgba(0,0,0,0.4);
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 11px;
+          color: #00ff88;
+        }
+        
+        .session-hint {
+          font-size: 10px;
+          color: #00ff88;
+          margin-top: 4px;
         }
         
         .task-input-section {

@@ -1,10 +1,12 @@
 {
   "agent_id": "scout",
-  "status": "sleeping",
+  "status": "working",
   "since": "2026-02-12T11:00:12.367Z",
   "wakes_for": [
     "09:00 meeting",
     "17:00 meeting",
     "manual_wake"
-  ]
+  ],
+  "current_task": "can you inspect the system to see how many subagents are running right now and what are their session ids?",
+  "updated_at": "2026-02-12T18:53:48.349Z"
 }

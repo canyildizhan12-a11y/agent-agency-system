@@ -1,0 +1,28 @@
+[
+  {
+    "sender": "user",
+    "message": "yo scout, can you hear me?",
+    "timestamp": "2026-02-12T18:53:10.248Z",
+    "queuedId": "scout-1770922390248-6kxnqtswp"
+  },
+  {
+    "sender": "agent",
+    "message": "🔍 Loud and clear. Scout here, online and ready. \n\nWhat's on your mind?\n",
+    "timestamp": "2026-02-12T18:53:10.248Z",
+    "queuedId": "scout-1770922390248-6kxnqtswp",
+    "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "can you inspect the system to see how many subagents are running right now and what are their session ids?",
+    "timestamp": "2026-02-12T18:53:39.339Z",
+    "queuedId": "scout-1770922419339-a6ottrctf"
+  },
+  {
+    "sender": "agent",
+    "message": "🔍 System scan complete. \n\n**Current Session Status:**\n- **Total active sessions:** 1\n- **Subagents running:** 0\n\nThe only active session is your main one with me:\n| Property | Value |\n|----------|-------|\n| Session ID | `ffb715be-d9d8-4853-8770-5e06eaa0910b` |\n| Key | `agent:scout:main` |\n| Channel | WhatsApp |\n| Model | kimi-k2.5 |\n\nNo subagents are currently running. If you need me to spawn one for a background task, just say the word.\n",
+    "timestamp": "2026-02-12T18:53:39.339Z",
+    "queuedId": "scout-1770922419339-a6ottrctf",
+    "status": "completed"
+  }
+]

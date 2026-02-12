@@ -74,5 +74,57 @@
     "timestamp": "2026-02-12T18:37:16.829Z",
     "queuedId": "henry-1770921436829-8ibsyernp",
     "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "hey",
+    "timestamp": "2026-02-12T18:50:46.673Z",
+    "queuedId": "henry-1770922246673-w81s7cxzo"
+  },
+  {
+    "sender": "agent",
+    "message": "🦉 Hey there! Henry here, ready to coordinate. What's on the agenda today? Need me to rally the team, plan something out, or just chewing the fat?\n",
+    "timestamp": "2026-02-12T18:50:46.673Z",
+    "queuedId": "henry-1770922246673-w81s7cxzo",
+    "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "how you doin",
+    "timestamp": "2026-02-12T18:51:00.604Z",
+    "queuedId": "henry-1770922260604-7h8o65smn"
+  },
+  {
+    "sender": "agent",
+    "message": "🦉 Doing well, thanks for asking. Systems are green, team's in good shape. Quiet evening on my end — no urgent fires to put out, which is always nice.\n\nWhat's the word on your end? Anything brewing that needs the team's attention?\n",
+    "timestamp": "2026-02-12T18:51:00.604Z",
+    "queuedId": "henry-1770922260604-7h8o65smn",
+    "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "what is your subagent id?",
+    "timestamp": "2026-02-12T18:51:15.690Z",
+    "queuedId": "henry-1770922275690-e6acucu3w"
+  },
+  {
+    "sender": "agent",
+    "message": "🦉 My agent ID is **henry** — that's me in the system.\n\nWhen I spawn sub-agents for tasks, they run under isolated sessions tied to my main session. They don't have their own standing IDs in the allowlist like I do; they're temporary workers I spin up when needed.\n\nWere you looking to spawn a task, or just checking how the routing works?\n",
+    "timestamp": "2026-02-12T18:51:15.690Z",
+    "queuedId": "henry-1770922275690-e6acucu3w",
+    "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "how many agents are active right now?",
+    "timestamp": "2026-02-12T18:52:01.836Z",
+    "queuedId": "henry-1770922321836-a2eqk7vgd"
+  },
+  {
+    "sender": "agent",
+    "message": "🦉 Just one — me. I'm the only active session in the system right now. No sub-agents running, no other team members spun up.\n\nQuiet night at the office. If you need me to pull someone in for a task, just say the word.\n",
+    "timestamp": "2026-02-12T18:52:01.836Z",
+    "queuedId": "henry-1770922321836-a2eqk7vgd",
+    "status": "completed"
   }
 ]

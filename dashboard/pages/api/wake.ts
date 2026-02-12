@@ -1,9 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { spawnAgent, isAgentActive } from '../../lib/openclaw';
-import fs from 'fs';
-import path from 'path';
-
-const AGENCY_DIR = '/home/ubuntu/.openclaw/workspace/agent-agency';
+import { 
+  queueSpawnRequest, 
+  isAgentAwake, 
+  getAgentSession,
+  registerSpawnedSession,
+  buildIdentityContext,
+  AGENT_IDENTITIES,
+  MAX_SESSION_MINUTES
+} from '../../lib/subagentManager';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -11,44 +15,65 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { id } = req.query;
-  
+  const { task, sessionKey, spawnComplete } = req.body;
+
   if (!id || typeof id !== 'string') {
     return res.status(400).json({ error: 'Agent ID required' });
   }
 
-  const { task, message } = req.body;
+  const agentId = id.toLowerCase();
+  const identity = AGENT_IDENTITIES[agentId];
 
-  try {
-    // Check if agent is already active
-    const wasActive = isAgentActive(id);
-    
-    // Spawn/wake the agent
-    const result = await spawnAgent(id, task || message || 'Wake up and report for duty');
-    
-    // Update sleeping_agents status file
-    const sleepFile = path.join(AGENCY_DIR, 'sleeping_agents', `${id}.json`);
-    if (fs.existsSync(sleepFile)) {
-      const data = JSON.parse(fs.readFileSync(sleepFile, 'utf8'));
-      data.status = 'awake';
-      data.woken_at = new Date().toISOString();
-      data.woken_by = 'dashboard';
-      data.current_task = task || message;
-      fs.writeFileSync(sleepFile, JSON.stringify(data, null, 2));
-    }
-
-    res.status(200).json({ 
-      success: true, 
-      message: wasActive 
-        ? `📨 Message sent to ${id}` 
-        : `🚀 ${id} is now awake and working`,
-      agentId: id,
-      wasActive,
-      agentName: result.name,
-      agentEmoji: result.emoji,
-      wokenAt: new Date().toISOString()
-    });
-  } catch (err: any) {
-    console.error('Error waking agent:', err);
-    res.status(500).json({ error: err.message });
+  if (!identity) {
+    return res.status(400).json({ error: `Unknown agent: ${agentId}` });
   }
+
+  // Check if already awake
+  if (isAgentAwake(agentId)) {
+    const existingSession = getAgentSession(agentId);
+    return res.status(200).json({
+      success: true,
+      agentId,
+      agentName: identity.name,
+      agentEmoji: identity.emoji,
+      status: 'already_awake',
+      message: `${identity.name} is already awake`,
+      session: existingSession
+    });
+  }
+
+  // If spawnComplete flag is set, this is a callback from the main agent
+  // after sessions_spawn has been called
+  if (spawnComplete && sessionKey) {
+    const session = registerSpawnedSession(agentId, sessionKey, task || 'General task');
+    
+    return res.status(200).json({
+      success: true,
+      agentId,
+      agentName: identity.name,
+      agentEmoji: identity.emoji,
+      status: 'awake',
+      message: `${identity.name} has been spawned successfully`,
+      session
+    });
+  }
+
+  // Otherwise, queue a spawn request
+  const defaultTask = task || 'Check in and report status';
+  const request = queueSpawnRequest(agentId, defaultTask);
+
+  // Return immediate response that request is queued
+  // The main agent will process this and call back with spawnComplete
+  res.status(202).json({
+    success: true,
+    agentId,
+    agentName: identity.name,
+    agentEmoji: identity.emoji,
+    status: 'spawn_queued',
+    message: `${identity.name} spawn request queued. Main agent will spawn the subagent shortly.`,
+    requestId: request.id,
+    task: defaultTask,
+    maxSessionMinutes: MAX_SESSION_MINUTES,
+    identityContext: buildIdentityContext(agentId)
+  });
 }

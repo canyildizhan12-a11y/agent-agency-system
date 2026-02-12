@@ -1,0 +1,50 @@
+[
+  {
+    "timestamp": "2026-02-12T18:50:52.609Z",
+    "agentId": "henry",
+    "duration": 5935,
+    "inputChars": 132,
+    "outputChars": 147,
+    "estimatedTokens": 70
+  },
+  {
+    "timestamp": "2026-02-12T18:51:06.117Z",
+    "agentId": "henry",
+    "duration": 5512,
+    "inputChars": 141,
+    "outputChars": 231,
+    "estimatedTokens": 93
+  },
+  {
+    "timestamp": "2026-02-12T18:51:25.166Z",
+    "agentId": "henry",
+    "duration": 9475,
+    "inputChars": 154,
+    "outputChars": 340,
+    "estimatedTokens": 124
+  },
+  {
+    "timestamp": "2026-02-12T18:52:08.763Z",
+    "agentId": "henry",
+    "duration": 6926,
+    "inputChars": 166,
+    "outputChars": 218,
+    "estimatedTokens": 96
+  },
+  {
+    "timestamp": "2026-02-12T18:53:16.551Z",
+    "agentId": "scout",
+    "duration": 6302,
+    "inputChars": 151,
+    "outputChars": 72,
+    "estimatedTokens": 56
+  },
+  {
+    "timestamp": "2026-02-12T18:53:48.349Z",
+    "agentId": "scout",
+    "duration": 9009,
+    "inputChars": 231,
+    "outputChars": 443,
+    "estimatedTokens": 169
+  }
+]
