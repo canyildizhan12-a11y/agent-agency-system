@@ -56,10 +56,10 @@ fi
 
 # 4. Clean temporary files
 TEMP_SIZE=0
-for temp in /tmp/*.tmp /tmp/.temp* /var/tmp/*.tmp 2>/dev/null; do
-    if [ -f "$temp" ]; then
+for temp in /tmp/*.tmp /tmp/.temp* /var/tmp/*.tmp; do
+    if [ -f "$temp" 2>/dev/null ]; then
         FILE_SIZE=$(du -sm "$temp" 2>/dev/null | cut -f1 || echo "0")
-        rm -f "$temp"
+        rm -f "$temp" 2>/dev/null
         TEMP_SIZE=$((TEMP_SIZE + FILE_SIZE))
     fi
 done

@@ -54,7 +54,7 @@ wake_conditions:
   - security_policy_triggered: true
   - red_zone_alert: true
   - critical_decision_required: true  # Escalate to Can
-  # Disk space regulation
+  # Disk space regulation (hourly check)
   - disk_usage_threshold_exceeded: true  # > 85%
   - cleanup_required: true
 

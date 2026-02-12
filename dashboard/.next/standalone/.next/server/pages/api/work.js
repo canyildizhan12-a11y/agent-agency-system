@@ -1,8 +1,0 @@
-"use strict";(()=>{var e={};e.id=205,e.ids=[205],e.modules={145:e=>{e.exports=require("next/dist/compiled/next-server/pages-api.runtime.prod.js")},6249:(e,t)=>{Object.defineProperty(t,"l",{enumerable:!0,get:function(){return function e(t,n){return n in t?t[n]:"then"in t&&"function"==typeof t.then?t.then(t=>e(t,n)):"function"==typeof t&&"default"===n?t:void 0}}})},3298:(e,t,n)=>{n.r(t),n.d(t,{config:()=>d,default:()=>u,routeModule:()=>c});var r={};n.r(r),n.d(r,{default:()=>s});var a=n(1802),o=n(7153),i=n(6249);let l={from:()=>({select:()=>({data:[],error:null}),insert:()=>({data:null,error:null}),update:()=>({data:null,error:null}),eq:()=>({data:null,error:null})})};async function s(e,t){try{let{data:e,error:n}=await l.from("work_items").select(`
-        *,
-        agents (
-          agent_id,
-          name,
-          emoji
-        )
-      `).order("completed_at",{ascending:!1}).limit(50);if(n)throw n;let r=e?.map(e=>({agent:e.agents?.agent_id,agentName:e.agents?.name,agentEmoji:e.agents?.emoji,task:e.task,description:e.description,status:e.status,time:e.completed_at||e.created_at,file:e.file_path,linesOfCode:e.lines_of_code}))||[];t.status(200).json(r)}catch(e){console.error("Error fetching work:",e),t.status(500).json({error:e.message})}}let u=(0,i.l)(r,"default"),d=(0,i.l)(r,"config"),c=new a.PagesAPIRouteModule({definition:{kind:o.x.PAGES_API,page:"/api/work",pathname:"/api/work",bundlePath:"",filename:""},userland:r})},7153:(e,t)=>{var n;Object.defineProperty(t,"x",{enumerable:!0,get:function(){return n}}),function(e){e.PAGES="PAGES",e.PAGES_API="PAGES_API",e.APP_PAGE="APP_PAGE",e.APP_ROUTE="APP_ROUTE"}(n||(n={}))},1802:(e,t,n)=>{e.exports=n(145)}};var t=require("../../webpack-api-runtime.js");t.C(e);var n=t(t.s=3298);module.exports=n})();

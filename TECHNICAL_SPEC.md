@@ -454,7 +454,7 @@ D) Let me handle it (routine)
 - Request manual intervention
 
 **Monitoring:**
-- Check every 5 minutes via cron
+- Check every hour via cron (top of each hour)
 - Log all cleanup actions
 - Report freed space and new disk usage
 
