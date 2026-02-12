@@ -197,7 +197,68 @@ If disk > 95% and cleanup insufficient:
 
 ---
 
-## 7. Policy Updates
+## 7. Heartbeat Monitoring System
+
+### 7.1 Heartbeat Inspection
+**Monitored by:** Alex 🛡️  
+**Source:** Garmin (main agent) HEARTBEAT.md checks  
+**Frequency:** Every 30 minutes
+
+### 7.2 Inspection Criteria
+Alex reviews heartbeat reports for:
+- **Completeness:** All checklist items checked
+- **Anomalies:** Unusual patterns in system activity
+- **Security:** Any suspicious findings during checks
+- **Token Usage:** Efficiency of heartbeat operations
+- **Laziness Signs:** Premature HEARTBEAT_OK without proper checks
+
+### 7.3 Heartbeat Report Format
+```yaml
+heartbeat_report:
+  timestamp: "2026-02-12T13:00:00+03:00"
+  agent: "garmin"
+  checks_performed:
+    - research_tasks
+    - reminders
+    - blog_monitoring
+    - github_monitoring
+    - token_usage
+    - intelligence_monitoring
+    - metrics_performance
+    - proactive_behaviors
+    - laziness_engine_check
+    - feedback_loop_check
+    - routine_verification
+    - self_healer_check
+  findings:
+    - item: "blog_monitoring"
+      status: "ok"
+      details: "No new articles"
+    - item: "token_usage"
+      status: "alert"
+      details: "Approaching 80%"
+  actions_taken:
+    - "Checked 5 research tasks"
+    - "Scanned 3 blogs"
+  issues_found: false
+  status: "HEARTBEAT_OK"
+```
+
+### 7.4 Alex Response Actions
+**If issues detected:**
+- Log to: `immune-system/logs/heartbeat-inspections.log`
+- Escalate to Can if critical
+- Request re-check if incomplete
+- Update procedures if pattern emerges
+
+**If HEARTBEAT_OK without proper checks:**
+- Flag as laziness violation
+- Require immediate re-check
+- Log to feedback loop
+
+---
+
+## 8. Policy Updates
 
 Only Can can update policies:
 

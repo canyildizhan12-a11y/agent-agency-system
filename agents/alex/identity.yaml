@@ -31,6 +31,8 @@ domain_expertise:
   - verification
   - disk_space_regulation
   - system_health_monitoring
+  - heartbeat_inspection
+  - activity_pattern_analysis
 
 relationships:
   can:
@@ -57,6 +59,9 @@ wake_conditions:
   # Disk space regulation (hourly check)
   - disk_usage_threshold_exceeded: true  # > 85%
   - cleanup_required: true
+  # Heartbeat inspection
+  - heartbeat_report_received: true
+  - heartbeat_anomaly_detected: true
 
 sleep_conditions:
   - never: true  # Immune system never sleeps
