@@ -458,6 +458,37 @@ D) Let me handle it (routine)
 - Log all cleanup actions
 - Report freed space and new disk usage
 
+### 6.5 Heartbeat Monitoring System
+
+**Managed by:** Alex 🛡️ (Immune System)  
+**Source:** Garmin HEARTBEAT.md checks  
+**Frequency:** Every 30 minutes
+
+**Inspection Criteria:**
+- Completeness of all 12 checklist items
+- Anomalous patterns in system activity
+- Security concerns from checks
+- Token usage efficiency
+- Signs of laziness (premature HEARTBEAT_OK)
+
+**Report Format:**
+```yaml
+heartbeat_report:
+  timestamp: "2026-02-12T13:00:00+03:00"
+  agent: "garmin"
+  checks_performed: [list of 12 checks]
+  findings: [details per check]
+  actions_taken: [what was done]
+  issues_found: true/false
+  status: "HEARTBEAT_OK" or "ALERT"
+```
+
+**Alex Actions:**
+- Log to `immune-system/logs/heartbeat-inspections.log`
+- Escalate to Can if critical issues
+- Flag laziness violations
+- Update procedures if patterns emerge
+
 ---
 
 ## 7. Memory & Persistence System
