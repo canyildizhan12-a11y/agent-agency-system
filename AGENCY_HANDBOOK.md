@@ -239,7 +239,13 @@ CONTEXT: brief context
 3. **Next** — What are you doing next?
 4. **Needs** — Do you need other agents?
 
-### 7.3 Sleep/Wake
+### 7.3 Meeting Documentation
+**ALL meetings must be recorded and pushed to GitHub:**
+- Transcripts saved to: `meetings/YYYY-MM-DD-description-transcript.md`
+- Auto-push script: `scripts/push-meetings.sh`
+- After every meeting, run: `./scripts/push-meetings.sh`
+
+### 7.4 Sleep/Wake
 - **Default:** SLEEP
 - **Wake triggers:**
   - Can asks by name
