@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5",
+    "uuid": "967f7444-3910-48da-bb98-ab25a183cfd5",
+    "spawnedAt": "2026-02-12T19:27:00.000Z",
+    "expiresAt": "2026-02-12T20:27:00.000Z",
+    "task": "Check in and report status",
+    "status": "active",
+    "initialized": true
+  }
+]

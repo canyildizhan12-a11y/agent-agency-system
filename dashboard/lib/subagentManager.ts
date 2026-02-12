@@ -90,6 +90,7 @@ export interface ActiveSession {
   expiresAt: string;
   task: string;
   status: 'active' | 'completed' | 'error';
+  initialized: boolean;  // Has the subagent acknowledged its identity?
 }
 
 export interface SpawnRequest {
@@ -273,7 +274,8 @@ export function registerSpawnedSession(
     spawnedAt,
     expiresAt,
     task,
-    status: 'active'
+    status: 'active',
+    initialized: false  // Will be set to true after subagent acknowledges
   };
 
   const sessions = loadActiveSessions();
@@ -288,6 +290,24 @@ export function registerSpawnedSession(
   logSpawnEvent(agentId, sessionKey, task);
 
   return session;
+}
+
+/**
+ * Mark session as initialized (subagent acknowledged identity)
+ */
+export function markSessionInitialized(agentId: string): boolean {
+  const sessions = loadActiveSessions();
+  const session = sessions.find(s => 
+    s.agentId === agentId.toLowerCase() && s.status === 'active'
+  );
+
+  if (!session) {
+    return false;
+  }
+
+  session.initialized = true;
+  saveActiveSessions(sessions);
+  return true;
 }
 
 /**
@@ -397,3 +417,4 @@ export function sleepAllAgents(): Array<{
   
   return results;
 }
+

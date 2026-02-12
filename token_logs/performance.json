@@ -46,5 +46,37 @@
     "inputChars": 231,
     "outputChars": 443,
     "estimatedTokens": 169
+  },
+  {
+    "timestamp": "2026-02-12T19:27:21.140Z",
+    "agentId": "henry",
+    "duration": 4608,
+    "inputChars": 142,
+    "outputChars": 41,
+    "estimatedTokens": 46
+  },
+  {
+    "timestamp": "2026-02-12T19:27:43.532Z",
+    "agentId": "henry",
+    "duration": 6047,
+    "inputChars": 154,
+    "outputChars": 201,
+    "estimatedTokens": 89
+  },
+  {
+    "timestamp": "2026-02-12T19:29:37.311Z",
+    "agentId": "henry",
+    "duration": 5612,
+    "inputChars": 160,
+    "outputChars": 86,
+    "estimatedTokens": 62
+  },
+  {
+    "timestamp": "2026-02-12T19:30:36.235Z",
+    "agentId": "henry",
+    "duration": 8589,
+    "inputChars": 154,
+    "outputChars": 299,
+    "estimatedTokens": 114
   }
 ]

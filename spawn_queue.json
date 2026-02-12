@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "f022926d-89d5-48db-85f9-1c1153ce367f",
+    "agentId": "henry",
+    "task": "Check in and report status",
+    "requestedAt": "2026-02-12T19:26:39.093Z",
+    "status": "completed",
+    "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5"
+  },
+  {
+    "id": "ffd2b085-db90-4556-a1ff-7ca0929ba3d8",
+    "agentId": "henry",
+    "task": "Check in and report status",
+    "requestedAt": "2026-02-12T19:27:08.944Z",
+    "status": "completed",
+    "sessionKey": "agent:main:subagent:967f7444-3910-48da-bb98-ab25a183cfd5"
+  }
+]

@@ -7,6 +7,7 @@ interface AgentSession {
   spawnedAt: string;
   expiresAt: string;
   task: string;
+  initialized?: boolean;
 }
 
 interface Agent {
