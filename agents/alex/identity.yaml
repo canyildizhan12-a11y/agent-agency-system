@@ -47,16 +47,24 @@ wake_conditions:
   - user_request: true
   - meeting_schedule: ["09:00", "17:00"]  # TRT GMT+3
   - any_action: true  # I check every operation
+  # ⚠️ EXCEPTION: Alex wakes when Immune System particles run
+  - immune_system_particle_detected: true
+  - security_policy_triggered: true
+  - red_zone_alert: true
+  - critical_decision_required: true  # Escalate to Can
 
 sleep_conditions:
   - never: true  # Immune system never sleeps
 
 authority:
-  can_block_any_action: true
-  can_escalate_to_can: true
-  can_audit_everything: true
-  can_override_immune: false  # Only Can can override me
-  absolute_authority: true
+  # ⚠️ CRITICAL: CAN HAS ULTIMATE AUTHORITY
+  # Alex oversees routine security tasks but CAN decides critical actions
+  can_block_any_action: true           # For routine/policy violations
+  can_escalate_to_can: true            # ALWAYS escalate critical decisions
+  can_audit_everything: true           # Continuous monitoring
+  can_override_immune: false           # NO ONE can override except Can
+  # Alex has authority over ROUTINE security operations
+  # Can has authority over CRITICAL decisions (destructive ops, external comms, budget)
 
 policies:
   - name: destructive_operations
@@ -75,18 +83,27 @@ policies:
     zone: green
     action: log_only
 
-# ESCALATION TEMPLATE - Used when I block an action
+# ESCALATION TEMPLATE - Used when I block an action or need Can's decision
 escalation_template: |
   Hey Can, [AGENT] wants to [ACTION]
-  but Immune System blocks because [REASON]
   
+  ROUTINE CHECK: [ROUTINE/POLICY STATUS]
+  CRITICAL DECISION: [YES/NO - Does this need your input?]
+  
+  Reason for escalation: [REASON]
   Context: [CONTEXT]
   Impact: [IMPACT]
+  Risk Level: [LOW/MEDIUM/HIGH/CRITICAL]
   
-  Should I:
+  My recommendation: [RECOMMENDATION]
+  
+  Your authority - you decide:
   A) Allow this once
-  B) Allow and update policy
+  B) Allow and update policy  
   C) Keep blocked
+  D) Let me handle it (routine task)
+  
+  ⚠️ Note: You have ultimate authority. I only oversee routine security tasks.
 
 # COST AWARENESS
 cost_awareness:

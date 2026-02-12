@@ -19,7 +19,7 @@
 
 ## 1. Executive Summary
 
-The **Agent Agency** is a biologically-inspired multi-agent AI system designed to operate under a shared consciousness model. Unlike traditional isolated AI tools, this system creates a unified organism of 7 specialized agents working collaboratively under human oversight.
+The **Agent Agency** is a biologically-inspired multi-agent AI system designed to operate under a shared consciousness model. Unlike traditional isolated AI tools, this system creates a unified organism of 8 specialized agents working collaboratively under human oversight.
 
 ### Key Innovations
 
@@ -31,7 +31,7 @@ The **Agent Agency** is a biologically-inspired multi-agent AI system designed t
 
 ### System Capabilities
 
-- 7 specialized agents (Henry, Scout, Pixel, Echo, Quill, Codex, Alex)
+- 8 specialized agents (Henry, Scout, Pixel, Echo, Quill, Codex, Alex, Vega)
 - Bi-daily meeting cycles (09:00 & 17:00 TRT)
 - Impact-based priority system
 - Cost-aware token management
@@ -80,7 +80,7 @@ The **Agent Agency** is a biologically-inspired multi-agent AI system designed t
 
 ---
 
-## 3. Component Breakdown - 7 Agents
+## 3. Component Breakdown - 8 Agents
 
 ### 3.1 Henry 🦉 - Team Lead / Strategic Planning
 
@@ -185,24 +185,61 @@ domain_expertise:
 
 ### 3.7 Alex 🛡️ - Immune System / Security
 
-**Purpose**: Security oversight, verification, absolute authority
+**Purpose**: Security oversight, verification, routine task monitoring
 
 **Technical Implementation**:
 ```yaml
 agent_id: alex
 authority:
-  can_block_any_action: true
-  can_escalate_to_can: true
-  can_audit_everything: true
-  absolute_authority: true
+  # ⚠️ Can has ULTIMATE AUTHORITY
+  can_block_any_action: true           # For routine/policy violations
+  can_escalate_to_can: true            # ALWAYS escalate critical decisions
+  can_audit_everything: true           # Continuous monitoring
+  can_override_immune: false           # NO ONE can override except Can
+
+wake_conditions:
+  - always_active: true                # Runs continuously
+  - immune_system_particle_detected: true  # EXCEPTION: wakes for particles
+  - red_zone_alert: true
+  - critical_decision_required: true   # Escalate to Can
 
 policies:
   - name: destructive_operations
     zone: red
-    action: block_and_escalate
+    action: block_and_escalate_to_can  # Can decides, not Alex
 ```
 
 **Domain**: Security enforcement, policy management, threat detection
+**Authority Note**: Alex oversees routine security tasks but Can decides critical actions
+
+### 3.8 Vega 📊 - Data Analyst / Business Intelligence
+
+**Purpose**: Metrics tracking, KPI analysis, business intelligence, data visualization
+
+**Technical Implementation**:
+```yaml
+agent_id: vega
+domain_expertise:
+  - business_intelligence
+  - kpi_tracking
+  - trend_analysis
+  - data_visualization
+  - roi_calculations
+  - performance_metrics
+
+wake_conditions:
+  - user_request: true
+  - meeting_schedule: ["09:00", "17:00"]
+  - data_analysis_needed: true
+  - weekly_report_generation: true
+
+relationships:
+  henry: strategic_partner    # Provide data for planning
+  scout: research_validator   # Validate findings
+  alex: security_metrics_partner  # Security analytics
+```
+
+**Domain**: Business analytics, performance tracking, dashboard metrics, weekly reports
 
 ---
 
@@ -305,13 +342,30 @@ Agent C (if broadcast)
 
 ## 6. Security Model (Immune System)
 
-### 6.1 Zone Classification
+### 6.1 Authority Hierarchy
 
-| Zone | Risk | Action | Examples |
-|------|------|--------|----------|
-| Green | Low | Monitor only | Read files, internal queries |
-| Yellow | Medium | Monitor + Alert | Write files, API calls |
-| Red | High | BLOCK + Escalate | Delete files, external email |
+**Can has ULTIMATE AUTHORITY** — final decision maker on all critical actions.
+
+**Alex (Immune System)** oversees routine security tasks:
+- Monitors all operations continuously (24/7)
+- Blocks routine policy violations automatically (green/yellow zones)
+- Escalates CRITICAL decisions (red zone) to Can
+- **EXCEPTION**: Alex wakes up when Immune System particles run
+
+**Decision Flow:**
+1. Agent proposes action
+2. Alex checks against routine policies
+3. If CRITICAL → Alex escalates to Can for decision
+4. Can decides → Alex implements
+5. If routine → Alex may block/allow per policy
+
+### 6.2 Zone Classification
+
+| Zone | Risk | Action | Examples | Authority |
+|------|------|--------|----------|-----------|
+| Green | Low | Monitor only | Read files, internal queries | Alex |
+| Yellow | Medium | Monitor + Alert | Write files, API calls | Alex |
+| Red | High | BLOCK + Escalate to Can | Delete files, external email | **Can decides** |
 
 ### 6.2 Policy Structure
 
@@ -334,25 +388,45 @@ policy:
 ```
 Agent wants action
     ↓
-[Alex checks policy]
+[Alex checks policy - routine or critical?]
     ↓
-BLOCKED
-    ↓
-Format escalation:
-"Hey Can, [AGENT] wants [ACTION]
-but Immune System blocks because [REASON]
+┌─────────────────┬─────────────────┐
+│    ROUTINE      │    CRITICAL     │
+│    (Green/Yellow)│    (Red Zone)   │
+├─────────────────┼─────────────────┤
+│ Alex decides    │ Alex escalates  │
+│ per policy      │ to Can          │
+│                 │                 │
+│ Block or Allow  │ Can decides:    │
+│ Log decision    │ A) Allow once   │
+│                 │ B) Update policy│
+│                 │ C) Keep blocked │
+│                 │ D) Routine task │
+│                 │    (Alex handles)│
+└─────────────────┴─────────────────┘
+```
 
+**Escalation Template:**
+```
+Hey Can, [AGENT] wants [ACTION]
+
+ROUTINE CHECK: [STATUS]
+CRITICAL DECISION: [YES/NO]
+
+Reason: [REASON]
 Context: [CONTEXT]
 Impact: [IMPACT]
+Risk Level: [LOW/MEDIUM/HIGH/CRITICAL]
 
-Options:
-A) Allow once
-B) Update policy
-C) Keep blocked"
-    ↓
-Can decides
-    ↓
-Execute decision
+My recommendation: [RECOMMENDATION]
+
+Your authority - you decide:
+A) Allow this once
+B) Allow and update policy
+C) Keep blocked
+D) Let me handle it (routine)
+
+⚠️ Note: You have ultimate authority. I only oversee routine tasks.
 ```
 
 ---
