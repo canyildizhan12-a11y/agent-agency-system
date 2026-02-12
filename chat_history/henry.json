@@ -48,5 +48,18 @@
     "timestamp": "2026-02-12T18:27:34.631Z",
     "queuedId": "henry-1770920854631-2x8opgtb0",
     "status": "completed"
+  },
+  {
+    "sender": "user",
+    "message": "hey",
+    "timestamp": "2026-02-12T18:33:33.527Z",
+    "queuedId": "henry-1770921213526-hcfndrq5q"
+  },
+  {
+    "sender": "agent",
+    "message": "Error: Unknown agent id \"henry\". Use \"openclaw agents list\" to see configured agents.\n",
+    "timestamp": "2026-02-12T18:33:33.527Z",
+    "queuedId": "henry-1770921213526-hcfndrq5q",
+    "status": "completed"
   }
 ]

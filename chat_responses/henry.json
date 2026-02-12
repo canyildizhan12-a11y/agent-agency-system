@@ -1,7 +1,7 @@
 {
-  "messageId": "henry-1770920854631-2x8opgtb0",
+  "messageId": "henry-1770921213526-hcfndrq5q",
   "agentId": "henry",
-  "response": "Error: Pass --to <E.164>, --session-id, or --agent to choose a session\n",
-  "timestamp": "2026-02-12T18:27:36.919Z",
+  "response": "Error: Unknown agent id \"henry\". Use \"openclaw agents list\" to see configured agents.\n",
+  "timestamp": "2026-02-12T18:33:36.025Z",
   "status": "completed"
 }

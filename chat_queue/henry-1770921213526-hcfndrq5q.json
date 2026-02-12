@@ -1,0 +1,9 @@
+{
+  "id": "henry-1770921213526-hcfndrq5q",
+  "agentId": "henry",
+  "message": "hey",
+  "timestamp": "2026-02-12T18:33:33.526Z",
+  "status": "completed",
+  "processedAt": "2026-02-12T18:33:36.025Z",
+  "response": "Error: Unknown agent id \"henry\". Use \"openclaw agents list\" to see configured agents.\n"
+}

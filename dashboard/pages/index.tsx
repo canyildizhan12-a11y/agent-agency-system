@@ -28,8 +28,8 @@ export default function Dashboard() {
     { id: 'echo', name: 'Echo', emoji: '💾', role: 'Memory', status: 'sleeping', color: '#00ff88' },
     { id: 'quill', name: 'Quill', emoji: '✍️', role: 'Documentation', status: 'sleeping', color: '#00ff88' },
     { id: 'codex', name: 'Codex', emoji: '🏗️', role: 'Architecture', status: 'working', color: '#00ff88' },
-    { id: 'alex', name: 'Alex', emoji: '🛡️', role: 'Security', status: 'awake', color: '#00ff88' },
-    { id: 'vega', name: 'Vega', emoji: '📊', role: 'Analyst', status: 'sleeping', color: '#00ff88' },
+    { id: 'alex', name: 'Alex', emoji: '🛡️', role: 'Security Lead', status: 'awake', color: '#00ff88' },
+    { id: 'vega', name: 'Vega', emoji: '📊', role: 'Data Analyst', status: 'sleeping', color: '#00ff88' },
   ]);
   
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);

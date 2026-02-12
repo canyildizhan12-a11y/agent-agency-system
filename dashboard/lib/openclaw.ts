@@ -15,6 +15,7 @@ if (!fs.existsSync(SESSION_CACHE_DIR)) {
 }
 
 // Agent personas - COMPRESSED for token efficiency
+// NOTE: OpenClaw only has "main" agent - these personas are simulated via prompts
 const AGENT_PERSONAS: Record<string, any> = {
   henry: {
     name: 'Henry',
@@ -39,10 +40,10 @@ const AGENT_PERSONAS: Record<string, any> = {
   },
   echo: {
     name: 'Echo',
-    emoji: '💻',
-    role: 'Developer',
+    emoji: '💾',
+    role: 'Memory',
     personality: 'Practical, efficient',
-    skills: 'coding, prototyping'
+    skills: 'state management, logs'
   },
   quill: {
     name: 'Quill',
@@ -60,10 +61,17 @@ const AGENT_PERSONAS: Record<string, any> = {
   },
   alex: {
     name: 'Alex',
+    emoji: '🛡️',
+    role: 'Security Lead',
+    personality: 'Vigilant, protective',
+    skills: 'security, compliance, oversight'
+  },
+  vega: {
+    name: 'Vega',
     emoji: '📊',
-    role: 'Analyst',
-    personality: 'Data-driven',
-    skills: 'metrics, analytics'
+    role: 'Data Analyst',
+    personality: 'Data-driven, analytical',
+    skills: 'metrics, analytics, reporting'
   }
 };
 
@@ -192,11 +200,12 @@ async function executeAgent(
       // For now, spawn fresh but track for next time
     }
     
-    // Spawn via openclaw CLI - use --agent and -m flags
+    // Spawn via openclaw CLI - use default "main" agent (OpenClaw only has main)
+    // Agent personas are simulated by prepending character context to prompt
     const startTime = Date.now();
     const escapedPrompt = prompt.replace(/"/g, '\\"').replace(/\n/g, ' ');
     const output = execSync(
-      `cd ${WORKSPACE_DIR} && openclaw agent --local --agent ${agentId} -m "${escapedPrompt}" 2>&1`,
+      `cd ${WORKSPACE_DIR} && openclaw agent --local -m "${escapedPrompt}" 2>&1`,
       {
         encoding: 'utf8',
         timeout: 120000,
