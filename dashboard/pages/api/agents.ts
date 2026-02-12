@@ -10,21 +10,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get agent status
     try {
       const agentsFile = path.join(AGENCY_DIR, 'agents.json');
-      const agents = JSON.parse(fs.readFileSync(agentsFile, 'utf8')).agents;
+      const agentsData = JSON.parse(fs.readFileSync(agentsFile, 'utf8'));
       
       // Check actual status from OpenClaw
-      const agentsWithStatus = agents.map((agent: any) => {
+      const agentsWithStatus = agentsData.agents.map((agent: any) => {
         const isActive = isAgentActive(agent.id);
         
         // Also check sleeping_agents folder
         const sleepFile = path.join(AGENCY_DIR, 'sleeping_agents', `${agent.id}.json`);
         let status = 'sleeping';
         let lastTask = null;
+        let wokenAt = null;
         
         if (fs.existsSync(sleepFile)) {
           const data = JSON.parse(fs.readFileSync(sleepFile, 'utf8'));
           status = data.status || 'sleeping';
-          lastTask = data.last_task;
+          lastTask = data.current_task || data.last_task;
+          wokenAt = data.woken_at;
           
           // Override if actually active in OpenClaw
           if (isActive) {
@@ -37,9 +39,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name: agent.name,
           emoji: agent.emoji,
           role: agent.role,
-          color: agent.color,
+          personality: agent.personality,
+          skills: agent.skills,
           status,
           lastTask,
+          wokenAt,
           isActive
         };
       });
@@ -51,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } else if (req.method === 'POST') {
     // Wake/spawn an agent
-    const { agentId, task } = req.body;
+    const { agentId, task, message } = req.body;
     
     if (!agentId) {
       return res.status(400).json({ error: 'Agent ID required' });
@@ -59,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     try {
       // ACTUALLY spawn the agent via OpenClaw
-      const result = await spawnAgent(agentId, task || 'Wake up and standby');
+      const result = await spawnAgent(agentId, task || message || 'Wake up and standby');
       
       // Update status file
       const sleepFile = path.join(AGENCY_DIR, 'sleeping_agents', `${agentId}.json`);
@@ -68,14 +72,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data.status = 'awake';
         data.woken_at = new Date().toISOString();
         data.woken_by = 'dashboard';
-        data.current_task = task;
-        data.openclaw_session = result.sessionId || result.childSessionKey;
+        data.current_task = task || message;
         fs.writeFileSync(sleepFile, JSON.stringify(data, null, 2));
       }
       
       res.status(200).json({
         success: true,
         agentId,
+        agentName: result.name,
+        agentEmoji: result.emoji,
         message: `🚀 ${agentId} is now awake and working`,
         openclawResult: result
       });

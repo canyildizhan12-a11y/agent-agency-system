@@ -1,51 +1,18 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useRouter } from 'next/router';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleEnter = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      // Redirect happens automatically via middleware
-    } catch (err: any) {
-      setMessage(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async () => {
-    setLoading(true);
-    setMessage('');
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      setMessage('Check your email for confirmation link!');
-    } catch (err: any) {
-      setMessage(err.message);
-    } finally {
-      setLoading(false);
-    }
+    
+    // Simple redirect to dashboard - no auth needed
+    setTimeout(() => {
+      router.push('/');
+    }, 500);
   };
 
   return (
@@ -64,93 +31,44 @@ export default function Login() {
         borderRadius: '20px',
         width: '100%',
         maxWidth: '400px',
-        border: '1px solid rgba(255,255,255,0.1)'
+        border: '1px solid rgba(255,255,255,0.1)',
+        textAlign: 'center'
       }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '28px' }}>
+        <h1 style={{ marginBottom: '10px', fontSize: '32px' }}>
           🦉 Agent Agency
         </h1>
+        <p style={{ color: '#aaa', marginBottom: '30px' }}>
+          Your AI Team Dashboard
+        </p>
 
-        {message && (
-          <div style={{
-            padding: '12px',
-            borderRadius: '8px',
-            background: message.includes('error') ? 'rgba(255,0,0,0.2)' : 'rgba(0,255,136,0.2)',
-            color: message.includes('error') ? '#ff6b6b' : '#00ff88',
-            marginBottom: '20px',
-            textAlign: 'center'
-          }}>
-            {message}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              padding: '12px 16px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.2)',
-              background: 'rgba(255,255,255,0.05)',
-              color: '#fff',
-              fontSize: '16px'
-            }}
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              padding: '12px 16px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.2)',
-              background: 'rgba(255,255,255,0.05)',
-              color: '#fff',
-              fontSize: '16px'
-            }}
-          />
-
+        <form onSubmit={handleEnter}>
           <button
             type="submit"
             disabled={loading}
             style={{
-              padding: '12px',
+              padding: '14px 32px',
               borderRadius: '8px',
               border: 'none',
               background: '#00ff88',
               color: '#000',
               fontWeight: 'bold',
-              fontSize: '16px',
+              fontSize: '18px',
               cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1
+              opacity: loading ? 0.7 : 1,
+              width: '100%'
             }}
           >
-            {loading ? 'Loading...' : 'Sign In'}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSignUp}
-            disabled={loading}
-            style={{
-              padding: '12px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.2)',
-              background: 'transparent',
-              color: '#fff',
-              fontSize: '16px',
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            Create Account
+            {loading ? 'Loading...' : 'Enter Dashboard'}
           </button>
         </form>
+
+        <p style={{ 
+          marginTop: '20px', 
+          fontSize: '12px', 
+          color: '#666' 
+        }}>
+          7 AI agents waiting for your commands
+        </p>
       </div>
     </div>
   );

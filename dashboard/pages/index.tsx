@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 
 interface Agent {
@@ -18,25 +18,83 @@ interface WorkItem {
   time: string;
 }
 
+interface ChatMessage {
+  sender: string;
+  text: string;
+  agentName?: string;
+  loading?: boolean;
+  messageId?: string;
+  status?: 'pending' | 'completed' | 'error';
+}
+
+interface TokenMetrics {
+  optimization: {
+    compressed: number;
+    full: number;
+    savings: number;
+    percentage: number;
+  };
+  usage: {
+    totalTokens: number;
+    totalInput: number;
+    totalOutput: number;
+    estimatedCost: { usd: number; local: string };
+    byAgent: Record<string, { tokens: number; requests: number }>;
+  };
+  performance: {
+    avgDuration: number;
+    totalRequests: number;
+    avgTokens: number;
+    last24h: number;
+  };
+}
+
 export default function Dashboard() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [work, setWork] = useState<WorkItem[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'agents' | 'chat' | 'work'>('agents');
-  const [chatMessages, setChatMessages] = useState<{sender: string; text: string; agentName?: string}[]>([]);
+  const [activeTab, setActiveTab] = useState<'agents' | 'chat' | 'work' | 'tokens'>('agents');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [taskInput, setTaskInput] = useState('');
+  const [agentResponse, setAgentResponse] = useState<string | null>(null);
+  const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
+  const [tokenMetrics, setTokenMetrics] = useState<TokenMetrics | null>(null);
 
+  // Fetch agents and work data
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  // Poll for chat responses when there's a pending message
+  useEffect(() => {
+    if (!pendingMessageId || !selectedAgent) return;
+    
+    const pollInterval = setInterval(async () => {
+      await pollForResponse();
+    }, 2000);
+    
+    return () => clearInterval(pollInterval);
+  }, [pendingMessageId, selectedAgent]);
+
+  // Fetch token metrics when on tokens tab
+  useEffect(() => {
+    if (activeTab === 'tokens') {
+      fetchTokenMetrics();
+      const interval = setInterval(fetchTokenMetrics, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab]);
+
   const fetchData = async () => {
     try {
-      const agentsRes = await fetch('/api/agents');
-      const workRes = await fetch('/api/work');
+      const [agentsRes, workRes] = await Promise.all([
+        fetch('/api/agents'),
+        fetch('/api/work')
+      ]);
       
       if (agentsRes.ok) setAgents(await agentsRes.json());
       if (workRes.ok) setWork(await workRes.json());
@@ -45,16 +103,68 @@ export default function Dashboard() {
     }
   };
 
-  const wakeAgent = async (agentId: string) => {
-    setIsLoading(true);
+  const fetchTokenMetrics = async () => {
     try {
-      const res = await fetch(`/api/wake?id=${agentId}`, { method: 'POST' });
+      const res = await fetch('/api/tokens');
       if (res.ok) {
-        await fetchData();
-        alert(`🚀 Waking up ${agentId}...`);
+        setTokenMetrics(await res.json());
       }
     } catch (err) {
-      alert('Failed to wake agent');
+      console.error('Failed to fetch token metrics:', err);
+    }
+  };
+
+  const pollForResponse = async () => {
+    if (!selectedAgent) return;
+    
+    try {
+      const res = await fetch(`/api/chat?agentId=${selectedAgent}`);
+      if (!res.ok) return;
+      
+      const data = await res.json();
+      
+      if (data.response && data.response.messageId === pendingMessageId) {
+        // Update the loading message with actual response
+        setChatMessages(prev => prev.map(msg => {
+          if (msg.messageId === pendingMessageId) {
+            return {
+              ...msg,
+              text: data.response.response,
+              loading: false,
+              status: data.response.status
+            };
+          }
+          return msg;
+        }));
+        
+        setPendingMessageId(null);
+      }
+    } catch (err) {
+      console.error('Polling error:', err);
+    }
+  };
+
+  const wakeAgent = async (agentId: string) => {
+    const task = taskInput.trim() || 'General task - analyze our current projects and suggest improvements';
+    setIsLoading(true);
+    setAgentResponse(null);
+    
+    try {
+      const res = await fetch(`/api/wake?id=${agentId}`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAgentResponse(`${data.agentEmoji} ${data.agentName} is working on: ${task}`);
+        await fetchData();
+      } else {
+        setAgentResponse('Error: Failed to wake agent');
+      }
+    } catch (err) {
+      setAgentResponse('Error: ' + (err as Error).message);
     }
     setIsLoading(false);
   };
@@ -65,17 +175,75 @@ export default function Dashboard() {
     const agent = agents.find(a => a.id === selectedAgent);
     if (!agent) return;
 
-    setChatMessages(prev => [...prev, { sender: 'user', text: chatInput }]);
+    const userMessage = chatInput;
     setChatInput('');
 
-    // Simulate agent response
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, {
-        sender: 'agent',
-        agentName: `${agent.emoji} ${agent.name}`,
-        text: `Hello! I'm ${agent.name}, your ${agent.role}. How can I help you today?`
-      }]);
-    }, 1000);
+    // Add user message
+    setChatMessages(prev => [...prev, { 
+      sender: 'user', 
+      text: userMessage 
+    }]);
+
+    // Add loading message
+    const loadingMsg: ChatMessage = { 
+      sender: 'agent', 
+      agentName: `${agent.emoji} ${agent.name}`,
+      text: 'Thinking...',
+      loading: true,
+      status: 'pending'
+    };
+    setChatMessages(prev => [...prev, loadingMsg]);
+
+    // Send to API
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId: selectedAgent, message: userMessage })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        
+        // Update loading message with messageId for tracking
+        setChatMessages(prev => prev.map((msg, idx) => {
+          if (idx === prev.length - 1 && msg.loading) {
+            return {
+              ...msg,
+              messageId: data.messageId,
+              text: 'Processing...'
+            };
+          }
+          return msg;
+        }));
+        
+        setPendingMessageId(data.messageId);
+      } else {
+        setChatMessages(prev => prev.map((msg, idx) => {
+          if (idx === prev.length - 1 && msg.loading) {
+            return {
+              ...msg,
+              text: 'Failed to send message',
+              loading: false,
+              status: 'error'
+            };
+          }
+          return msg;
+        }));
+      }
+    } catch (err) {
+      setChatMessages(prev => prev.map((msg, idx) => {
+        if (idx === prev.length - 1 && msg.loading) {
+          return {
+            ...msg,
+            text: 'Error: ' + (err as Error).message,
+            loading: false,
+            status: 'error'
+          };
+        }
+        return msg;
+      }));
+    }
   };
 
   const getStatusClass = (status: string) => {
@@ -129,11 +297,39 @@ export default function Dashboard() {
               <button className={activeTab === 'agents' ? 'active' : ''} onClick={() => setActiveTab('agents')}>Agents</button>
               <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>Chat</button>
               <button className={activeTab === 'work' ? 'active' : ''} onClick={() => setActiveTab('work')}>Work</button>
+              <button className={activeTab === 'tokens' ? 'active' : ''} onClick={() => setActiveTab('tokens')}>📊 Tokens</button>
             </div>
 
             <div className="panel-content">
               {activeTab === 'agents' && (
                 <div className="agent-list">
+                  <div style={{ padding: '10px', marginBottom: '15px', background: 'rgba(0,255,136,0.1)', borderRadius: '8px' }}>
+                    <input
+                      type="text"
+                      placeholder="Enter task for agent..."
+                      value={taskInput}
+                      onChange={(e) => setTaskInput(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        background: 'rgba(0,0,0,0.3)',
+                        color: '#fff',
+                        marginBottom: '10px'
+                      }}
+                    />
+                    <p style={{ fontSize: '11px', color: '#888', margin: 0 }}>
+                      💡 Token-optimized prompts enabled (70% savings)
+                    </p>
+                  </div>
+
+                  {agentResponse && (
+                    <div style={{ padding: '12px', marginBottom: '15px', background: 'rgba(0,255,136,0.2)', borderRadius: '8px', fontSize: '13px' }}>
+                      {agentResponse}
+                    </div>
+                  )}
+
                   {agents.map(agent => (
                     <div key={agent.id} className={`agent-card ${selectedAgent === agent.id ? 'selected' : ''}`} onClick={() => setSelectedAgent(agent.id)}>
                       <div className="agent-emoji">{agent.emoji}</div>
@@ -146,10 +342,10 @@ export default function Dashboard() {
                       </div>
                       <button 
                         className="wake-btn" 
-                        disabled={agent.status === 'awake' || isLoading}
+                        disabled={isLoading}
                         onClick={(e) => { e.stopPropagation(); wakeAgent(agent.id); }}
                       >
-                        {agent.status === 'awake' ? 'Awake' : 'Wake Up'}
+                        {isLoading ? '...' : 'Wake Up'}
                       </button>
                     </div>
                   ))}
@@ -161,13 +357,21 @@ export default function Dashboard() {
                   <div className="chat-messages">
                     {chatMessages.length === 0 ? (
                       <div className="chat-placeholder">
-                        {selectedAgent ? 'Start chatting!' : 'Select an agent first'}
+                        {selectedAgent ? `Chat with ${agents.find(a => a.id === selectedAgent)?.name || selectedAgent}` : 'Select an agent first'}
                       </div>
                     ) : (
                       chatMessages.map((msg, idx) => (
-                        <div key={idx} className={`chat-message ${msg.sender}`}>
+                        <div key={idx} className={`chat-message ${msg.sender} ${msg.status || ''}`}>
                           {msg.agentName && <div className="sender">{msg.agentName}</div>}
-                          {msg.text}
+                          {msg.loading ? (
+                            <span className="loading-dots">
+                              <span className="dot">.</span>
+                              <span className="dot">.</span>
+                              <span className="dot">.</span>
+                            </span>
+                          ) : (
+                            msg.text
+                          )}
                         </div>
                       ))
                     )}
@@ -177,11 +381,11 @@ export default function Dashboard() {
                       type="text"
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder={selectedAgent ? `Message ${selectedAgent}...` : 'Select an agent...'}
-                      disabled={!selectedAgent}
+                      placeholder={selectedAgent ? `Message ${agents.find(a => a.id === selectedAgent)?.name}...` : 'Select an agent...'}
+                      disabled={!selectedAgent || pendingMessageId !== null}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                     />
-                    <button onClick={sendMessage} disabled={!selectedAgent}>➤</button>
+                    <button onClick={sendMessage} disabled={!selectedAgent || !chatInput.trim() || pendingMessageId !== null}>➤</button>
                   </div>
                 </div>
               )}
@@ -189,19 +393,75 @@ export default function Dashboard() {
               {activeTab === 'work' && (
                 <div className="work-list">
                   <h3>📋 Recent Work</h3>
-                  {work.map((item, idx) => {
-                    const agent = agents.find(a => a.id === item.agent);
-                    return (
-                      <div key={idx} className={`work-item ${item.status}`}>
-                        <div className="work-header">
-                          <span>{agent?.emoji} {agent?.name}</span>
-                          <span className="work-time">{new Date(item.time).toLocaleTimeString()}</span>
+                  {work.length === 0 ? (
+                    <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>No work items yet</p>
+                  ) : (
+                    work.map((item, idx) => {
+                      const agent = agents.find(a => a.id === item.agent);
+                      return (
+                        <div key={idx} className={`work-item ${item.status}`}>
+                          <div className="work-header">
+                            <span>{agent?.emoji} {agent?.name}</span>
+                            <span className="work-time">{new Date(item.time).toLocaleTimeString()}</span>
+                          </div>
+                          <div className="work-task">{item.task}</div>
+                          <span className={`work-status ${item.status}`}>{item.status.toUpperCase()}</span>
                         </div>
-                        <div className="work-task">{item.task}</div>
-                        <span className={`work-status ${item.status}`}>{item.status.toUpperCase()}</span>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'tokens' && tokenMetrics && (
+                <div className="token-metrics">
+                  <h3>📊 Token Analytics</h3>
+                  
+                  <div className="metric-card savings">
+                    <div className="metric-title">💰 Optimization Savings</div>
+                    <div className="metric-value">{tokenMetrics.optimization.percentage}%</div>
+                    <div className="metric-subtitle">
+                      {tokenMetrics.optimization.full} → {tokenMetrics.optimization.compressed} tokens
+                    </div>
+                  </div>
+
+                  <div className="metric-grid">
+                    <div className="metric-card">
+                      <div className="metric-title">📈 Total Tokens</div>
+                      <div className="metric-value">{tokenMetrics.usage.totalTokens.toLocaleString()}</div>
+                    </div>
+                    <div className="metric-card">
+                      <div className="metric-title">💵 Est. Cost</div>
+                      <div className="metric-value">{tokenMetrics.usage.estimatedCost.usd}</div>
+                      <div className="metric-subtitle">USD</div>
+                    </div>
+                  </div>
+
+                  <div className="metric-card">
+                    <div className="metric-title">⚡ Performance</div>
+                    <div className="metric-row">
+                      <span>Avg Response Time</span>
+                      <span>{tokenMetrics.performance.avgDuration}ms</span>
+                    </div>
+                    <div className="metric-row">
+                      <span>Total Requests</span>
+                      <span>{tokenMetrics.performance.totalRequests}</span>
+                    </div>
+                    <div className="metric-row">
+                      <span>Last 24h</span>
+                      <span>{tokenMetrics.performance.last24h}</span>
+                    </div>
+                  </div>
+
+                  <div className="metric-card">
+                    <div className="metric-title">👤 Usage by Agent</div>
+                    {Object.entries(tokenMetrics.usage.byAgent).map(([agentId, data]) => (
+                      <div key={agentId} className="metric-row">
+                        <span>{agentId}</span>
+                        <span>{data.tokens.toLocaleString()} tokens ({data.requests} req)</span>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -333,10 +593,20 @@ export default function Dashboard() {
         .chat-message { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
         .chat-message.user { align-self: flex-end; background: linear-gradient(145deg, #0084ff, #0066cc); border-bottom-right-radius: 4px; }
         .chat-message.agent { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+        .chat-message.agent.completed { border-left: 3px solid #00ff88; }
+        .chat-message.agent.error { border-left: 3px solid #ff4444; }
         .chat-message .sender { font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #aaa; }
+        
+        .loading-dots { display: inline-flex; }
+        .loading-dots .dot { animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .loading-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        
         .chat-input-area { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; }
         .chat-input-area input { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 10px 20px; color: #fff; font-size: 14px; outline: none; }
         .chat-input-area input::placeholder { color: #666; }
+        .chat-input-area input:disabled { opacity: 0.5; }
         .chat-input-area button { background: #00ff88; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .chat-input-area button:hover { transform: scale(1.1); }
         .chat-input-area button:disabled { background: #666; cursor: not-allowed; }
@@ -352,11 +622,56 @@ export default function Dashboard() {
         .work-item .work-status { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; margin-top: 8px; }
         .work-status.pending { background: rgba(255,170,0,0.2); color: #ffaa00; }
         .work-status.completed { background: rgba(0,255,136,0.2); color: #00ff88; }
+
+        /* Token Metrics Styles */
+        .token-metrics { display: flex; flex-direction: column; gap: 15px; }
+        .token-metrics h3 { margin-bottom: 10px; color: #00ff88; }
+        .metric-card {
+          background: rgba(255,255,255,0.05);
+          border-radius: 12px;
+          padding: 15px;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        .metric-card.savings {
+          background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,200,100,0.05));
+          border-color: rgba(0,255,136,0.3);
+        }
+        .metric-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .metric-title {
+          font-size: 12px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 8px;
+        }
+        .metric-value {
+          font-size: 28px;
+          font-weight: bold;
+          color: #fff;
+        }
+        .metric-subtitle {
+          font-size: 12px;
+          color: #888;
+          margin-top: 4px;
+        }
+        .metric-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          font-size: 13px;
+        }
+        .metric-row:last-child { border-bottom: none; }
         
         @media (max-width: 900px) {
           .main { flex-direction: column; }
           .office { flex: none; height: 400px; }
           .side-panel { flex: none; height: 400px; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
+          .metric-grid { grid-template-columns: 1fr; }
         }
       `}</style>
     </>

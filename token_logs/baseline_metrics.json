@@ -1,0 +1,187 @@
+{
+  "timestamp": "2026-02-11T21:20:00Z",
+  "collection_phase": "baseline",
+  "collection_duration_minutes": 60,
+  "agents": {
+    "henry": {
+      "total_sessions": 0,
+      "total_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "tool_calls": 0,
+      "tool_tokens": 0,
+      "avg_session_cost": 0,
+      "last_active": null,
+      "estimated_daily": 8000,
+      "role": "Coder - High tool usage expected"
+    },
+    "scout": {
+      "total_sessions": 0,
+      "total_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "tool_calls": 0,
+      "tool_tokens": 0,
+      "avg_session_cost": 0,
+      "last_active": null,
+      "estimated_daily": 12000,
+      "role": "Researcher - Web search heavy"
+    },
+    "pixel": {
+      "total_sessions": 0,
+      "total_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "tool_calls": 0,
+      "tool_tokens": 0,
+      "avg_session_cost": 0,
+      "last_active": null,
+      "estimated_daily": 5000,
+      "role": "Designer - Browser automation"
+    },
+    "echo": {
+      "total_sessions": 0,
+      "total_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "tool_calls": 0,
+      "tool_tokens": 0,
+      "avg_session_cost": 0,
+      "last_active": null,
+      "estimated_daily": 3000,
+      "role": "Voice - TTS costs"
+    },
+    "quill": {
+      "total_sessions": 0,
+      "total_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "tool_calls": 0,
+      "tool_tokens": 0,
+      "avg_session_cost": 0,
+      "last_active": null,
+      "estimated_daily": 4000,
+      "role": "Writer - Content generation"
+    },
+    "codex": {
+      "total_sessions": 0,
+      "total_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "tool_calls": 0,
+      "tool_tokens": 0,
+      "avg_session_cost": 0,
+      "last_active": null,
+      "estimated_daily": 6000,
+      "role": "Knowledge - File reads heavy"
+    },
+    "alex": {
+      "total_sessions": 1,
+      "total_tokens": 2850,
+      "input_tokens": 1200,
+      "output_tokens": 1650,
+      "tool_calls": 4,
+      "tool_tokens": 900,
+      "avg_session_cost": 2850,
+      "last_active": "2026-02-11T21:15:00Z",
+      "estimated_daily": 3000,
+      "role": "Analyst - Data processing"
+    }
+  },
+  "tools": {
+    "web_search": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 2000,
+      "agents": {},
+      "estimated_daily": 8000
+    },
+    "web_fetch": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 800,
+      "agents": {},
+      "estimated_daily": 1600
+    },
+    "browser": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 5000,
+      "agents": {},
+      "estimated_daily": 5000
+    },
+    "read": {
+      "invocations": 2,
+      "total_tokens": 200,
+      "avg_cost": 100,
+      "agents": {"alex": 2},
+      "estimated_daily": 1000
+    },
+    "write": {
+      "invocations": 2,
+      "total_tokens": 300,
+      "avg_cost": 150,
+      "agents": {"alex": 2},
+      "estimated_daily": 600
+    },
+    "edit": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 200,
+      "agents": {},
+      "estimated_daily": 400
+    },
+    "exec": {
+      "invocations": 1,
+      "total_tokens": 600,
+      "avg_cost": 600,
+      "agents": {"alex": 1},
+      "estimated_daily": 1200
+    },
+    "process": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 200,
+      "agents": {},
+      "estimated_daily": 200
+    },
+    "message": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 500,
+      "agents": {},
+      "estimated_daily": 1000
+    },
+    "tts": {
+      "invocations": 0,
+      "total_tokens": 0,
+      "avg_cost": 400,
+      "agents": {},
+      "estimated_daily": 800
+    }
+  },
+  "summary": {
+    "total_sessions": 1,
+    "total_tokens": 2850,
+    "total_tool_calls": 4,
+    "avg_tokens_per_session": 2850,
+    "estimated_daily_total": 50000,
+    "target_daily_total": 15000,
+    "reduction_needed": 35000,
+    "reduction_percentage": 70
+  },
+  "baseline_projections": {
+    "without_optimization": {
+      "daily_tokens": 50000,
+      "weekly_tokens": 350000,
+      "monthly_tokens": 1500000,
+      "cost_tier": "EXCEEDS_LIMIT"
+    },
+    "with_70_percent_reduction": {
+      "daily_tokens": 15000,
+      "weekly_tokens": 105000,
+      "monthly_tokens": 450000,
+      "cost_tier": "WITHIN_LIMIT"
+    }
+  }
+}

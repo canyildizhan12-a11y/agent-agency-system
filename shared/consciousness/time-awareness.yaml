@@ -1,0 +1,66 @@
+# Time Awareness Engine
+## TRT (Turkish Time) GMT+3
+
+**Purpose:** Ensure all agents operate in TRT timezone  
+**Last Updated:** 2026-02-12  
+
+---
+
+## Timezone Constants
+
+```
+TIMEZONE: Europe/Istanbul
+OFFSET: GMT+3
+ABBREVIATION: TRT
+DST: Not observed (Turkey abolished DST)
+```
+
+## Conversion Rules
+
+| From | To | Operation |
+|------|-----|-----------|
+| UTC | TRT | Add 3 hours |
+| TRT | UTC | Subtract 3 hours |
+| GMT | TRT | Add 3 hours |
+
+## Schedule References
+
+All schedule times are in TRT:
+- Morning Standup: 09:00 TRT
+- Evening Standup: 17:00 TRT
+- Scout Intel Sweep: 08:00 TRT
+- Weekly Report: Sundays 17:00 TRT
+
+## Implementation
+
+**Current Time Check:**
+```bash
+date +"%Y-%m-%d %H:%M TRT"
+```
+
+**Cron Schedule (TRT):**
+```
+# Morning standup - 09:00 TRT = 06:00 UTC
+0 6 * * *
+
+# Evening standup - 17:00 TRT = 14:00 UTC  
+0 14 * * *
+
+# Scout intel - 08:00 TRT = 05:00 UTC
+0 5 * * *
+```
+
+## Reminder Triggers
+
+Agents should be aware of TRT during:
+- Scheduling any time-based task
+- Communicating times to Can
+- Setting deadlines or reminders
+- Logging timestamps
+
+**Never assume UTC. Always convert to TRT.**
+
+---
+
+**Maintainer:** All Agents  
+**Frequency:** Every heartbeat/operation

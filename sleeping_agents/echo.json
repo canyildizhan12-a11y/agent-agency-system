@@ -1,9 +1,11 @@
 {
   "agent_id": "echo",
   "status": "sleeping",
-  "since": "2026-02-10T12:11:00Z",
-  "last_active": "2026-02-10T12:10:00Z",
-  "last_task": "Built Smart Cron System and Semantic Memory implementation",
-  "wakes_for": ["09:00 meeting", "17:00 meeting", "manual_wake"],
-  "notes": "Completed implementation work. Ready for next meeting."
+  "since": "2026-02-12T03:00:45.061Z",
+  "wakes_for": [
+    "09:00 meeting",
+    "17:00 meeting",
+    "manual_wake"
+  ],
+  "last_task_completed": "2026-02-12T03:00:45.061Z"
 }

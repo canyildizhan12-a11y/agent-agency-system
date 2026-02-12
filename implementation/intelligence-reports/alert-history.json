@@ -575,7 +575,583 @@
         "urgencyScore": 68
       },
       "timestamp": "2026-02-10T12:13:13.272Z"
+    },
+    {
+      "id": "funding-11x.ai-2025-01-15",
+      "type": "COMPETITOR_FUNDING",
+      "priority": "HIGH",
+      "title": "🚀 11x.ai raised $24.0M Series A",
+      "company": "11x.ai",
+      "amount": 24000000,
+      "insight": "AI sales rep space heating up - 11x.ai raised $24M at 10x valuation from seed",
+      "recommendations": [
+        "📊 Action: Analyze their pricing page for competitive positioning",
+        "🎯 Action: Review their feature set - what are they doubling down on?",
+        "⚠️ Watch: Monitor their hiring - expansion into new verticals likely",
+        "💰 Opportunity: Their raise validates the space - positioning for partnerships/investors"
+      ],
+      "data": {
+        "company": "11x.ai",
+        "round": "Series A",
+        "amount": 24000000,
+        "date": "2025-01-15",
+        "investors": [
+          "Andreessen Horowitz",
+          "Sequoia"
+        ],
+        "source": "TechCrunch",
+        "insight": "AI sales rep space heating up - 11x.ai raised $24M at 10x valuation from seed"
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "funding-Clay-2025-02-05",
+      "type": "COMPETITOR_FUNDING",
+      "priority": "HIGH",
+      "title": "🚀 Clay raised $46.0M Series B",
+      "company": "Clay",
+      "amount": 46000000,
+      "insight": "Data enrichment wars continue - Clay doubling down on AI-powered personalization",
+      "recommendations": [
+        "🔗 Action: Check if they're moving upmarket or staying SMB-focused",
+        "🛡️ Action: Prepare competitive response for data enrichment features",
+        "💰 Opportunity: Their raise validates the space - positioning for partnerships/investors"
+      ],
+      "data": {
+        "company": "Clay",
+        "round": "Series B",
+        "amount": 46000000,
+        "date": "2025-02-05",
+        "investors": [
+          "Tiger Global",
+          "Lightspeed"
+        ],
+        "source": "The Information",
+        "insight": "Data enrichment wars continue - Clay doubling down on AI-powered personalization"
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "pricing-Kimi-2025-02-08",
+      "type": "AI_PRICING_CHANGE",
+      "priority": "HIGH",
+      "title": "📈 Kimi Kimi k2.5 pricing increased 33%",
+      "provider": "Kimi",
+      "percentChange": 0.33,
+      "insight": "20-33% price hike suggests strong demand or capacity constraints",
+      "recommendations": [
+        "✅ Opportunity: Kimi becoming more expensive - price advantage window",
+        "📊 Action: Update competitive comparison docs with new pricing",
+        "🔄 Action: Review your own cost structure - can you maintain margins?"
+      ],
+      "data": {
+        "provider": "Kimi",
+        "model": "Kimi k2.5",
+        "change": "increase",
+        "oldPrice": {
+          "input": 0.5,
+          "output": 1.5
+        },
+        "newPrice": {
+          "input": 0.6,
+          "output": 2
+        },
+        "date": "2025-02-08",
+        "percentChange": 0.33,
+        "insight": "20-33% price hike suggests strong demand or capacity constraints"
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "pricing-OpenAI-2025-02-01",
+      "type": "AI_PRICING_CHANGE",
+      "priority": "HIGH",
+      "title": "📉 OpenAI GPT-4o pricing decreased 33%",
+      "provider": "OpenAI",
+      "percentChange": -0.33,
+      "insight": "Aggressive pricing to compete with Claude - margins compressing industry-wide",
+      "recommendations": [
+        "⚠️ Watch: Price compression means margin pressure industry-wide",
+        "💡 Action: Consider value-adds beyond raw price (features, support, reliability)",
+        "🔄 Action: Review your own cost structure - can you maintain margins?"
+      ],
+      "data": {
+        "provider": "OpenAI",
+        "model": "GPT-4o",
+        "change": "decrease",
+        "oldPrice": {
+          "input": 5,
+          "output": 15
+        },
+        "newPrice": {
+          "input": 2.5,
+          "output": 10
+        },
+        "date": "2025-02-01",
+        "percentChange": -0.33,
+        "insight": "Aggressive pricing to compete with Claude - margins compressing industry-wide"
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "reddit-startups-2025-02-09",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "HIGH",
+      "title": "💡 r/startups: Sales outreach is killing our SDR team - anyone found a good...",
+      "subreddit": "startups",
+      "engagement": 429,
+      "painSignals": [
+        "burnout",
+        "manual work",
+        "low response rates",
+        "scaling issues"
+      ],
+      "insight": "High engagement on SDR pain points - validation for AI sales tools",
+      "recommendations": [
+        "🎯 Content: Create ROI calculator for time saved with AI SDRs",
+        "📢 Marketing: Target \"SDR burnout\" keywords in SEO/content",
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "startups",
+        "title": "Sales outreach is killing our SDR team - anyone found a good AI solution?",
+        "score": 342,
+        "comments": 87,
+        "painSignals": [
+          "burnout",
+          "manual work",
+          "low response rates",
+          "scaling issues"
+        ],
+        "date": "2025-02-09",
+        "insight": "High engagement on SDR pain points - validation for AI sales tools",
+        "urgencyScore": 85
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "reddit-Entrepreneur-2025-02-06",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "HIGH",
+      "title": "💡 r/Entrepreneur: AI tools are eating my budget - $5K/month just for APIs. How...",
+      "subreddit": "Entrepreneur",
+      "engagement": 535,
+      "painSignals": [
+        "cost",
+        "AI spending",
+        "budget optimization",
+        "ROI concerns"
+      ],
+      "insight": "AI cost optimization is becoming a major concern - consolidation opportunity",
+      "recommendations": [
+        "🏆 Positioning: Emphasize cost efficiency vs hiring additional headcount",
+        "📊 Sales: Prepare TCO (Total Cost of Ownership) comparison sheets",
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "Entrepreneur",
+        "title": "AI tools are eating my budget - $5K/month just for APIs. How to optimize?",
+        "score": 423,
+        "comments": 112,
+        "painSignals": [
+          "cost",
+          "AI spending",
+          "budget optimization",
+          "ROI concerns"
+        ],
+        "date": "2025-02-06",
+        "insight": "AI cost optimization is becoming a major concern - consolidation opportunity",
+        "urgencyScore": 91
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "pricing-OpenRouter-2025-02-07",
+      "type": "AI_PRICING_CHANGE",
+      "priority": "MEDIUM",
+      "title": "📉 OpenRouter Claude 3.5 Sonnet pricing decreased 17%",
+      "provider": "OpenRouter",
+      "percentChange": -0.17,
+      "insight": "Price war intensifying - OpenRouter passing through Anthropic cuts",
+      "recommendations": [
+        "⚠️ Watch: Price compression means margin pressure industry-wide",
+        "💡 Action: Consider value-adds beyond raw price (features, support, reliability)",
+        "🔄 Action: Review your own cost structure - can you maintain margins?"
+      ],
+      "data": {
+        "provider": "OpenRouter",
+        "model": "Claude 3.5 Sonnet",
+        "change": "decrease",
+        "oldPrice": {
+          "input": 3,
+          "output": 15
+        },
+        "newPrice": {
+          "input": 2.5,
+          "output": 12.5
+        },
+        "date": "2025-02-07",
+        "percentChange": -0.17,
+        "insight": "Price war intensifying - OpenRouter passing through Anthropic cuts"
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "reddit-SaaS-2025-02-08",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "MEDIUM",
+      "title": "💡 r/SaaS: Churn is through the roof since we raised prices. How to com...",
+      "subreddit": "SaaS",
+      "engagement": 331,
+      "painSignals": [
+        "churn",
+        "pricing sensitivity",
+        "value communication"
+      ],
+      "insight": "Pricing optimization is top-of-mind for SaaS founders right now",
+      "recommendations": [
+        "💰 Product: Build value-based pricing calculator",
+        "🎓 Content: Publish \"How to communicate AI ROI to customers\" guide",
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "SaaS",
+        "title": "Churn is through the roof since we raised prices. How to communicate value better?",
+        "score": 267,
+        "comments": 64,
+        "painSignals": [
+          "churn",
+          "pricing sensitivity",
+          "value communication"
+        ],
+        "date": "2025-02-08",
+        "insight": "Pricing optimization is top-of-mind for SaaS founders right now",
+        "urgencyScore": 72
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "reddit-startups-2025-02-07",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "MEDIUM",
+      "title": "💡 r/startups: Prospecting data quality is our biggest bottleneck. Any reli...",
+      "subreddit": "startups",
+      "engagement": 234,
+      "painSignals": [
+        "data quality",
+        "prospecting",
+        "enrichment",
+        "bottleneck"
+      ],
+      "insight": "Data enrichment market showing strong demand signals",
+      "recommendations": [
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "startups",
+        "title": "Prospecting data quality is our biggest bottleneck. Any reliable enrichment tools?",
+        "score": 189,
+        "comments": 45,
+        "painSignals": [
+          "data quality",
+          "prospecting",
+          "enrichment",
+          "bottleneck"
+        ],
+        "date": "2025-02-07",
+        "insight": "Data enrichment market showing strong demand signals",
+        "urgencyScore": 68
+      },
+      "timestamp": "2026-02-11T05:00:03.490Z"
+    },
+    {
+      "id": "funding-11x.ai-2025-01-15",
+      "type": "COMPETITOR_FUNDING",
+      "priority": "HIGH",
+      "title": "🚀 11x.ai raised $24.0M Series A",
+      "company": "11x.ai",
+      "amount": 24000000,
+      "insight": "AI sales rep space heating up - 11x.ai raised $24M at 10x valuation from seed",
+      "recommendations": [
+        "📊 Action: Analyze their pricing page for competitive positioning",
+        "🎯 Action: Review their feature set - what are they doubling down on?",
+        "⚠️ Watch: Monitor their hiring - expansion into new verticals likely",
+        "💰 Opportunity: Their raise validates the space - positioning for partnerships/investors"
+      ],
+      "data": {
+        "company": "11x.ai",
+        "round": "Series A",
+        "amount": 24000000,
+        "date": "2025-01-15",
+        "investors": [
+          "Andreessen Horowitz",
+          "Sequoia"
+        ],
+        "source": "TechCrunch",
+        "insight": "AI sales rep space heating up - 11x.ai raised $24M at 10x valuation from seed"
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "funding-Clay-2025-02-05",
+      "type": "COMPETITOR_FUNDING",
+      "priority": "HIGH",
+      "title": "🚀 Clay raised $46.0M Series B",
+      "company": "Clay",
+      "amount": 46000000,
+      "insight": "Data enrichment wars continue - Clay doubling down on AI-powered personalization",
+      "recommendations": [
+        "🔗 Action: Check if they're moving upmarket or staying SMB-focused",
+        "🛡️ Action: Prepare competitive response for data enrichment features",
+        "💰 Opportunity: Their raise validates the space - positioning for partnerships/investors"
+      ],
+      "data": {
+        "company": "Clay",
+        "round": "Series B",
+        "amount": 46000000,
+        "date": "2025-02-05",
+        "investors": [
+          "Tiger Global",
+          "Lightspeed"
+        ],
+        "source": "The Information",
+        "insight": "Data enrichment wars continue - Clay doubling down on AI-powered personalization"
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "pricing-Kimi-2025-02-08",
+      "type": "AI_PRICING_CHANGE",
+      "priority": "HIGH",
+      "title": "📈 Kimi Kimi k2.5 pricing increased 33%",
+      "provider": "Kimi",
+      "percentChange": 0.33,
+      "insight": "20-33% price hike suggests strong demand or capacity constraints",
+      "recommendations": [
+        "✅ Opportunity: Kimi becoming more expensive - price advantage window",
+        "📊 Action: Update competitive comparison docs with new pricing",
+        "🔄 Action: Review your own cost structure - can you maintain margins?"
+      ],
+      "data": {
+        "provider": "Kimi",
+        "model": "Kimi k2.5",
+        "change": "increase",
+        "oldPrice": {
+          "input": 0.5,
+          "output": 1.5
+        },
+        "newPrice": {
+          "input": 0.6,
+          "output": 2
+        },
+        "date": "2025-02-08",
+        "percentChange": 0.33,
+        "insight": "20-33% price hike suggests strong demand or capacity constraints"
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "pricing-OpenAI-2025-02-01",
+      "type": "AI_PRICING_CHANGE",
+      "priority": "HIGH",
+      "title": "📉 OpenAI GPT-4o pricing decreased 33%",
+      "provider": "OpenAI",
+      "percentChange": -0.33,
+      "insight": "Aggressive pricing to compete with Claude - margins compressing industry-wide",
+      "recommendations": [
+        "⚠️ Watch: Price compression means margin pressure industry-wide",
+        "💡 Action: Consider value-adds beyond raw price (features, support, reliability)",
+        "🔄 Action: Review your own cost structure - can you maintain margins?"
+      ],
+      "data": {
+        "provider": "OpenAI",
+        "model": "GPT-4o",
+        "change": "decrease",
+        "oldPrice": {
+          "input": 5,
+          "output": 15
+        },
+        "newPrice": {
+          "input": 2.5,
+          "output": 10
+        },
+        "date": "2025-02-01",
+        "percentChange": -0.33,
+        "insight": "Aggressive pricing to compete with Claude - margins compressing industry-wide"
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "reddit-startups-2025-02-09",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "HIGH",
+      "title": "💡 r/startups: Sales outreach is killing our SDR team - anyone found a good...",
+      "subreddit": "startups",
+      "engagement": 429,
+      "painSignals": [
+        "burnout",
+        "manual work",
+        "low response rates",
+        "scaling issues"
+      ],
+      "insight": "High engagement on SDR pain points - validation for AI sales tools",
+      "recommendations": [
+        "🎯 Content: Create ROI calculator for time saved with AI SDRs",
+        "📢 Marketing: Target \"SDR burnout\" keywords in SEO/content",
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "startups",
+        "title": "Sales outreach is killing our SDR team - anyone found a good AI solution?",
+        "score": 342,
+        "comments": 87,
+        "painSignals": [
+          "burnout",
+          "manual work",
+          "low response rates",
+          "scaling issues"
+        ],
+        "date": "2025-02-09",
+        "insight": "High engagement on SDR pain points - validation for AI sales tools",
+        "urgencyScore": 85
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "reddit-Entrepreneur-2025-02-06",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "HIGH",
+      "title": "💡 r/Entrepreneur: AI tools are eating my budget - $5K/month just for APIs. How...",
+      "subreddit": "Entrepreneur",
+      "engagement": 535,
+      "painSignals": [
+        "cost",
+        "AI spending",
+        "budget optimization",
+        "ROI concerns"
+      ],
+      "insight": "AI cost optimization is becoming a major concern - consolidation opportunity",
+      "recommendations": [
+        "🏆 Positioning: Emphasize cost efficiency vs hiring additional headcount",
+        "📊 Sales: Prepare TCO (Total Cost of Ownership) comparison sheets",
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "Entrepreneur",
+        "title": "AI tools are eating my budget - $5K/month just for APIs. How to optimize?",
+        "score": 423,
+        "comments": 112,
+        "painSignals": [
+          "cost",
+          "AI spending",
+          "budget optimization",
+          "ROI concerns"
+        ],
+        "date": "2025-02-06",
+        "insight": "AI cost optimization is becoming a major concern - consolidation opportunity",
+        "urgencyScore": 91
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "pricing-OpenRouter-2025-02-07",
+      "type": "AI_PRICING_CHANGE",
+      "priority": "MEDIUM",
+      "title": "📉 OpenRouter Claude 3.5 Sonnet pricing decreased 17%",
+      "provider": "OpenRouter",
+      "percentChange": -0.17,
+      "insight": "Price war intensifying - OpenRouter passing through Anthropic cuts",
+      "recommendations": [
+        "⚠️ Watch: Price compression means margin pressure industry-wide",
+        "💡 Action: Consider value-adds beyond raw price (features, support, reliability)",
+        "🔄 Action: Review your own cost structure - can you maintain margins?"
+      ],
+      "data": {
+        "provider": "OpenRouter",
+        "model": "Claude 3.5 Sonnet",
+        "change": "decrease",
+        "oldPrice": {
+          "input": 3,
+          "output": 15
+        },
+        "newPrice": {
+          "input": 2.5,
+          "output": 12.5
+        },
+        "date": "2025-02-07",
+        "percentChange": -0.17,
+        "insight": "Price war intensifying - OpenRouter passing through Anthropic cuts"
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "reddit-SaaS-2025-02-08",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "MEDIUM",
+      "title": "💡 r/SaaS: Churn is through the roof since we raised prices. How to com...",
+      "subreddit": "SaaS",
+      "engagement": 331,
+      "painSignals": [
+        "churn",
+        "pricing sensitivity",
+        "value communication"
+      ],
+      "insight": "Pricing optimization is top-of-mind for SaaS founders right now",
+      "recommendations": [
+        "💰 Product: Build value-based pricing calculator",
+        "🎓 Content: Publish \"How to communicate AI ROI to customers\" guide",
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "SaaS",
+        "title": "Churn is through the roof since we raised prices. How to communicate value better?",
+        "score": 267,
+        "comments": 64,
+        "painSignals": [
+          "churn",
+          "pricing sensitivity",
+          "value communication"
+        ],
+        "date": "2025-02-08",
+        "insight": "Pricing optimization is top-of-mind for SaaS founders right now",
+        "urgencyScore": 72
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
+    },
+    {
+      "id": "reddit-startups-2025-02-07",
+      "type": "MARKET_PAIN_POINT",
+      "priority": "MEDIUM",
+      "title": "💡 r/startups: Prospecting data quality is our biggest bottleneck. Any reli...",
+      "subreddit": "startups",
+      "engagement": 234,
+      "painSignals": [
+        "data quality",
+        "prospecting",
+        "enrichment",
+        "bottleneck"
+      ],
+      "insight": "Data enrichment market showing strong demand signals",
+      "recommendations": [
+        "🔗 Outreach: Engage in this thread with helpful, non-promotional advice"
+      ],
+      "data": {
+        "subreddit": "startups",
+        "title": "Prospecting data quality is our biggest bottleneck. Any reliable enrichment tools?",
+        "score": 189,
+        "comments": 45,
+        "painSignals": [
+          "data quality",
+          "prospecting",
+          "enrichment",
+          "bottleneck"
+        ],
+        "date": "2025-02-07",
+        "insight": "Data enrichment market showing strong demand signals",
+        "urgencyScore": 68
+      },
+      "timestamp": "2026-02-12T05:00:06.275Z"
     }
   ],
-  "lastRun": "2026-02-10T12:13:13.274Z"
+  "lastRun": "2026-02-12T05:00:06.276Z"
 }

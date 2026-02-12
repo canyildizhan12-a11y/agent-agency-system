@@ -25,7 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     // ACTUALLY create cron job via OpenClaw
-    const result = await createCronJob(cronSchedule, task);
+    const jobName = `Dashboard: ${agentId} - ${task.substring(0, 30)}...`;
+    const result = await createCronJob(jobName, cronSchedule, task);
     
     res.status(200).json({
       success: true,

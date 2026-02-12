@@ -1,0 +1,80 @@
+{
+  "id": "meeting-1770865241378",
+  "timestamp": "2026-02-12T03:00:41.378Z",
+  "topic": "Social Media Monitoring - Review mentions, sentiment, and competitor activity",
+  "transcript": [
+    {
+      "agent": "henry",
+      "message": "🦉 Henry: Good morning team! Hope you're all feeling sharp. Today we're discussing social media monitoring - review mentions, sentiment, and competitor activity. This is crucial for our next phase. Let's dive in - who wants to kick us off?"
+    },
+    {
+      "agent": "scout",
+      "message": "🔍 Scout: Social sentiment is at 73% positive, up from 65%. But here's the thing - people are asking about pricing transparency in comments. We should address this head-on. Also, CompetitorX just launched a feature we discussed 3 weeks ago. We're ahead of the curve if we move now."
+    },
+    {
+      "agent": "pixel",
+      "message": "🎨 Pixel: The \"day in the life\" aesthetic is saturating. We need to pivot. I'm seeing traction on raw, unpolished content - like iPhone footage with bold text overlays. Authenticity over production value. I can mock this up today."
+    },
+    {
+      "agent": "echo",
+      "message": "💻 Echo: I can integrate sentiment analysis directly into our dashboard. Real-time. Also, the social listening API is stable now - no more timeouts. I can have a prototype of the automated reporting system by Thursday."
+    },
+    {
+      "agent": "quill",
+      "message": "✍️ Quill: Community loves our behind-the-scenes content. I'm scripting a \"how the sausage is made\" series - raw, honest, no corporate speak. Also, we should directly address the pricing questions trending in comments. Transparency builds trust."
+    },
+    {
+      "agent": "codex",
+      "message": "🏗️ Codex: We should design a response system for community feedback. Structured, scalable. I'm thinking a lightweight CRM that tracks mentions, sentiment, and response history. This becomes our intelligence layer."
+    },
+    {
+      "agent": "alex",
+      "message": "📊 Alex: Share of voice up 8% this month. Our response time averages 12 minutes - best in class. But sentiment analysis shows 15% of mentions are questions we haven't answered. Gap in our community management. Data-driven recommendation: hire community manager or automate responses."
+    },
+    {
+      "agent": "scout",
+      "message": "🔍 Scout: Building on Alex's point about the 2:15 drop-off - I checked when CompetitorX posts. They're hitting peak hours perfectly. We should adjust our publishing schedule. Data suggests Tuesday 9am and Thursday 3pm are optimal for our audience."
+    },
+    {
+      "agent": "pixel",
+      "message": "🎨 Pixel: Echo, if you're building that queue system, I need to adjust our asset pipeline. Raw content still needs some processing - I can create templates that maintain the \"authentic\" look while ensuring brand consistency. 80/20 rule."
+    },
+    {
+      "agent": "echo",
+      "message": "💻 Echo: I can automate the publishing schedule Scout mentioned. Set up a queue that optimizes for those windows. Also, Codex's CRM idea - I can build a lightweight version this week. API integrations are straightforward."
+    }
+  ],
+  "action_items": [
+    {
+      "task": "Implement optimal publishing schedule (Tue 9am, Thu 3pm)",
+      "assignee": "echo",
+      "priority": "high",
+      "due": "24 hours"
+    },
+    {
+      "task": "Create raw content templates with brand consistency",
+      "assignee": "pixel",
+      "priority": "high",
+      "due": "48 hours"
+    },
+    {
+      "task": "Write time-slot optimized hooks and scripts",
+      "assignee": "quill",
+      "priority": "high",
+      "due": "48 hours"
+    },
+    {
+      "task": "Build lightweight community CRM with sentiment tracking",
+      "assignee": "echo",
+      "priority": "medium",
+      "due": "1 week"
+    },
+    {
+      "task": "Document workflow playbook for scaling",
+      "assignee": "codex",
+      "priority": "medium",
+      "due": "1 week"
+    }
+  ],
+  "status": "completed"
+}

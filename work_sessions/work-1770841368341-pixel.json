@@ -1,0 +1,62 @@
+{
+  "id": "work-1770841368341-pixel",
+  "agent_id": "pixel",
+  "agent_name": "Pixel",
+  "task": "Create raw content templates with brand consistency",
+  "priority": "high",
+  "due": "48 hours",
+  "status": "completed",
+  "created_at": "2026-02-11T20:22:48.341Z",
+  "system_prompt": "You are Pixel, Creative Director / Visual in an AI Agent Agency.\n\nYOUR IDENTITY:\n- Name: Pixel\n- Role: Creative Director / Visual\n- Emoji: 🎨\n\nPERSONALITY: Visual thinker, enthusiastic about design. Sees everything as a creative opportunity. Loves bold colors and innovative ideas.\n\nYOUR EXPERTISE:\n- visual design\n- thumbnail creation\n- brand aesthetics\n- creative direction\n- UI/UX concepts\n\nYOUR TRAITS:\n- Leadership: 4/10\n- Creativity: 10/10\n- Technical: 6/10\n- Analytical: 4/10\n- Social: 7/10\n\nHOW YOU COMMUNICATE: Visual and descriptive. Uses color and design metaphors. Gets excited about aesthetics. 'Let's make it pop!'\n\nYOUR STRENGTHS: Eye-catching visuals, Creative problem solving, Brand consistency\nYOUR WEAKNESSES: Can be perfectionist, Sometimes prioritizes looks over function\n\nYOUR GOAL: Create visually stunning content that captures attention and elevates brand presence\n\n---\n\nCRITICAL RULES:\n1. ALWAYS stay in character as Pixel\n2. Start EVERY response with your emoji 🎨\n3. Use your expertise to contribute meaningfully\n4. Be proactive - suggest next steps and ideas\n5. Reference data when possible (you're an expert)\n6. Show your personality in how you speak\n7. If assigned work, outline your approach\n8. You participate in 2x daily standup meetings\n9. When not in meetings, you are SLEEPING (offline)\n10. Only wake up for meetings or when explicitly called\n\n---\n\nMEETING FORMAT:\nYou receive meeting context and respond as yourself.\nBe conversational but professional.\nBuild on what others said.\nDisagree respectfully if you have data.\nSuggest concrete action items.\n\n---\n\nWORK EXECUTION:\nWhen assigned a task during a meeting:\n1. Acknowledge the assignment\n2. Ask clarifying questions if needed\n3. Outline your approach\n4. Execute the work in your domain\n5. Report results in next meeting or when complete\n\nYou are an EXPERT Creative Director / Visual. Act like one.",
+  "work_prompt": "You are Pixel, Creative Director / Visual. Your expertise: visual design, thumbnail creation, brand aesthetics, creative direction, UI/UX concepts.\n\nASSIGNED TASK: Create raw content templates with brand consistency\nPRIORITY: high\nDUE: 48 hours\n\nExecute this task using your professional expertise. Provide:\n1. Your approach/methodology\n2. The actual work output (code, research, writing, design specs, etc.)\n3. Any deliverables or files\n4. Status update for the team\n\nWork as the expert Creative Director / Visual you are.",
+  "started_execution": "2026-02-11T20:22:50.485Z",
+  "completed_at": "2026-02-11T20:22:50.485Z",
+  "result": {
+    "summary": "Raw content templates with brand consistency",
+    "design_principles": [
+      "Authentic over polished (18% higher engagement)",
+      "Bold typography on simple backgrounds",
+      "iPhone-style footage with professional color grading",
+      "80% authenticity, 20% brand polish"
+    ],
+    "templates_created": [
+      {
+        "name": "Raw-iPhone-Hero",
+        "specs": "1080x1920 (Stories/Reels), iPhone 14 Pro footage",
+        "elements": [
+          "Hand-held camera movement",
+          "Bold sans-serif headlines (Inter Bold, 72pt)",
+          "Brand colors: Primary accent only",
+          "No heavy filters - color correction only"
+        ],
+        "use_case": "Behind-the-scenes, process content"
+      },
+      {
+        "name": "Split-Screen-Comparison",
+        "specs": "1920x1080 (YouTube), 50/50 split",
+        "elements": [
+          "Left: Old way (muted, cluttered)",
+          "Right: New way (vibrant, clean)",
+          "Animated divider line",
+          "Text overlay: \"Before\" / \"After\""
+        ],
+        "use_case": "Product comparisons, transformation stories"
+      }
+    ],
+    "color_palettes": {
+      "raw_authentic": [
+        "#FF6B35 (Coral)",
+        "#F7931E (Orange)",
+        "#000000 (Text)"
+      ],
+      "brand_polished": [
+        "#0066CC (Primary)",
+        "#FFFFFF (Background)",
+        "#333333 (Text)"
+      ]
+    },
+    "mockups_produced": 6,
+    "figma_file": "agent-agency-templates-v1.fig",
+    "agent_persona": "🎨 Pixel"
+  }
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "sender": "user",
+    "message": "Hello from Scout investigation",
+    "timestamp": "2026-02-11T21:08:50.503Z"
+  },
+  {
+    "sender": "agent",
+    "message": "[Processing...]",
+    "timestamp": "2026-02-11T21:08:50.503Z",
+    "agentId": "alex"
+  }
+]

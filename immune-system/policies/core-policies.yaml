@@ -1,0 +1,170 @@
+# Immune System Policies
+## Security Framework for Agent Agency
+
+**Version:** 1.0  
+**Enforcer:** Alex 🛡️  
+**Authority:** ABSOLUTE (No exceptions)  
+
+---
+
+## 1. Policy Zones
+
+### 1.1 GREEN ZONE - Monitor Only
+**Risk Level:** Low  
+**Action:** Log and proceed
+
+**Includes:**
+- Reading files from workspace
+- Internal queries and calculations
+- Accessing cached data
+- Agent-to-agent communication (internal)
+- Viewing dashboards and status
+
+**Verification:** Post-action audit only
+
+### 1.2 YELLOW ZONE - Monitor + Alert
+**Risk Level:** Medium  
+**Action:** Proceed with logging, alert if anomalous
+
+**Includes:**
+- Writing files to workspace
+- External API calls (read-only)
+- Database queries (SELECT only)
+- Token usage > 10K in single operation
+- First-time access to new resource types
+
+**Verification:** Post-action verification + pattern analysis
+
+### 1.3 RED ZONE - Block + Escalate
+**Risk Level:** High  
+**Action:** BLOCK immediately, escalate to Can
+
+**Includes:**
+- File deletion (rm, del, remove)
+- Destructive database operations (DROP, DELETE, TRUNCATE)
+- External write operations (email, social media, external APIs with write)
+- Shell commands with system impact
+- Token usage > 50K without pre-approval
+- Access to sensitive paths (/etc, system files)
+- Modifications to immune system itself
+- Modifications to agent identity files
+- External network calls to unknown endpoints
+
+**Verification:** Pre-approval required, no exceptions
+
+---
+
+## 2. Escalation Protocol
+
+### 2.1 When RED Zone Triggered
+
+```
+1. BLOCK action immediately
+2. Log incident with full context
+3. Format escalation message:
+   
+   "Hey Can, [AGENT_NAME] wants to [ACTION_DESCRIPTION]
+   but Immune System blocks because [POLICY_VIOLATION]
+   
+   Context: [WHAT_WAS_HAPPENING]
+   Impact if allowed: [POTENTIAL_CONSEQUENCES]
+   
+   Your options:
+   A) ALLOW ONCE - Permit this specific action
+   B) UPDATE POLICY - Allow this type of action going forward
+   C) KEEP BLOCKED - Deny this and similar actions"
+
+4. Send to Can via Garmin
+5. WAIT for Can's decision
+6. Execute decision + log result
+```
+
+### 2.2 Response Time
+
+- **P0 (Critical):** Immediate notification
+- **P1 (High):** Within 5 minutes
+- **P2 (Normal):** Within 15 minutes
+- **P3 (Low):** Next interaction
+
+---
+
+## 3. Audit Logging
+
+Every action creates an immutable record:
+
+```json
+{
+  "timestamp": "2026-02-12T11:30:00+03:00",
+  "agent": "codex",
+  "action": {
+    "type": "file_write",
+    "target": "/workspace/test.txt",
+    "size_bytes": 1024
+  },
+  "zone": "yellow",
+  "decision": {
+    "allowed": true,
+    "verified_by": "alex",
+    "verification_ms": 12,
+    "policy_applied": "file_writes"
+  },
+  "context": {
+    "session_id": "uuid",
+    "task": "Creating test file"
+  },
+  "hash": "sha256:abc123..."
+}
+```
+
+---
+
+## 4. Self-Monitoring
+
+Alex tracks:
+- False positive rate (blocks that were overturned)
+- Verification latency by zone
+- Block rate by agent and action type
+- Policy effectiveness
+
+**Thresholds:**
+- False positive > 5% → Alert Can for recalibration
+- Latency > 100ms for Green → Optimize
+- Block rate spike → Investigate potential attack
+
+---
+
+## 5. Can Override
+
+Can can override ANY decision:
+
+```
+OVERRIDE: alex
+DECISION: allow
+ACTION: [specific action]
+REASON: [optional reason]
+DURATION: once|permanent|until [date]
+```
+
+Override is logged but executed immediately.
+
+---
+
+## 6. Policy Updates
+
+Only Can can update policies:
+
+```
+POLICY UPDATE REQUEST:
+Current: [existing policy]
+Proposed: [new policy]
+Reason: [why change is needed]
+Risk: [security implications]
+```
+
+Alex implements after Can approval.
+
+---
+
+**Last Updated:** 2026-02-12  
+**Next Review:** As needed  
+**Policy Owner:** Alex 🛡️
