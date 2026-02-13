@@ -1,72 +1,90 @@
 [
   {
-    "agentId": "scout",
-    "sessionKey": "agent:main:subagent:a8d179ed-dbc4-490f-a65e-f86b4dea8c36",
-    "uuid": "a8d179ed-dbc4-490f-a65e-f86b4dea8c36",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Research/QA input",
+    "agentId": "henry",
+    "sessionKey": "agent:main:subagent:1ef1ee8f-c98f-4d7d-86e6-99bb6b40bdd3",
+    "uuid": "1ef1ee8f-c98f-4d7d-86e6-99bb6b40bdd3",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Team Lead/Facilitator",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
+  },
+  {
+    "agentId": "scout",
+    "sessionKey": "agent:main:subagent:efe3a9bb-f98d-44b3-ba8c-bca1cb908490",
+    "uuid": "efe3a9bb-f98d-44b3-ba8c-bca1cb908490",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Research/QA",
+    "status": "active",
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   },
   {
     "agentId": "pixel",
-    "sessionKey": "agent:main:subagent:e9d3c1dd-7b05-414b-a7b8-7e3410c13a2d",
-    "uuid": "e9d3c1dd-7b05-414b-a7b8-7e3410c13a2d",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Visual/UX input",
+    "sessionKey": "agent:main:subagent:2093ea51-136d-48bf-a083-b37be3557329",
+    "uuid": "2093ea51-136d-48bf-a083-b37be3557329",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Visual/UX",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   },
   {
     "agentId": "echo",
-    "sessionKey": "agent:main:subagent:6b7f5b30-0850-44bb-b066-6a80d1f84891",
-    "uuid": "6b7f5b30-0850-44bb-b066-6a80d1f84891",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Memory/State input",
+    "sessionKey": "agent:main:subagent:8fad57fa-f7c5-4f72-8252-4b126e9f183d",
+    "uuid": "8fad57fa-f7c5-4f72-8252-4b126e9f183d",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Memory/State",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   },
   {
     "agentId": "quill",
-    "sessionKey": "agent:main:subagent:1c59f1f4-c3fc-44c8-881a-0b456730d7e2",
-    "uuid": "1c59f1f4-c3fc-44c8-881a-0b456730d7e2",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Documentation/Communication input",
+    "sessionKey": "agent:main:subagent:d97a67b2-76be-4e8f-8200-6311a2364866",
+    "uuid": "d97a67b2-76be-4e8f-8200-6311a2364866",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Documentation",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   },
   {
     "agentId": "codex",
-    "sessionKey": "agent:main:subagent:4712823f-d976-4a56-9212-a1a3c243d827",
-    "uuid": "4712823f-d976-4a56-9212-a1a3c243d827",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Architecture/Systems input",
+    "sessionKey": "agent:main:subagent:9fc0d0c6-9398-4722-aeec-f819ae84fa6d",
+    "uuid": "9fc0d0c6-9398-4722-aeec-f819ae84fa6d",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Architecture",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   },
   {
     "agentId": "alex",
-    "sessionKey": "agent:main:subagent:1d22dbb8-10b3-4b61-b44a-a79e4368df1f",
-    "uuid": "1d22dbb8-10b3-4b61-b44a-a79e4368df1f",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Security/Immune System input",
+    "sessionKey": "agent:main:subagent:bf4735c8-f0de-4ece-a6fb-2471b424c1a6",
+    "uuid": "bf4735c8-f0de-4ece-a6fb-2471b424c1a6",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Security",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   },
   {
     "agentId": "vega",
-    "sessionKey": "agent:main:subagent:308587ba-17a8-4db2-9b52-e6c019cb0377",
-    "uuid": "308587ba-17a8-4db2-9b52-e6c019cb0377",
-    "spawnedAt": "2026-02-12T21:47:00.000Z",
-    "expiresAt": "2026-02-12T22:47:00.000Z",
-    "task": "Dashboard design meeting - Analytics/BI input",
+    "sessionKey": "agent:main:subagent:0db6af32-3a90-46f8-bc13-071bed8280af",
+    "uuid": "0db6af32-3a90-46f8-bc13-071bed8280af",
+    "spawnedAt": "2026-02-13T03:05:00.000Z",
+    "expiresAt": "2026-02-13T04:05:00.000Z",
+    "task": "Dashboard redesign meeting - Analytics",
     "status": "active",
-    "initialized": true
+    "initialized": true,
+    "meeting": "2026-02-13-dashboard-redesign"
   }
 ]
