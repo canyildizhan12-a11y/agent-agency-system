@@ -1,11 +1,11 @@
 {
   "agent_id": "codex",
   "status": "sleeping",
-  "since": "2026-02-12T11:00:17.020Z",
+  "since": "2026-02-13T03:00:11.370Z",
   "wakes_for": [
     "09:00 meeting",
     "17:00 meeting",
     "manual_wake"
   ],
-  "last_task_completed": "2026-02-12T11:00:17.020Z"
+  "last_task_completed": "2026-02-13T03:00:11.370Z"
 }

@@ -1,11 +1,71 @@
 [
   {
-    "agentId": "henry",
-    "sessionKey": "agent:main:subagent:1c45e020-ec6c-4482-a6a7-deb79e300f7a",
-    "uuid": "1c45e020-ec6c-4482-a6a7-deb79e300f7a",
-    "spawnedAt": "2026-02-12T21:23:00.000Z",
-    "expiresAt": "2026-02-12T22:23:00.000Z",
-    "task": "General availability",
+    "agentId": "scout",
+    "sessionKey": "agent:main:subagent:a8d179ed-dbc4-490f-a65e-f86b4dea8c36",
+    "uuid": "a8d179ed-dbc4-490f-a65e-f86b4dea8c36",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Research/QA input",
+    "status": "active",
+    "initialized": true
+  },
+  {
+    "agentId": "pixel",
+    "sessionKey": "agent:main:subagent:e9d3c1dd-7b05-414b-a7b8-7e3410c13a2d",
+    "uuid": "e9d3c1dd-7b05-414b-a7b8-7e3410c13a2d",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Visual/UX input",
+    "status": "active",
+    "initialized": true
+  },
+  {
+    "agentId": "echo",
+    "sessionKey": "agent:main:subagent:6b7f5b30-0850-44bb-b066-6a80d1f84891",
+    "uuid": "6b7f5b30-0850-44bb-b066-6a80d1f84891",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Memory/State input",
+    "status": "active",
+    "initialized": true
+  },
+  {
+    "agentId": "quill",
+    "sessionKey": "agent:main:subagent:1c59f1f4-c3fc-44c8-881a-0b456730d7e2",
+    "uuid": "1c59f1f4-c3fc-44c8-881a-0b456730d7e2",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Documentation/Communication input",
+    "status": "active",
+    "initialized": true
+  },
+  {
+    "agentId": "codex",
+    "sessionKey": "agent:main:subagent:4712823f-d976-4a56-9212-a1a3c243d827",
+    "uuid": "4712823f-d976-4a56-9212-a1a3c243d827",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Architecture/Systems input",
+    "status": "active",
+    "initialized": true
+  },
+  {
+    "agentId": "alex",
+    "sessionKey": "agent:main:subagent:1d22dbb8-10b3-4b61-b44a-a79e4368df1f",
+    "uuid": "1d22dbb8-10b3-4b61-b44a-a79e4368df1f",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Security/Immune System input",
+    "status": "active",
+    "initialized": true
+  },
+  {
+    "agentId": "vega",
+    "sessionKey": "agent:main:subagent:308587ba-17a8-4db2-9b52-e6c019cb0377",
+    "uuid": "308587ba-17a8-4db2-9b52-e6c019cb0377",
+    "spawnedAt": "2026-02-12T21:47:00.000Z",
+    "expiresAt": "2026-02-12T22:47:00.000Z",
+    "task": "Dashboard design meeting - Analytics/BI input",
     "status": "active",
     "initialized": true
   }

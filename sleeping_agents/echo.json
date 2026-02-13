@@ -1,11 +1,11 @@
 {
   "agent_id": "echo",
   "status": "sleeping",
-  "since": "2026-02-12T11:00:17.017Z",
+  "since": "2026-02-13T03:00:11.372Z",
   "wakes_for": [
     "09:00 meeting",
     "17:00 meeting",
     "manual_wake"
   ],
-  "last_task_completed": "2026-02-12T11:00:17.017Z"
+  "last_task_completed": "2026-02-13T03:00:11.372Z"
 }

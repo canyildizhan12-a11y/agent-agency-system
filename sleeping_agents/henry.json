@@ -1,14 +1,10 @@
 {
   "agent_id": "henry",
-  "status": "working",
-  "since": "2026-02-12T11:00:12.367Z",
+  "status": "sleeping",
+  "since": "2026-02-13T03:00:06.467Z",
   "wakes_for": [
     "09:00 meeting",
     "17:00 meeting",
     "manual_wake"
-  ],
-  "woken_at": "2026-02-12T18:04:31.213Z",
-  "woken_by": "dashboard",
-  "current_task": "hey henry, what's your subagent id?",
-  "updated_at": "2026-02-12T19:42:48.909Z"
+  ]
 }

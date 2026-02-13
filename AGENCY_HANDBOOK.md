@@ -39,6 +39,7 @@
 | File | Purpose | Check Before |
 |------|---------|--------------|
 | `AGENCY_HANDBOOK.md` | Operating standards | Every action |
+| `STANDARD_PRACTICES.md` | Meeting protocols & agent lifecycle | Every meeting/spawn |
 | `immune-system/policies/core-policies.yaml` | Security policies | External actions |
 | `feedback-loop.md` | Preference learning | Output generation |
 | `laziness-engine.md` | Self-correction | Long tasks |

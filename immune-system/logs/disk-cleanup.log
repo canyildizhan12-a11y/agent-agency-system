@@ -34,3 +34,36 @@
 [2026-02-12 21:00:04] Ran git garbage collection
 [2026-02-12 21:00:04] Cleanup complete. Total freed: 179MB
 [2026-02-12 21:00:04] Disk usage: 90% → 88%
+[2026-02-12 22:00:19] Current disk usage: 89%
+[2026-02-12 22:00:19] WARNING: Disk usage 89% exceeds threshold. Starting cleanup...
+[2026-02-12 22:00:19] Cleaned npm cache: 24MB freed
+[2026-02-12 22:00:19] Removed Next.js build artifacts: 40MB freed
+[2026-02-12 22:00:19] Ran git garbage collection
+[2026-02-12 22:00:19] Cleanup complete. Total freed: 64MB
+[2026-02-12 22:00:19] Disk usage: 89% → 88%
+[2026-02-12 23:00:12] Current disk usage: 88%
+[2026-02-12 23:00:12] WARNING: Disk usage 88% exceeds threshold. Starting cleanup...
+[2026-02-12 23:00:12] Removed Next.js build artifacts: 39MB freed
+[2026-02-12 23:00:12] Ran git garbage collection
+[2026-02-12 23:00:12] Cleanup complete. Total freed: 39MB
+[2026-02-12 23:00:12] Disk usage: 88% → 88%
+[2026-02-13 00:00:07] Current disk usage: 88%
+[2026-02-13 00:00:07] WARNING: Disk usage 88% exceeds threshold. Starting cleanup...
+[2026-02-13 00:00:07] Ran git garbage collection
+[2026-02-13 00:00:07] Cleanup complete. Total freed: 0MB
+[2026-02-13 00:00:07] Disk usage: 88% → 88%
+[2026-02-13 01:00:06] Current disk usage: 88%
+[2026-02-13 01:00:06] WARNING: Disk usage 88% exceeds threshold. Starting cleanup...
+[2026-02-13 01:00:06] Ran git garbage collection
+[2026-02-13 01:00:06] Cleanup complete. Total freed: 0MB
+[2026-02-13 01:00:06] Disk usage: 88% → 88%
+[2026-02-13 02:00:07] Current disk usage: 88%
+[2026-02-13 02:00:07] WARNING: Disk usage 88% exceeds threshold. Starting cleanup...
+[2026-02-13 02:00:07] Ran git garbage collection
+[2026-02-13 02:00:07] Cleanup complete. Total freed: 0MB
+[2026-02-13 02:00:07] Disk usage: 88% → 88%
+[2026-02-13 03:00:27] Current disk usage: 88%
+[2026-02-13 03:00:27] WARNING: Disk usage 88% exceeds threshold. Starting cleanup...
+[2026-02-13 03:00:27] Ran git garbage collection
+[2026-02-13 03:00:27] Cleanup complete. Total freed: 0MB
+[2026-02-13 03:00:27] Disk usage: 88% → 88%
