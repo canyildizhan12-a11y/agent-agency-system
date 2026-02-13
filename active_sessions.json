@@ -1,90 +1,90 @@
 [
   {
     "agentId": "henry",
-    "sessionKey": "agent:main:subagent:1ef1ee8f-c98f-4d7d-86e6-99bb6b40bdd3",
-    "uuid": "1ef1ee8f-c98f-4d7d-86e6-99bb6b40bdd3",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Team Lead/Facilitator",
+    "sessionKey": "agent:main:subagent:851b2016-1096-4e25-b3a8-aa4899c7021b",
+    "uuid": "851b2016-1096-4e25-b3a8-aa4899c7021b",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Team Lead",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "scout",
-    "sessionKey": "agent:main:subagent:efe3a9bb-f98d-44b3-ba8c-bca1cb908490",
-    "uuid": "efe3a9bb-f98d-44b3-ba8c-bca1cb908490",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Research/QA",
+    "sessionKey": "agent:main:subagent:12942bf4-4031-4dbb-a207-ed13a68ebbf6",
+    "uuid": "12942bf4-4031-4dbb-a207-ed13a68ebbf6",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Research/Diagnosis",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "pixel",
-    "sessionKey": "agent:main:subagent:2093ea51-136d-48bf-a083-b37be3557329",
-    "uuid": "2093ea51-136d-48bf-a083-b37be3557329",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Visual/UX",
+    "sessionKey": "agent:main:subagent:22d8c0d6-f56a-4626-bcd5-f9412d7edc19",
+    "uuid": "22d8c0d6-f56a-4626-bcd5-f9412d7edc19",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Visual/UX",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "echo",
-    "sessionKey": "agent:main:subagent:8fad57fa-f7c5-4f72-8252-4b126e9f183d",
-    "uuid": "8fad57fa-f7c5-4f72-8252-4b126e9f183d",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Memory/State",
+    "sessionKey": "agent:main:subagent:4f28ec56-10f7-40ba-898c-428d20735ada",
+    "uuid": "4f28ec56-10f7-40ba-898c-428d20735ada",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - State/Data (FIXED ISSUE)",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "quill",
-    "sessionKey": "agent:main:subagent:d97a67b2-76be-4e8f-8200-6311a2364866",
-    "uuid": "d97a67b2-76be-4e8f-8200-6311a2364866",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Documentation",
+    "sessionKey": "agent:main:subagent:a8ce1af7-a721-4249-85f0-4741d6d842da",
+    "uuid": "a8ce1af7-a721-4249-85f0-4741d6d842da",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Documentation",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "codex",
-    "sessionKey": "agent:main:subagent:9fc0d0c6-9398-4722-aeec-f819ae84fa6d",
-    "uuid": "9fc0d0c6-9398-4722-aeec-f819ae84fa6d",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Architecture",
+    "sessionKey": "agent:main:subagent:cdec8439-5504-4d2c-9f38-783c747dbeaf",
+    "uuid": "cdec8439-5504-4d2c-9f38-783c747dbeaf",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Architecture (owned the schema drift)",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "alex",
-    "sessionKey": "agent:main:subagent:bf4735c8-f0de-4ece-a6fb-2471b424c1a6",
-    "uuid": "bf4735c8-f0de-4ece-a6fb-2471b424c1a6",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Security",
+    "sessionKey": "agent:main:subagent:943838bd-9c30-4084-95f1-546b11ed77cb",
+    "uuid": "943838bd-9c30-4084-95f1-546b11ed77cb",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Security (89% disk alert)",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   },
   {
     "agentId": "vega",
-    "sessionKey": "agent:main:subagent:0db6af32-3a90-46f8-bc13-071bed8280af",
-    "uuid": "0db6af32-3a90-46f8-bc13-071bed8280af",
-    "spawnedAt": "2026-02-13T03:05:00.000Z",
-    "expiresAt": "2026-02-13T04:05:00.000Z",
-    "task": "Dashboard redesign meeting - Analytics",
+    "sessionKey": "agent:main:subagent:16f2cfc5-96b8-4a41-b831-d92a190ba23a",
+    "uuid": "16f2cfc5-96b8-4a41-b831-d92a190ba23a",
+    "spawnedAt": "2026-02-13T03:38:00.000Z",
+    "expiresAt": "2026-02-13T04:38:00.000Z",
+    "task": "Emergency dashboard meeting - Analytics/Disk analysis",
     "status": "active",
     "initialized": true,
-    "meeting": "2026-02-13-dashboard-redesign"
+    "meeting": "2026-02-13-emergency-dashboard"
   }
 ]
