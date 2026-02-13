@@ -46,9 +46,12 @@ SPAWN → INITIALIZE → ACTIVE → INTERACT → REPORT → SLEEP
 - ✅ **Action Items** - Tracked with owners and deadlines
 - ✅ **Push to GitHub** - All files committed and pushed
 
-### 4. WHAT IS FORBIDDEN
+### 4. WHAT IS FORBIDDEN - ZERO TOLERANCE
 
-❌ **Scripted conversations** ("Agent X says: [scripted line]")
+❌ **ABSOLUTELY NO SCRIPTS** - Agents speak naturally, not from a script
+❌ **NO "Agent X says:" format** - Let them talk TO EACH OTHER
+❌ **NO predetermined dialogue** - Conversation emerges organically
+❌ **NO bi-daily meeting templates** - Every meeting is unique and natural
 ❌ **Spawning duplicates** (14 agents for 8 roles)
 ❌ **One-off responses** (spawn → answer once → die)
 ❌ **No interaction** (agents isolated, not talking to each other)

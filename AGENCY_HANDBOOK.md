@@ -234,11 +234,24 @@ CONTEXT: brief context
 - **Morning:** 09:00 TRT
 - **Evening:** 17:00 TRT
 
-### 7.2 Format
-1. **Status** — What did you work on?
-2. **Blockers** — Anything stopping progress?
-3. **Next** — What are you doing next?
-4. **Needs** — Do you need other agents?
+### 7.2 Format - NATURAL CONVERSATION (NOT SCRIPTED)
+
+**⚠️ CRITICAL: Bi-daily meetings follow the same rules as all meetings:**
+- **NO scripts** - Agents talk naturally to each other
+- **NO templates** - "Status → Blockers → Next → Needs" is FORBIDDEN
+- **Henry facilitates** - Natural turn-based conversation
+- **Agents build on each other** - Real discussion, not isolated reports
+
+**Correct Flow:**
+1. Henry spawns all 8 agents with meeting context
+2. Henry kicks off: "Team, what's on your mind today?"
+3. Natural conversation emerges
+4. Agents respond to each other, debate, collaborate
+5. Henry synthesizes action items at end
+6. Full transcript saved to GitHub
+
+**❌ FORBIDDEN:** "Scout, status? Scout: [isolated response]. Pixel, status? Pixel: [isolated response]..."
+**✅ CORRECT:** "Team, what challenges are we facing?" → Agents naturally discuss together
 
 ### 7.3 Meeting Documentation
 **ALL meetings must be recorded and pushed to GitHub:**
