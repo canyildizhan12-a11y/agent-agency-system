@@ -1,54 +1,100 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabase } from '../../lib/supabase';
 
-interface WorkItem {
+type ResponseData = {
+  success: boolean;
+  taskId?: string;
+  message?: string;
+  error?: string;
+};
+
+// Work queue
+const workQueue: Array<{
+  id: string;
+  agentId: string;
   task: string;
-  description?: string;
-  status: string;
-  completed_at?: string;
-  created_at: string;
-  file_path?: string;
-  lines_of_code?: number;
-  agents?: {
-    agent_id: string;
-    name: string;
-    emoji: string;
-  };
-}
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  createdAt: string;
+  result?: string;
+}> = [];
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { data: workItems, error } = await supabase
-      .from('work_items')
-      .select(`
-        *,
-        agents (
-          agent_id,
-          name,
-          emoji
-        )
-      `)
-      .order('completed_at', { ascending: false })
-      .limit(50);
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    if (error) throw error;
-
-    // Transform data
-    const transformedWork = (workItems as WorkItem[] | null)?.map((item: WorkItem) => ({
-      agent: item.agents?.agent_id,
-      agentName: item.agents?.name,
-      agentEmoji: item.agents?.emoji,
-      task: item.task,
-      description: item.description,
-      status: item.status,
-      time: item.completed_at || item.created_at,
-      file: item.file_path,
-      linesOfCode: item.lines_of_code
-    })) || [];
-
-    res.status(200).json(transformedWork);
-  } catch (err: any) {
-    console.error('Error fetching work:', err);
-    res.status(500).json({ error: err.message });
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
+
+  // GET: Get work status
+  if (req.method === 'GET') {
+    const { agentId, status } = req.query;
+    let filtered = [...workQueue];
+
+    if (agentId) filtered = filtered.filter(w => w.agentId === agentId);
+    if (status) filtered = filtered.filter(w => w.status === status);
+
+    res.status(200).json({ success: true, data: filtered });
+    return;
+  }
+
+  // POST: Assign work to agent
+  if (req.method === 'POST') {
+    const { agentId, task } = req.body;
+
+    if (!agentId || !task) {
+      res.status(400).json({ success: false, error: 'agentId and task required' });
+      return;
+    }
+
+    // Validate agent
+    const validAgents = ['henry', 'scout', 'pixel', 'echo', 'quill', 'codex', 'alex', 'vega'];
+    if (!validAgents.includes(agentId)) {
+      res.status(404).json({ success: false, error: 'Agent not found' });
+      return;
+    }
+
+    const taskId = `task_${Date.now()}`;
+    const newWork = {
+      id: taskId,
+      agentId,
+      task,
+      status: 'pending' as const,
+      createdAt: new Date().toISOString(),
+    };
+
+    workQueue.push(newWork);
+
+    // In production, this would trigger the agent via sessions_send
+    // For now, just queue it
+    res.status(201).json({ 
+      success: true, 
+      taskId, 
+      message: `Task assigned to ${agentId}` 
+    });
+    return;
+  }
+
+  // PUT: Update work status
+  if (req.method === 'PUT') {
+    const { taskId, status, result } = req.body;
+
+    const workIndex = workQueue.findIndex(w => w.id === taskId);
+    if (workIndex === -1) {
+      res.status(404).json({ success: false, error: 'Task not found' });
+      return;
+    }
+
+    if (status) workQueue[workIndex].status = status;
+    if (result) workQueue[workIndex].result = result;
+
+    res.status(200).json({ success: true, message: 'Task updated' });
+    return;
+  }
+
+  res.status(405).json({ success: false, error: 'Method not allowed' });
 }

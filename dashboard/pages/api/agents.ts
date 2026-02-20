@@ -1,52 +1,60 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getActiveSessions, isAgentAwake, getAgentSession } from '../../lib/subagentManager';
-import fs from 'fs';
-import path from 'path';
 
-const AGENCY_DIR = '/home/ubuntu/.openclaw/workspace/agent-agency';
-
-// Agent definitions with their details
-const AGENTS = [
-  { id: 'henry', name: 'Henry', emoji: '🦉', role: 'Team Lead' },
-  { id: 'scout', name: 'Scout', emoji: '🔍', role: 'Research' },
-  { id: 'pixel', name: 'Pixel', emoji: '🎨', role: 'Creative' },
-  { id: 'echo', name: 'Echo', emoji: '💾', role: 'Memory' },
-  { id: 'quill', name: 'Quill', emoji: '✍️', role: 'Documentation' },
-  { id: 'codex', name: 'Codex', emoji: '🏗️', role: 'Architecture' },
-  { id: 'alex', name: 'Alex', emoji: '🛡️', role: 'Security Lead' },
-  { id: 'vega', name: 'Vega', emoji: '📊', role: 'Data Analyst' }
+// Mock agent data - in production, fetch from OpenClaw gateway
+const agents = [
+  { id: 'henry', name: 'Henry', role: 'Team Lead', status: 'active', emoji: '🦆' },
+  { id: 'scout', name: 'Scout', role: 'Research', status: 'active', emoji: '🔍' },
+  { id: 'pixel', name: 'Pixel', role: 'Creative', status: 'active', emoji: '🎨' },
+  { id: 'echo', name: 'Echo', role: 'Developer', status: 'active', emoji: '💾' },
+  { id: 'quill', name: 'Quill', role: 'Documentation', status: 'active', emoji: '✍️' },
+  { id: 'codex', name: 'Codex', role: 'Architecture', status: 'active', emoji: '🏗️' },
+  { id: 'alex', name: 'Alex', role: 'Immune System', status: 'active', emoji: '🛡️' },
+  { id: 'vega', name: 'Vega', role: 'Data Analyst', status: 'active', emoji: '📊' },
 ];
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+type ResponseData = {
+  success: boolean;
+  data?: typeof agents;
+  error?: string;
+};
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  // Security: Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
 
-  try {
-    // Get real active sessions
-    const activeSessions = getActiveSessions();
-    
-    // Map agents with their real session status
-    const agentsWithStatus = AGENTS.map(agent => {
-      const isAwake = isAgentAwake(agent.id);
-      const session = getAgentSession(agent.id);
-      
-      return {
-        ...agent,
-        status: isAwake ? 'awake' : 'sleeping',
-        session: session ? {
-          sessionKey: session.sessionKey,
-          uuid: session.uuid,
-          spawnedAt: session.spawnedAt,
-          expiresAt: session.expiresAt,
-          task: session.task
-        } : null
-      };
-    });
-
-    res.status(200).json(agentsWithStatus);
-  } catch (err: any) {
-    console.error('Error fetching agents:', err);
-    res.status(500).json({ error: err.message });
+  // GET: List all agents
+  if (req.method === 'GET') {
+    res.status(200).json({ success: true, data: agents });
+    return;
   }
+
+  // POST: Get single agent or update status
+  if (req.method === 'POST') {
+    const { agentId, action } = req.body;
+
+    if (action === 'status') {
+      const agent = agents.find(a => a.id === agentId);
+      if (agent) {
+        res.status(200).json({ success: true, data: [agent] });
+        return;
+      }
+      res.status(404).json({ success: false, error: 'Agent not found' });
+      return;
+    }
+
+    res.status(400).json({ success: false, error: 'Invalid action' });
+    return;
+  }
+
+  res.status(405).json({ success: false, error: 'Method not allowed' });
 }

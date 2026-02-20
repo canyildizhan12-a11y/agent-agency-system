@@ -1,137 +1,75 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
-import path from 'path';
 
-const AGENCY_DIR = '/home/ubuntu/.openclaw/workspace/agent-agency';
+// Mock metrics data
+const metrics = {
+  overview: {
+    activeAgents: 8,
+    totalTasks: 24,
+    completedToday: 7,
+    pendingTasks: 12,
+  },
+  performance: {
+    avgResponseTime: '2.3s',
+    uptime: '99.8%',
+    tasksPerDay: 15,
+  },
+  agents: [
+    { id: 'henry', tasksCompleted: 3, avgResponseTime: '1.2s', status: 'active' },
+    { id: 'scout', tasksCompleted: 5, avgResponseTime: '3.1s', status: 'active' },
+    { id: 'pixel', tasksCompleted: 4, avgResponseTime: '2.0s', status: 'active' },
+    { id: 'echo', tasksCompleted: 4, avgResponseTime: '2.5s', status: 'active' },
+    { id: 'quill', tasksCompleted: 2, avgResponseTime: '1.8s', status: 'active' },
+    { id: 'codex', tasksCompleted: 3, avgResponseTime: '2.2s', status: 'active' },
+    { id: 'alex', tasksCompleted: 2, avgResponseTime: '1.5s', status: 'active' },
+    { id: 'vega', tasksCompleted: 1, avgResponseTime: '2.8s', status: 'active' },
+  ],
+  kpis: [
+    { name: 'Task Completion Rate', value: '87%', target: '90%', trend: 'up' },
+    { name: 'Agent Uptime', value: '99.8%', target: '99%', trend: 'stable' },
+    { name: 'Avg Response Time', value: '2.3s', target: '3s', trend: 'down' },
+    { name: 'User Satisfaction', value: '4.5/5', target: '4/5', trend: 'up' },
+  ],
+};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+type ResponseData = {
+  success: boolean;
+  data?: typeof metrics;
+  error?: string;
+};
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
 
-  try {
-    // Get cron jobs
-    const cronJobs = await getCronJobs();
+  if (req.method === 'GET') {
+    const { type } = req.query;
     
-    // Get token usage
-    const tokenUsage = await getTokenUsage();
+    if (type === 'overview') {
+      res.status(200).json({ success: true, data: metrics.overview });
+      return;
+    }
+    if (type === 'performance') {
+      res.status(200).json({ success: true, data: metrics.performance });
+      return;
+    }
+    if (type === 'kpis') {
+      res.status(200).json({ success: true, data: metrics.kpis });
+      return;
+    }
     
-    // Get immune system status
-    const immuneStatus = await getImmuneStatus();
-    
-    // Get recent work
-    const recentWork = await getRecentWork();
-    
-    // Get system health
-    const systemHealth = await getSystemHealth();
+    // Return all metrics
+    res.status(200).json({ success: true, data: metrics });
+    return;
+  }
 
-    res.status(200).json({
-      success: true,
-      timestamp: new Date().toISOString(),
-      metrics: {
-        cronJobs,
-        tokenUsage,
-        immuneStatus,
-        recentWork,
-        systemHealth
-      }
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-async function getCronJobs() {
-  // Read from OpenClaw cron list
-  try {
-    const { execSync } = require('child_process');
-    const result = execSync('openclaw cron list --json 2>/dev/null || echo "[]"', { 
-      encoding: 'utf8',
-      timeout: 5000 
-    });
-    return JSON.parse(result);
-  } catch {
-    return [];
-  }
-}
-
-async function getTokenUsage() {
-  const tokenFile = path.join(AGENCY_DIR, 'token_logs', `${new Date().toISOString().split('T')[0]}.json`);
-  
-  if (!fs.existsSync(tokenFile)) {
-    return { today: 0, sessions: [] };
-  }
-  
-  try {
-    const logs = JSON.parse(fs.readFileSync(tokenFile, 'utf8'));
-    const total = logs.reduce((sum: number, entry: any) => sum + (entry.totalTokens || 0), 0);
-    
-    return {
-      today: total,
-      sessions: logs.slice(-10) // Last 10 entries
-    };
-  } catch {
-    return { today: 0, sessions: [] };
-  }
-}
-
-async function getImmuneStatus() {
-  const statusFile = path.join(AGENCY_DIR, 'immune-system', 'status.json');
-  
-  if (!fs.existsSync(statusFile)) {
-    return {
-      lastCheck: null,
-      status: 'unknown',
-      alerts: []
-    };
-  }
-  
-  try {
-    return JSON.parse(fs.readFileSync(statusFile, 'utf8'));
-  } catch {
-    return {
-      lastCheck: null,
-      status: 'unknown',
-      alerts: []
-    };
-  }
-}
-
-async function getRecentWork() {
-  const workFile = path.join(AGENCY_DIR, 'work_tracker.json');
-  
-  if (!fs.existsSync(workFile)) {
-    return [];
-  }
-  
-  try {
-    const work = JSON.parse(fs.readFileSync(workFile, 'utf8'));
-    return work.slice(-20); // Last 20 work items
-  } catch {
-    return [];
-  }
-}
-
-async function getSystemHealth() {
-  const healthFile = path.join(AGENCY_DIR, 'system_health.json');
-  
-  if (!fs.existsSync(healthFile)) {
-    return {
-      status: 'unknown',
-      lastCheck: null,
-      diskUsage: null,
-      memoryUsage: null
-    };
-  }
-  
-  try {
-    return JSON.parse(fs.readFileSync(healthFile, 'utf8'));
-  } catch {
-    return {
-      status: 'unknown',
-      lastCheck: null,
-      diskUsage: null,
-      memoryUsage: null
-    };
-  }
+  res.status(405).json({ success: false, error: 'Method not allowed' });
 }

@@ -1,79 +1,63 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { 
-  queueSpawnRequest, 
-  isAgentAwake, 
-  getAgentSession,
-  registerSpawnedSession,
-  buildIdentityContext,
-  AGENT_IDENTITIES,
-  MAX_SESSION_MINUTES
-} from '../../lib/subagentManager';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+type ResponseData = {
+  success: boolean;
+  message?: string;
+  agentId?: string;
+  error?: string;
+};
+
+// Agent states (in production, store in database)
+const agentStates: Record<string, 'awake' | 'asleep'> = {
+  henry: 'awake',
+  scout: 'awake',
+  pixel: 'awake',
+  echo: 'awake',
+  quill: 'awake',
+  codex: 'awake',
+  alex: 'awake',
+  vega: 'awake',
+};
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
 
-  const { id } = req.query;
-  const { task, sessionKey, spawnComplete } = req.body;
+  // POST: Wake agent(s)
+  if (req.method === 'POST') {
+    const { agentId, all } = req.body;
 
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'Agent ID required' });
+    if (all) {
+      Object.keys(agentStates).forEach(id => {
+        agentStates[id] = 'awake';
+      });
+      res.status(200).json({ success: true, message: 'All agents awakened' });
+      return;
+    }
+
+    if (!agentId) {
+      res.status(400).json({ success: false, error: 'agentId required' });
+      return;
+    }
+
+    if (!agentStates[agentId]) {
+      res.status(404).json({ success: false, error: 'Agent not found' });
+      return;
+    }
+
+    agentStates[agentId] = 'awake';
+    res.status(200).json({ success: true, agentId, message: `Agent ${agentId} awakened` });
+    return;
   }
 
-  const agentId = id.toLowerCase();
-  const identity = AGENT_IDENTITIES[agentId];
-
-  if (!identity) {
-    return res.status(400).json({ error: `Unknown agent: ${agentId}` });
-  }
-
-  // Check if already awake
-  if (isAgentAwake(agentId)) {
-    const existingSession = getAgentSession(agentId);
-    return res.status(200).json({
-      success: true,
-      agentId,
-      agentName: identity.name,
-      agentEmoji: identity.emoji,
-      status: 'already_awake',
-      message: `${identity.name} is already awake`,
-      session: existingSession
-    });
-  }
-
-  // If spawnComplete flag is set, this is a callback from the main agent
-  // after sessions_spawn has been called
-  if (spawnComplete && sessionKey) {
-    const session = registerSpawnedSession(agentId, sessionKey, task || 'General task');
-    
-    return res.status(200).json({
-      success: true,
-      agentId,
-      agentName: identity.name,
-      agentEmoji: identity.emoji,
-      status: 'awake',
-      message: `${identity.name} has been spawned successfully`,
-      session
-    });
-  }
-
-  // Otherwise, queue a spawn request
-  const defaultTask = task || 'Check in and report status';
-  const request = queueSpawnRequest(agentId, defaultTask);
-
-  // Return immediate response that request is queued
-  // The main agent will process this and call back with spawnComplete
-  res.status(202).json({
-    success: true,
-    agentId,
-    agentName: identity.name,
-    agentEmoji: identity.emoji,
-    status: 'spawn_queued',
-    message: `${identity.name} spawn request queued. Main agent will spawn the subagent shortly.`,
-    requestId: request.id,
-    task: defaultTask,
-    maxSessionMinutes: MAX_SESSION_MINUTES,
-    identityContext: buildIdentityContext(agentId)
-  });
+  res.status(405).json({ success: false, error: 'Method not allowed' });
 }

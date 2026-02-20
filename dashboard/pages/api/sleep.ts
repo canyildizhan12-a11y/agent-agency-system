@@ -1,58 +1,63 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { sleepSubagent, isAgentAwake } from '../../lib/subagentManager';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+type ResponseData = {
+  success: boolean;
+  message?: string;
+  agentId?: string;
+  error?: string;
+};
+
+// Agent states (shared with wake.ts in production, use database)
+const agentStates: Record<string, 'awake' | 'asleep'> = {
+  henry: 'awake',
+  scout: 'awake',
+  pixel: 'awake',
+  echo: 'awake',
+  quill: 'awake',
+  codex: 'awake',
+  alex: 'awake',
+  vega: 'awake',
+};
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
 
-  const { id } = req.query;
+  // POST: Sleep agent(s)
+  if (req.method === 'POST') {
+    const { agentId, all } = req.body;
 
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'Agent ID required' });
+    if (all) {
+      Object.keys(agentStates).forEach(id => {
+        agentStates[id] = 'asleep';
+      });
+      res.status(200).json({ success: true, message: 'All agents put to sleep' });
+      return;
+    }
+
+    if (!agentId) {
+      res.status(400).json({ success: false, error: 'agentId required' });
+      return;
+    }
+
+    if (!agentStates[agentId]) {
+      res.status(404).json({ success: false, error: 'Agent not found' });
+      return;
+    }
+
+    agentStates[agentId] = 'asleep';
+    res.status(200).json({ success: true, agentId, message: `Agent ${agentId} put to sleep` });
+    return;
   }
 
-  const agentId = id.toLowerCase();
-
-  // Check if already sleeping
-  if (!isAgentAwake(agentId)) {
-    return res.status(200).json({
-      success: true,
-      agentId,
-      agentName: capitalize(agentId),
-      agentEmoji: getAgentEmoji(agentId),
-      status: 'already_sleeping',
-      message: `${capitalize(agentId)} is already sleeping`
-    });
-  }
-
-  // Put agent to sleep (terminate session)
-  const result = await sleepSubagent(agentId);
-
-  res.status(200).json({
-    success: result.success,
-    agentId,
-    agentName: capitalize(agentId),
-    agentEmoji: getAgentEmoji(agentId),
-    status: 'sleeping',
-    message: result.message
-  });
-}
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function getAgentEmoji(agentId: string): string {
-  const emojis: Record<string, string> = {
-    henry: '🦉',
-    scout: '🔍',
-    pixel: '🎨',
-    echo: '💾',
-    quill: '✍️',
-    codex: '🏗️',
-    alex: '🛡️',
-    vega: '📊'
-  };
-  return emojis[agentId] || '🤖';
+  res.status(405).json({ success: false, error: 'Method not allowed' });
 }

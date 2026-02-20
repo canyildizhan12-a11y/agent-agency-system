@@ -1,88 +1,141 @@
-/**
- * API Route: /api/cron
- * Returns scheduled cron jobs
- */
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-interface CronJob {
-  id: string;
-  name: string;
-  schedule: string;
-  status: 'active' | 'paused' | 'error';
-  lastRun: string;
-  nextRun: string;
-  description: string;
-}
-
-interface CronData {
-  jobs: CronJob[];
-  timestamp: string;
-}
-
-const cronJobs: CronJob[] = [
+// Cron jobs configuration
+let cronJobs = [
   { 
     id: '1', 
     name: 'Morning Standup', 
     schedule: '0 9 * * 1-5', 
-    status: 'active', 
-    lastRun: '2026-02-18T06:00:00Z', 
-    nextRun: '2026-02-19T06:00:00Z',
-    description: 'Daily morning standup at 09:00 TRT'
+    action: 'meeting',
+    payload: { type: 'standup', time: '09:00' },
+    enabled: true,
+    lastRun: '2026-02-20T09:00:00Z',
+    nextRun: '2026-02-21T09:00:00Z',
   },
   { 
     id: '2', 
     name: 'Evening Standup', 
     schedule: '0 17 * * 1-5', 
-    status: 'active', 
-    lastRun: '2026-02-18T14:00:00Z', 
-    nextRun: '2026-02-18T14:00:00Z',
-    description: 'Daily evening standup at 17:00 TRT'
+    action: 'meeting',
+    payload: { type: 'standup', time: '17:00' },
+    enabled: true,
+    lastRun: '2026-02-20T17:00:00Z',
+    nextRun: '2026-02-21T17:00:00Z',
   },
   { 
     id: '3', 
-    name: 'Intelligence Sweep', 
-    schedule: '0 */6 * * *', 
-    status: 'active', 
-    lastRun: '2026-02-18T12:00:00Z', 
-    nextRun: '2026-02-18T18:00:00Z',
-    description: 'Scout intelligence monitoring every 6 hours'
+    name: 'Health Check', 
+    schedule: '0 * * * *', 
+    action: 'healthcheck',
+    payload: { type: 'system' },
+    enabled: true,
+    lastRun: '2026-02-20T17:00:00Z',
+    nextRun: '2026-02-20T18:00:00Z',
   },
   { 
     id: '4', 
-    name: 'Disk Monitor', 
-    schedule: '0 */4 * * *', 
-    status: 'active', 
-    lastRun: '2026-02-18T10:00:00Z', 
-    nextRun: '2026-02-18T14:00:00Z',
-    description: 'Alex disk space monitoring every 4 hours'
-  },
-  { 
-    id: '5', 
-    name: 'Security Scan', 
-    schedule: '0 22 * * 0', 
-    status: 'paused', 
-    lastRun: '2026-02-16T19:00:00Z', 
-    nextRun: 'Paused',
-    description: 'Weekly security audit scan'
-  },
-  { 
-    id: '6', 
-    name: 'Token Usage Check', 
-    schedule: '0 * * * *', 
-    status: 'active', 
-    lastRun: '2026-02-18T12:00:00Z', 
-    nextRun: '2026-02-18T13:00:00Z',
-    description: 'Hourly token usage monitoring'
+    name: 'Weekly Report', 
+    schedule: '0 10 * * 5', 
+    action: 'report',
+    payload: { type: 'weekly' },
+    enabled: false,
+    lastRun: null,
+    nextRun: null,
   },
 ];
 
+type ResponseData = {
+  success: boolean;
+  data?: typeof cronJobs;
+  job?: typeof cronJobs[0];
+  error?: string;
+};
+
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<CronData>
+  res: NextApiResponse<ResponseData>
 ) {
-  res.status(200).json({
-    jobs: cronJobs,
-    timestamp: new Date().toISOString()
-  });
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // GET: List cron jobs
+  if (req.method === 'GET') {
+    const { enabled } = req.query;
+    let filtered = [...cronJobs];
+
+    if (enabled !== undefined) {
+      filtered = filtered.filter(j => j.enabled === (enabled === 'true'));
+    }
+
+    res.status(200).json({ success: true, data: filtered });
+    return;
+  }
+
+  // POST: Create cron job
+  if (req.method === 'POST') {
+    const { name, schedule, action, payload, enabled = true } = req.body;
+
+    if (!name || !schedule || !action) {
+      res.status(400).json({ success: false, error: 'Name, schedule, and action required' });
+      return;
+    }
+
+    const newJob = {
+      id: String(cronJobs.length + 1),
+      name,
+      schedule,
+      action,
+      payload: payload || {},
+      enabled,
+      lastRun: null,
+      nextRun: null, // Would be calculated
+    };
+
+    cronJobs.push(newJob);
+    res.status(201).json({ success: true, job: newJob });
+    return;
+  }
+
+  // PUT: Update cron job
+  if (req.method === 'PUT') {
+    const { id, name, schedule, action, payload, enabled } = req.body;
+
+    const jobIndex = cronJobs.findIndex(j => j.id === id);
+    if (jobIndex === -1) {
+      res.status(404).json({ success: false, error: 'Job not found' });
+      return;
+    }
+
+    if (name) cronJobs[jobIndex].name = name;
+    if (schedule) cronJobs[jobIndex].schedule = schedule;
+    if (action) cronJobs[jobIndex].action = action;
+    if (payload) cronJobs[jobIndex].payload = payload;
+    if (enabled !== undefined) cronJobs[jobIndex].enabled = enabled;
+
+    res.status(200).json({ success: true, job: cronJobs[jobIndex] });
+    return;
+  }
+
+  // DELETE: Remove cron job
+  if (req.method === 'DELETE') {
+    const { id } = req.body;
+    const jobIndex = cronJobs.findIndex(j => j.id === id);
+
+    if (jobIndex === -1) {
+      res.status(404).json({ success: false, error: 'Job not found' });
+      return;
+    }
+
+    cronJobs.splice(jobIndex, 1);
+    res.status(200).json({ success: true });
+    return;
+  }
+
+  res.status(405).json({ success: false, error: 'Method not allowed' });
 }
