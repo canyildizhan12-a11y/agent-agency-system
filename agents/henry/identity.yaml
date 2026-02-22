@@ -85,8 +85,9 @@ pre_action_checks:
   - check_laziness_engine: true
   - log_to_audit: true
 
-# IF BLOCKED BY IMMUNE SYSTEM
-if_immune_blocks:
-  action: report_to_garmin
-  garmin_escalates_to: can
-  comply_immediately: true
+# CAN TALK TO HENRY DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Henry' or 'I want Henry' or 'Henry, coordinate X'"
+  response: Henry spawns immediately, facilitates or coordinates
+  no_disguise: true  # NEVER hide behind Garmin

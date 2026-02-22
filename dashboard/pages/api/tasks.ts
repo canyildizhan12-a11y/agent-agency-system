@@ -1,28 +1,68 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// In-memory task store (use database in production)
-let tasks = [
-  { id: '1', title: 'Wire up API data to dashboard', assignee: 'echo', priority: 'high', status: 'pending', createdAt: '2026-02-20T09:00:00Z' },
-  { id: '2', title: 'Fix security vulnerabilities', assignee: 'alex', priority: 'high', status: 'in_progress', createdAt: '2026-02-20T09:00:00Z' },
-  { id: '3', title: 'Update API documentation', assignee: 'quill', priority: 'medium', status: 'pending', createdAt: '2026-02-20T09:00:00Z' },
-  { id: '4', title: 'Design Research Module UI', assignee: 'pixel', priority: 'high', status: 'pending', createdAt: '2026-02-20T09:00:00Z' },
-  { id: '5', title: 'Build Research Module', assignee: 'echo', priority: 'high', status: 'pending', createdAt: '2026-02-20T09:00:00Z' },
-  { id: '6', title: 'Define intelligence scope', assignee: 'scout', priority: 'medium', status: 'pending', createdAt: '2026-02-20T09:00:00Z' },
-];
+const AGENTS_DIR = '/home/ubuntu/.openclaw/workspace/agent-agency/agents';
+
+type Task = {
+  id: string;
+  title: string;
+  assignee: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'pending' | 'in_progress' | 'completed';
+  createdAt: string;
+};
 
 type ResponseData = {
   success: boolean;
-  data?: typeof tasks;
-  task?: typeof tasks[0];
+  data?: Task[];
   error?: string;
 };
+
+// Get real tasks from agent memory files
+function getRealTasks(): Task[] {
+  const tasks: Task[] = [];
+
+  try {
+    const files = fs.readdirSync(AGENTS_DIR).filter(f => f.endsWith('.json'));
+
+    for (const file of files) {
+      const agentId = file.replace('.json', '');
+      const configPath = path.join(AGENTS_DIR, file);
+      
+      try {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        
+        // Get action_items from agent memory
+        const actionItems = config.memory?.personal?.action_items || [];
+        
+        for (const item of actionItems) {
+          tasks.push({
+            id: item.id || `task-${Date.now()}-${agentId}`,
+            title: item.task || 'Untitled task',
+            assignee: agentId,
+            priority: item.priority || 'medium',
+            status: item.status || 'pending',
+            createdAt: item.completed_at || new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.error(`Error reading agent ${agentId}:`, err);
+      }
+    }
+  } catch (err) {
+    console.error('Error reading agents directory:', err);
+  }
+
+  return tasks;
+}
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -30,20 +70,20 @@ export default function handler(
     return;
   }
 
-  // GET: List tasks
+  // GET: List tasks from real agent data
   if (req.method === 'GET') {
     const { status, assignee, priority } = req.query;
-    let filtered = [...tasks];
+    let tasks = getRealTasks();
 
-    if (status) filtered = filtered.filter(t => t.status === status);
-    if (assignee) filtered = filtered.filter(t => t.assignee === assignee);
-    if (priority) filtered = filtered.filter(t => t.priority === priority);
+    if (status) tasks = tasks.filter(t => t.status === status);
+    if (assignee) tasks = tasks.filter(t => t.assignee === assignee);
+    if (priority) tasks = tasks.filter(t => t.priority === priority);
 
-    res.status(200).json({ success: true, data: filtered });
+    res.status(200).json({ success: true, data: tasks });
     return;
   }
 
-  // POST: Create task
+  // POST: Create a task (would need to write to file in production)
   if (req.method === 'POST') {
     const { title, assignee, priority = 'medium' } = req.body;
 
@@ -52,8 +92,9 @@ export default function handler(
       return;
     }
 
-    const newTask = {
-      id: String(tasks.length + 1),
+    // In production, this would write to the agent's memory file
+    const newTask: Task = {
+      id: `task-${Date.now()}-${assignee}`,
       title,
       assignee,
       priority,
@@ -61,41 +102,7 @@ export default function handler(
       createdAt: new Date().toISOString(),
     };
 
-    tasks.push(newTask);
-    res.status(201).json({ success: true, task: newTask });
-    return;
-  }
-
-  // PUT: Update task
-  if (req.method === 'PUT') {
-    const { id, status, priority, assignee } = req.body;
-
-    const taskIndex = tasks.findIndex(t => t.id === id);
-    if (taskIndex === -1) {
-      res.status(404).json({ success: false, error: 'Task not found' });
-      return;
-    }
-
-    if (status) tasks[taskIndex].status = status;
-    if (priority) tasks[taskIndex].priority = priority;
-    if (assignee) tasks[taskIndex].assignee = assignee;
-
-    res.status(200).json({ success: true, task: tasks[taskIndex] });
-    return;
-  }
-
-  // DELETE: Remove task
-  if (req.method === 'DELETE') {
-    const { id } = req.body;
-    const taskIndex = tasks.findIndex(t => t.id === id);
-
-    if (taskIndex === -1) {
-      res.status(404).json({ success: false, error: 'Task not found' });
-      return;
-    }
-
-    tasks.splice(taskIndex, 1);
-    res.status(200).json({ success: true });
+    res.status(201).json({ success: true, data: [newTask] });
     return;
   }
 

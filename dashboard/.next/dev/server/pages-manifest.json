@@ -1,0 +1,7 @@
+{
+  "/api/agents": "pages/api/agents.js",
+  "/api/cron": "pages/api/cron.js",
+  "/api/metrics": "pages/api/metrics.js",
+  "/api/tasks": "pages/api/tasks.js",
+  "/api/work": "pages/api/work.js"
+}

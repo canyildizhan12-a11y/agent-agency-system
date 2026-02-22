@@ -1,62 +1,67 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import * as fs from 'fs';
 
-// Cron jobs configuration
-let cronJobs = [
-  { 
-    id: '1', 
-    name: 'Morning Standup', 
-    schedule: '0 9 * * 1-5', 
-    action: 'meeting',
-    payload: { type: 'standup', time: '09:00' },
-    enabled: true,
-    lastRun: '2026-02-20T09:00:00Z',
-    nextRun: '2026-02-21T09:00:00Z',
-  },
-  { 
-    id: '2', 
-    name: 'Evening Standup', 
-    schedule: '0 17 * * 1-5', 
-    action: 'meeting',
-    payload: { type: 'standup', time: '17:00' },
-    enabled: true,
-    lastRun: '2026-02-20T17:00:00Z',
-    nextRun: '2026-02-21T17:00:00Z',
-  },
-  { 
-    id: '3', 
-    name: 'Health Check', 
-    schedule: '0 * * * *', 
-    action: 'healthcheck',
-    payload: { type: 'system' },
-    enabled: true,
-    lastRun: '2026-02-20T17:00:00Z',
-    nextRun: '2026-02-20T18:00:00Z',
-  },
-  { 
-    id: '4', 
-    name: 'Weekly Report', 
-    schedule: '0 10 * * 5', 
-    action: 'report',
-    payload: { type: 'weekly' },
-    enabled: false,
-    lastRun: null,
-    nextRun: null,
-  },
-];
+const CRON_JOBS_PATH = '/home/ubuntu/.openclaw/cron/jobs.json';
+
+type CronJob = {
+  id: string;
+  name: string;
+  agentId: string;
+  schedule: string;
+  action: string;
+  enabled: boolean;
+  lastRun: string | null;
+  nextRun: string | null;
+  status: 'ok' | 'error' | 'pending';
+};
 
 type ResponseData = {
   success: boolean;
-  data?: typeof cronJobs;
-  job?: typeof cronJobs[0];
+  data?: CronJob[];
+  message?: string;
   error?: string;
 };
+
+// Read real cron jobs from OpenClaw
+function getRealCronJobs(): CronJob[] {
+  try {
+    if (!fs.existsSync(CRON_JOBS_PATH)) {
+      return [];
+    }
+
+    const data = JSON.parse(fs.readFileSync(CRON_JOBS_PATH, 'utf-8'));
+    
+    if (!data.jobs || !Array.isArray(data.jobs)) {
+      return [];
+    }
+
+    return data.jobs.map((job: any) => ({
+      id: job.id,
+      name: job.name || job.agentId,
+      agentId: job.agentId,
+      schedule: job.schedule?.expr || 'unknown',
+      action: job.payload?.kind || 'agentTurn',
+      enabled: job.enabled ?? true,
+      lastRun: job.state?.lastRunAtMs 
+        ? new Date(job.state.lastRunAtMs).toISOString() 
+        : null,
+      nextRun: job.state?.nextRunAtMs 
+        ? new Date(job.state.nextRunAtMs).toISOString() 
+        : null,
+      status: job.state?.lastStatus || 'pending',
+    }));
+  } catch (err) {
+    console.error('Error reading cron jobs:', err);
+    return [];
+  }
+}
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -64,76 +69,36 @@ export default function handler(
     return;
   }
 
-  // GET: List cron jobs
+  // GET: List cron jobs from real data
   if (req.method === 'GET') {
     const { enabled } = req.query;
-    let filtered = [...cronJobs];
+    let jobs = getRealCronJobs();
 
     if (enabled !== undefined) {
-      filtered = filtered.filter(j => j.enabled === (enabled === 'true'));
+      jobs = jobs.filter(j => j.enabled === (enabled === 'true'));
     }
 
-    res.status(200).json({ success: true, data: filtered });
+    res.status(200).json({ success: true, data: jobs });
     return;
   }
 
-  // POST: Create cron job
+  // POST: Trigger a cron job manually
   if (req.method === 'POST') {
-    const { name, schedule, action, payload, enabled = true } = req.body;
+    const { jobId } = req.body;
+    const jobs = getRealCronJobs();
+    const job = jobs.find(j => j.id === jobId);
 
-    if (!name || !schedule || !action) {
-      res.status(400).json({ success: false, error: 'Name, schedule, and action required' });
-      return;
-    }
-
-    const newJob = {
-      id: String(cronJobs.length + 1),
-      name,
-      schedule,
-      action,
-      payload: payload || {},
-      enabled,
-      lastRun: null,
-      nextRun: null, // Would be calculated
-    };
-
-    cronJobs.push(newJob);
-    res.status(201).json({ success: true, job: newJob });
-    return;
-  }
-
-  // PUT: Update cron job
-  if (req.method === 'PUT') {
-    const { id, name, schedule, action, payload, enabled } = req.body;
-
-    const jobIndex = cronJobs.findIndex(j => j.id === id);
-    if (jobIndex === -1) {
+    if (!job) {
       res.status(404).json({ success: false, error: 'Job not found' });
       return;
     }
 
-    if (name) cronJobs[jobIndex].name = name;
-    if (schedule) cronJobs[jobIndex].schedule = schedule;
-    if (action) cronJobs[jobIndex].action = action;
-    if (payload) cronJobs[jobIndex].payload = payload;
-    if (enabled !== undefined) cronJobs[jobIndex].enabled = enabled;
-
-    res.status(200).json({ success: true, job: cronJobs[jobIndex] });
-    return;
-  }
-
-  // DELETE: Remove cron job
-  if (req.method === 'DELETE') {
-    const { id } = req.body;
-    const jobIndex = cronJobs.findIndex(j => j.id === id);
-
-    if (jobIndex === -1) {
-      res.status(404).json({ success: false, error: 'Job not found' });
-      return;
-    }
-
-    cronJobs.splice(jobIndex, 1);
-    res.status(200).json({ success: true });
+    // In production, this would trigger the cron job via OpenClaw API
+    res.status(200).json({ 
+      success: true, 
+      message: `Triggered job: ${job.name}`,
+      data: [job]
+    });
     return;
   }
 

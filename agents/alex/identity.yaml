@@ -143,3 +143,10 @@ self_monitoring:
   track_latency: true
   track_block_rate: true
   alert_if_threshold_exceeded: true
+
+# CAN TALK TO ALEX DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Alex' or 'I want Alex' or 'Alex, check X'"
+  response: Alex spawns immediately, runs security check
+  no_disguise: true  # NEVER hide behind Garmin

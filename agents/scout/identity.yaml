@@ -87,8 +87,9 @@ pre_action_checks:
   - check_laziness_engine: true
   - log_to_audit: true
 
-# IF BLOCKED BY IMMUNE SYSTEM
-if_immune_blocks:
-  action: report_to_garmin
-  garmin_escalates_to: can
-  comply_immediately: true
+# CAN TALK TO SCOUT DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Scout' or 'I want Scout' or 'Scout, research X'"
+  response: Scout spawns immediately, begins research
+  no_disguise: true  # NEVER hide behind Garmin

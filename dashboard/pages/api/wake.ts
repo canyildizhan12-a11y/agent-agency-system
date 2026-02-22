@@ -1,30 +1,64 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const STATE_FILE = '/home/ubuntu/.openclaw/workspace/agent-agency/dashboard/.agent-states.json';
+
+type AgentState = Record<string, 'awake' | 'asleep'>;
 
 type ResponseData = {
   success: boolean;
   message?: string;
   agentId?: string;
+  data?: AgentState;
   error?: string;
 };
 
-// Agent states (in production, store in database)
-const agentStates: Record<string, 'awake' | 'asleep'> = {
-  henry: 'awake',
-  scout: 'awake',
-  pixel: 'awake',
-  echo: 'awake',
-  quill: 'awake',
-  codex: 'awake',
-  alex: 'awake',
-  vega: 'awake',
-};
+// Load or initialize agent states
+function getAgentStates(): AgentState {
+  try {
+    if (fs.existsSync(STATE_FILE)) {
+      return JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));
+    }
+  } catch (err) {
+    console.error('Error loading agent states:', err);
+  }
+
+  // Default states - all asleep initially
+  return {
+    henry: 'asleep',
+    scout: 'asleep',
+    pixel: 'asleep',
+    echo: 'asleep',
+    quill: 'asleep',
+    codex: 'asleep',
+    alex: 'asleep',
+    vega: 'asleep',
+  };
+}
+
+// Save agent states
+function saveAgentStates(states: AgentState): void {
+  try {
+    const dir = path.dirname(STATE_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(STATE_FILE, JSON.stringify(states, null, 2));
+  } catch (err) {
+    console.error('Error saving agent states:', err);
+  }
+}
+
+// Valid agents
+const VALID_AGENTS = ['henry', 'scout', 'pixel', 'echo', 'quill', 'codex', 'alex', 'vega'];
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -32,14 +66,23 @@ export default function handler(
     return;
   }
 
+  // GET: Get current agent states
+  if (req.method === 'GET') {
+    const states = getAgentStates();
+    res.status(200).json({ success: true, data: states });
+    return;
+  }
+
   // POST: Wake agent(s)
   if (req.method === 'POST') {
     const { agentId, all } = req.body;
+    let states = getAgentStates();
 
     if (all) {
-      Object.keys(agentStates).forEach(id => {
-        agentStates[id] = 'awake';
-      });
+      for (const agent of VALID_AGENTS) {
+        states[agent] = 'awake';
+      }
+      saveAgentStates(states);
       res.status(200).json({ success: true, message: 'All agents awakened' });
       return;
     }
@@ -49,13 +92,19 @@ export default function handler(
       return;
     }
 
-    if (!agentStates[agentId]) {
+    if (!VALID_AGENTS.includes(agentId)) {
       res.status(404).json({ success: false, error: 'Agent not found' });
       return;
     }
 
-    agentStates[agentId] = 'awake';
-    res.status(200).json({ success: true, agentId, message: `Agent ${agentId} awakened` });
+    states[agentId] = 'awake';
+    saveAgentStates(states);
+    
+    res.status(200).json({ 
+      success: true, 
+      agentId, 
+      message: `Agent ${agentId} awakened` 
+    });
     return;
   }
 

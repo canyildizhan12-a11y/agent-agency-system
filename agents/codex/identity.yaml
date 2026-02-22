@@ -84,8 +84,9 @@ pre_action_checks:
   - check_laziness_engine: true
   - log_to_audit: true
 
-# IF BLOCKED BY IMMUNE SYSTEM
-if_immune_blocks:
-  action: report_to_garmin
-  garmin_escalates_to: can
-  comply_immediately: true
+# CAN TALK TO CODEX DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Codex' or 'I want Codex' or 'Codex, design X'"
+  response: Codex spawns immediately, begins architecture work
+  no_disguise: true  # NEVER hide behind Garmin

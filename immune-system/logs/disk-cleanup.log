@@ -67,3 +67,40 @@
 [2026-02-13 03:00:27] Ran git garbage collection
 [2026-02-13 03:00:27] Cleanup complete. Total freed: 0MB
 [2026-02-13 03:00:27] Disk usage: 88% → 88%
+[2026-02-13 04:00:18] Current disk usage: 90%
+[2026-02-13 04:00:18] WARNING: Disk usage 90% exceeds threshold. Starting cleanup...
+[2026-02-13 04:00:18] Cleaned npm cache: 39MB freed
+[2026-02-13 04:00:18] Removed Next.js build artifacts: 24MB freed
+[2026-02-13 04:00:18] Ran git garbage collection
+[2026-02-13 04:00:18] Cleanup complete. Total freed: 63MB
+[2026-02-13 04:00:18] Disk usage: 90% → 89%
+[2026-02-13 05:00:25] Current disk usage: 89%
+[2026-02-13 05:00:25] WARNING: Disk usage 89% exceeds threshold. Starting cleanup...
+[2026-02-13 05:00:25] Ran git garbage collection
+[2026-02-13 05:00:25] Cleanup complete. Total freed: 0MB
+[2026-02-13 05:00:25] Disk usage: 89% → 89%
+[2026-02-13 06:00:09] Current disk usage: 90%
+[2026-02-13 06:00:09] WARNING: Disk usage 90% exceeds threshold. Starting cleanup...
+[2026-02-13 06:00:09] Ran git garbage collection
+[2026-02-13 06:00:09] Cleanup complete. Total freed: 0MB
+[2026-02-13 06:00:09] Disk usage: 90% → 90%
+[2026-02-14 13:00:05] Current disk usage: 24%
+[2026-02-14 13:00:05] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 14:00:20] Current disk usage: 24%
+[2026-02-14 14:00:20] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 15:00:09] Current disk usage: 24%
+[2026-02-14 15:00:09] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 16:00:05] Current disk usage: 24%
+[2026-02-14 16:00:05] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 17:00:07] Current disk usage: 24%
+[2026-02-14 17:00:07] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 20:01:24] Current disk usage: 25%
+[2026-02-14 20:01:24] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 21:00:02] Current disk usage: 25%
+[2026-02-14 21:00:02] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 22:00:04] Current disk usage: 25%
+[2026-02-14 22:00:04] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-14 23:00:04] Current disk usage: 25%
+[2026-02-14 23:00:04] Disk usage below threshold (85%). No cleanup needed.
+[2026-02-15 15:00:05] Current disk usage: 25%
+[2026-02-15 15:00:05] Disk usage below threshold (85%). No cleanup needed.

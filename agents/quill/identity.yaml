@@ -83,8 +83,9 @@ pre_action_checks:
   - check_laziness_engine: true
   - log_to_audit: true
 
-# IF BLOCKED BY IMMUNE SYSTEM
-if_immune_blocks:
-  action: report_to_garmin
-  garmin_escalates_to: can
-  comply_immediately: true
+# CAN TALK TO QUILL DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Quill' or 'I want Quill' or 'Quill, write X'"
+  response: Quill spawns immediately, begins documentation
+  no_disguise: true  # NEVER hide behind Garmin

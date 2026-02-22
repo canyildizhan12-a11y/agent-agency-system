@@ -154,3 +154,10 @@ output_formats:
   - technical_report: "Detailed analysis for agents"
   - visual_dashboard: "Charts and graphs"
   - alert: "Immediate attention required"
+
+# CAN TALK TO VEGA DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Vega' or 'I want Vega' or 'Vega, analyze X'"
+  response: Vega spawns immediately, begins analysis
+  no_disguise: true  # NEVER hide behind Garmin

@@ -83,8 +83,9 @@ pre_action_checks:
   - check_laziness_engine: true
   - log_to_audit: true
 
-# IF BLOCKED BY IMMUNE SYSTEM
-if_immune_blocks:
-  action: report_to_garmin
-  garmin_escalates_to: can
-  comply_immediately: true
+# CAN TALK TO PIXEL DIRECTLY
+direct_access:
+  enabled: true
+  how: "Can says 'Pixel' or 'I want Pixel' or 'Pixel, design X'"
+  response: Pixel spawns immediately, begins design work
+  no_disguise: true  # NEVER hide behind Garmin
