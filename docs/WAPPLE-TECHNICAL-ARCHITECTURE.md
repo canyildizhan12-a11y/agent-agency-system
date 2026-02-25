@@ -1,7 +1,7 @@
 # Wapple - Mobile AI Agent Superapp
 ## Technical Architecture & Implementation Document
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Date:** 2026-02-25  
 **Author:** Codex (Architecture)  
 **Status:** Production Ready
@@ -18,8 +18,7 @@
 6. [Frontend Architecture](#6-frontend-architecture)
 7. [Core Algorithms & Logic](#7-core-algorithms--logic)
 8. [Security Architecture](#8-security-architecture)
-9. [Data Models & Schemas](#9-data-models--schemas)
-10. [Implementation Roadmap](#10-implementation-roadmap)
+9. [Implementation Roadmap](#9-implementation-roadmap)
 
 ---
 
@@ -27,164 +26,221 @@
 
 ## 1.1 Project Overview
 
-**Wapple** is a mobile superapp that transforms Openclaw from a technical Telegram-based tool into a mainstream, 24/7 autonomous personal AI ecosystem accessible from a smartphone.
+**Wapple** is a mobile superapp that transforms Openclaw from a technical tool into a mainstream, 24/7 autonomous personal AI ecosystem accessible from a smartphone.
 
 ## 1.2 Core Value Proposition
 
 > "A 24/7 active AI agent environment that lives in your pocket and executes tasks on your behalf."
 
-## 1.3 Key Statistics
+## 1.3 What This Document Covers
 
-| Metric | Value |
-|--------|-------|
-| Target Users | Individual professionals, entrepreneurs, small teams |
-| Platform | iOS & Android (React Native) |
-| Deployment | Per-user dedicated VPS instances |
-| AI Engine | OpenRouter (multi-provider) |
-
-## 1.4 What This Document Covers
-
-This document provides a comprehensive blueprint for building Wapple, a mobile wrapper around Openclaw. It explains:
-- How Openclaw works (for AI agents unfamiliar with it)
+This document provides a comprehensive blueprint for building Wapple - a mobile wrapper around the vanilla Openclaw framework. It explains:
+- How vanilla Openclaw works (from docs.openclaw.ai)
 - How the mobile app communicates with Openclaw instances
 - How to provision and manage user VPS instances
 - How credit systems and billing work
-- How to build the mobile interface
 
 ---
 
 # 2. Understanding Openclaw
 
-This section provides a comprehensive explanation of Openclaw for any AI agent or developer who may not be familiar with it.
+This section explains the standard Openclaw framework - the actual open-source project from docs.openclaw.ai - not any custom implementation.
 
 ## 2.1 What is Openclaw?
 
-Openclaw is a multi-agent AI orchestration framework that allows multiple specialized AI agents to work together on complex tasks. Think of it as an "AI team" where each agent has a specific role, and they collaborate to accomplish goals.
+Openclaw is a **self-hosted gateway** that connects chat applications (WhatsApp, Telegram, Discord, iMessage, and more) to AI coding agents. Think of it as a bridge that lets you message an AI assistant from any chat app.
+
+**The core idea:** You run one Gateway process on your own server, and it becomes the bridge between your messaging apps and an always-available AI assistant.
 
 ## 2.2 Openclaw's Architecture
 
-### 2.2.1 The Agent Model
+### 2.2.1 The Gateway
 
-Openclaw operates with **8 distinct agents**, each with a specialized role:
+The **Gateway** is the central component - it's the "single source of truth" for:
+- Sessions management
+- Message routing
+- Channel connections
 
-| Agent | Role | What They Do |
-|-------|------|--------------|
-| **Henry** | Team Lead | Coordinates other agents, runs meetings, facilitates collaboration |
-| **Scout** | Research | Finds information, monitors trends, gathers intelligence |
-| **Pixel** | Creative | Handles visual design, UI/UX, aesthetics |
-| **Echo** | Developer | Writes code, implements features, fixes bugs |
-| **Quill** | Documentation | Writes docs, maintains knowledge base, creates guides |
-| **Codex** | Architecture | Designs systems, plans technical approaches |
-| **Alex** | Security | Monitors safety, enforces policies, handles compliance |
-| **Vega** | Data Analysis | Analyzes metrics, tracks KPIs, generates insights |
+The Gateway:
+- Runs as a Node.js process (`openclaw gateway`)
+- Listens on a port (default 18789)
+- Exposes a web Control UI
+- Manages all channel connections
 
-### 2.2.2 How Agents Communicate
+### 2.2.2 Channels
 
-Agents in Openclaw communicate through several mechanisms:
+Openclaw supports multiple chat platforms simultaneously:
 
-1. **Direct Messaging** - One agent can send messages to another directly
-2. **Standup Meetings** - Scheduled bi-daily meetings (morning and evening) where all agents discuss progress
-3. **Shared Memory** - All agents can access a shared consciousness system where information is stored
-4. **Sub-agents** - Agents can spawn smaller focused agents for specific tasks
+| Channel | Description |
+|---------|-------------|
+| **WhatsApp** | Direct messaging and group chats |
+| **Telegram** | Bots, DMs, and groups |
+| **Discord** | Multiple bots per server |
+| **iMessage** | Via Mac server |
 
-### 2.2.3 The File System Structure
+Each channel can have multiple **accounts** - for example, you could have two different WhatsApp numbers connected to one Gateway.
 
-Each Openclaw instance has a standardized workspace structure:
+### 2.2.3 Multi-Agent System
+
+One of Openclaw's powerful features is **multi-agent routing**. You can run multiple isolated AI agents, each with their own:
+- **Workspace** - Files, persona definitions, and configuration
+- **State directory (agentDir)** - Auth profiles, model registry, per-agent config
+- **Session store** - Chat history and routing state
+
+Each agent is essentially a separate "brain" that can handle different types of tasks.
+
+### 2.2.4 How Messages Get Routed
+
+Openclaw uses **bindings** to route incoming messages to the correct agent:
+
+1. Check for peer match (exact DM/group ID)
+2. Check for parent peer (thread inheritance)
+3. Check Discord role routing
+4. Check guild ID (Discord)
+5. Check team ID (Slack)
+6. Check account ID match
+7. Fall back to default agent
+
+This is deterministic - the most specific match wins.
+
+## 2.3 Openclaw's File System Structure
+
+When Openclaw runs, it creates this directory structure:
 
 ```
-/home/ubuntu/.openclaw/
-├── workspace/
-│   ├── agent-workspaces/
-│   │   ├── henry/      # Henry's personal workspace
-│   │   ├── scout/      # Scout's personal workspace
-│   │   ├── pixel/      # Pixel's personal workspace
-│   │   ├── echo/       # Echo's personal workspace
-│   │   ├── quill/      # Quill's personal workspace
-│   │   ├── codex/      # Codex's personal workspace
-│   │   ├── alex/       # Alex's personal workspace
-│   │   └── vega/       # Vega's personal workspace
-│   │
-│   ├── agent-agency/   # Core system files
-│   │   ├── AGENCY_HANDBOOK.md    # Operating standards
-│   │   ├── immune-system/         # Security policies
-│   │   │   └── policies/
-│   │   │       └── core-policies.yaml
-│   │   ├── feedback-loop.md       # User feedback integration
-│   │   ├── laziness-engine.md     # Self-correction system
-│   │   └── routine-verification.md
-│   │
-│   └── memory/         # Long-term storage
+~/.openclaw/
+├── openclaw.json           # Main configuration file
+├── agents/                 # Per-agent directories
+│   └── <agentId>/
+│       └── agent/          # agentDir - auth, config
+│           └── auth-profiles.json
+│       └── sessions/       # Chat history
 │
-└── skillbank/          # Skill reinforcement system
-    └── skills.json     # Defines available skills
+├── workspace/              # Default workspace (or workspace-<agentId>)
+│   ├── AGENTS.md          # Team structure reference
+│   ├── SOUL.md            # Agent persona
+│   ├── USER.md            # User information
+│   └── ...                # Other workspace files
+│
+├── credentials/           # Channel authentication
+│   └── whatsapp/
+│   └── telegram/
+│   └── discord/
+│
+└── skills/               # Shared skills (optional)
 ```
 
-### 2.2.4 Configuration Files
+### 2.3.1 Configuration File (openclaw.json)
 
-Each agent's behavior is defined by markdown files in their workspace:
+The main configuration lives in `~/.openclaw/openclaw.json` (or via `OPENCLAW_CONFIG_PATH`):
+
+```json
+{
+  "agents": {
+    "list": [
+      { "id": "main", "workspace": "~/.openclaw/workspace-main" }
+    ]
+  },
+  "bindings": [
+    { "agentId": "main", "match": { "channel": "telegram" } }
+  ],
+  "channels": {
+    "telegram": {
+      "accounts": {
+        "default": { "botToken": "..." }
+      }
+    }
+  }
+}
+```
+
+### 2.3.2 Agent Workspace Files
+
+Each agent's workspace contains persona-defining files:
 
 | File | Purpose |
 |------|---------|
-| **SOUL.md** | Defines the agent's persona, communication style |
+| **SOUL.md** | Defines the agent's personality and communication style |
+| **AGENTS.md** | Reference to team structure and other agents |
 | **USER.md** | Information about the human user |
-| **IDENTITY.md** | Technical identity (name, role, expertise) |
-| **AGENTS.md** | Reference to team structure and protocols |
-| **HEARTBEAT.md** | Proactive task checklist |
-| **MEMORY.md** | Historical context and past interactions |
-| **SKILLRL.md** | Skill reinforcement learning settings |
+| **IDENTITY.md** | Technical identity details |
 
-### 2.2.5 How Tasks Get Done
+These files shape how the AI behaves - changing SOUL.md changes the agent's persona.
 
-A typical task flow in Openclaw:
+## 2.4 Tools and Capabilities
 
-1. **User Request** - Human gives a task (e.g., "Research AI coding tools")
-2. **Wake** - Relevant agent wakes up (Scout for research)
-3. **Skill Selection** - Agent checks skills.json for relevant approaches
-4. **Execution** - Agent performs the task using available tools
-5. **Memory** - Results are stored in shared memory
-6. **Sleep** - Agent returns to idle state
+Openclaw agents have access to various **tools** - functions they can call to perform actions:
 
-### 2.2.6 The Skill System (SkillRL)
+### 2.4.1 Available Tool Categories
 
-Openclaw uses a **Skill Reinforcement Learning** system where skills improve through usage:
+| Tool | Description |
+|------|-------------|
+| **exec** | Run shell commands |
+| **read** | Read files |
+| **write** | Write files |
+| **edit** | Edit files |
+| **browser** | Control web browser |
+| **message** | Send messages via channels |
+| **sessions** | Manage conversations |
+| **cron** | Schedule tasks |
+| **nodes** | Control paired devices |
 
-- **General Skills** - Apply to any task (e.g., "Break Down Complex Tasks", "Verify Before Acting")
-- **Task-Specific Skills** - Apply to specific domains (e.g., research skills, coding skills)
+### 2.4.2 Tool Restrictions (Sandboxing)
 
-Each skill tracks:
-- Usage count (how often applied)
-- Success count (how often effective)
-- Failure count (how often didn't work)
+You can restrict what tools an agent can use:
 
-### 2.2.7 Security (The Immune System)
+```json
+{
+  "tools": {
+    "allow": ["read", "sessions_list"],
+    "deny": ["exec", "write", "browser"]
+  }
+}
+```
 
-Openclaw has a built-in security system called the "Immune System" that operates on three zones:
+This is useful for creating "lightweight" agents with limited capabilities.
 
-| Zone | Risk Level | Behavior |
-|------|-------------|----------|
-| **GREEN** | Low | Agent can proceed with just logging |
-| **YELLOW** | Medium | Agent proceeds but must alert and monitor |
-| **RED** | High | Agent is BLOCKED, must escalate to human |
+## 2.5 Skills System
 
-### 2.2.8 Automation (Cron Jobs)
+Openclaw has a **skills** system where agents can use predefined approaches:
 
-Openclaw supports scheduled tasks through cron jobs:
+- Skills can be **per-agent** (in workspace's skills folder)
+- Or **shared** (in ~/.openclaw/skills)
 
-- Morning standup at 09:00 TRT
-- Evening standup at 17:00 TRT
-- Intelligence monitoring at 08:00 TRT
-- Security reports at 20:00 TRT
+Skills help agents approach problems systematically - for example, a "Research" skill might guide the agent through structured information gathering.
 
-### 2.2.9 How Mobile Apps Connect to Openclaw
+## 2.6 How Tasks Flow in Openclaw
 
-To connect a mobile app to Openclaw:
+A typical interaction:
 
-1. **API Server** - Openclaw exposes an API (typically on port 3000)
-2. **WebSocket** - Real-time updates via WebSocket connections
-3. **File Access** - SSH/SCP to access workspace files
-4. **Agent Communication** - Send messages to agents via the API
+1. **User messages** via WhatsApp/Telegram/Discord
+2. **Gateway receives** the message
+3. **Binding lookup** finds the right agent
+4. **Session restored** - agent sees conversation history
+5. **Agent processes** - uses tools, calls LLM
+6. **Response sent** back through the channel
+7. **Session saved** for context continuity
 
-The mobile app acts as a **remote control and display layer** for Openclaw - it doesn't replace Openclaw's internal architecture, it provides a friendlier interface to it.
+## 2.7 API and Control
+
+Openclaw provides multiple control interfaces:
+
+| Interface | Access | Purpose |
+|-----------|--------|---------|
+| **Control UI** | Browser at 127.0.0.1:18789 | Dashboard for chat and config |
+| **CLI** | `openclaw` command | Terminal management |
+| **REST API** | HTTP endpoints | Programmatic access |
+| **WebSocket** | ws://... | Real-time updates |
+
+## 2.8 Mobile Nodes
+
+Openclaw supports **mobile nodes** - iOS and Android devices that can pair with the Gateway. This enables:
+- Push notifications
+- Camera access
+- Location services
+- Canvas (interactive UI)
+
+Users can pair their phone using a QR code flow.
 
 ---
 
@@ -192,7 +248,7 @@ The mobile app acts as a **remote control and display layer** for Openclaw - it 
 
 ## 3.1 High-Level Architecture
 
-Wapple consists of multiple layers working together:
+Wapple consists of multiple layers:
 
 ### 3.1.1 User Layer (Mobile App)
 The mobile application provides four main interfaces:
@@ -210,8 +266,8 @@ A central API server that:
 
 ### 3.1.3 Infrastructure Layer (Per-User VPS)
 Each user gets their own VPS running:
-- A Docker container with Openclaw
-- Their personalized configuration files
+- Docker container with Openclaw Gateway
+- Their personalized workspace files
 - Isolated from other users
 
 ### 3.1.4 External Services
@@ -223,29 +279,20 @@ Each user gets their own VPS running:
 
 ### 3.2.1 User Sends a Message
 
-When a user types a message in the mobile app:
-
-1. The mobile app sends the message to the backend API
-2. The backend validates the user's identity and credit balance
-3. The backend forwards the message to the user's Openclaw VPS via SSH/API
-4. Openclaw routes the message to the appropriate agent
-5. The agent processes the task and generates a response
-6. The response flows back through the VPS → backend → mobile app
+1. Mobile app sends message to backend API
+2. Backend validates user identity and credit balance
+3. Backend forwards message to user's Openclaw VPS
+4. Openclaw Gateway routes to appropriate agent
+5. Agent processes and generates response
+6. Response flows back: VPS → backend → mobile app
 
 ### 3.2.2 Real-Time Updates
 
 The mobile app maintains a WebSocket connection to receive:
-- Agent status changes (idle → working → idle)
+- Agent status changes
 - Task completion notifications
 - New file alerts
 - Credit balance updates
-
-### 3.2.3 Credit Consumption
-
-Every time an AI agent generates a response:
-- The backend calculates token usage (input + output)
-- Credits are deducted from the user's balance
-- The transaction is logged for billing history
 
 ---
 
@@ -258,8 +305,8 @@ Every time an AI agent generates a response:
 Each Wapple subscriber gets a dedicated VPS because:
 - **Isolation** - One user's issues don't affect others
 - **Customization** - Each user can have unique agent configurations
-- **Security** - Full control over their data and agents
-- **Performance** - Guaranteed resources, no shared contention
+- **Security** - Full control over their data
+- **Performance** - Guaranteed resources
 
 ### 4.1.2 Tier Specifications
 
@@ -274,33 +321,77 @@ Each Wapple subscriber gets a dedicated VPS because:
 When a new user subscribes:
 
 1. **Payment** - Stripe confirms payment
-2. **VPS Creation** - Backend creates a new droplet/instance
+2. **VPS Creation** - Backend creates droplet/instance
 3. **Docker Setup** - Install Docker on the VPS
-4. **Openclaw Deployment** - Pull and run Openclaw container
-5. **Configuration** - Generate user-specific .md files based on onboarding
-6. **API Key Generation** - Create unique key for the user
-7. **Testing** - Verify the instance is reachable
-8. **Activation** - Mark user as "ready" in the database
+4. **Openclaw Deployment** - Install Openclaw globally
+5. **Configuration** - Generate user's openclaw.json with their agents
+6. **Channel Setup** - (Optional) Configure Telegram/WhatsApp bots
+7. **API Key Generation** - Create OpenRouter keys
+8. **Testing** - Verify Gateway is reachable
+9. **Activation** - Mark user as "ready"
 
-This entire process takes approximately 5-10 minutes.
+This takes approximately 5-10 minutes.
 
-## 4.3 Teardown Process
+## 4.3 User-Specific Openclaw Configuration
 
-When a user cancels:
+Each user's VPS gets a customized `openclaw.json`:
 
-1. **Grace Period** - 30 days before actual deletion (configurable)
-2. **Backup** - Offer to download user data
-3. **Container Stop** - Gracefully stop Openclaw
-4. **Instance Destroy** - Delete the VPS
-5. **Database Cleanup** - Mark as terminated
+```json
+{
+  "agents": {
+    "list": [
+      {
+        "id": "assistant",
+        "workspace": "~/.openclaw/workspace",
+        "model": "anthropic/claude-sonnet-4-5"
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "agentId": "assistant",
+      "match": { "channel": "telegram", "accountId": "default" }
+    }
+  ],
+  "channels": {
+    "telegram": {
+      "accounts": {
+        "default": {
+          "botToken": "user-unique-bot-token"
+        }
+      }
+    }
+  },
+  "messages": {
+    "groupChat": {
+      "mentionPatterns": ["@assistant"]
+    }
+  }
+}
+```
 
-## 4.4 Infrastructure Management
+### 4.3.1 User Workspace Files
 
-The backend uses Infrastructure as Code principles:
-- VPS creation/deletion is automated
-- Configuration is versioned
-- Health checks run continuously
-- Failed provisioning auto-retries
+The backend also generates workspace files based on onboarding:
+
+**SOUL.md:**
+```markdown
+# SOUL.md - User Persona
+
+**You are talking to:** [User Name]
+
+## Communication Style
+- Tone: [friendly/professional/casual]
+- Detail level: [brief/detailed]
+
+## What They Care About
+- [Interest 1]
+- [Interest 2]
+
+## Goals
+- [Goal 1]
+- [Goal 2]
+```
 
 ---
 
@@ -315,51 +406,41 @@ Handles:
 - User registration and login
 - JWT token generation and validation
 - OAuth integration (Google, Apple)
-- Session management
 
 ### 5.1.2 Provisioning Service
 Handles:
 - Creating and destroying VPS instances
-- Monitoring VPS health
-- Managing Docker containers
-- Running Openclaw initialization scripts
+- Installing and configuring Openclaw
+- Managing Gateway lifecycle
 
 ### 5.1.3 Credit Manager
 Handles:
 - Tracking credit balances
-- Monitoring API usage
+- Monitoring OpenRouter API usage
 - Enforcing tier limits
-- Processing Stripe payments
 
 ### 5.1.4 File Sync Service
 Handles:
-- Polling user VPS for new files
+- Polling user VPS for workspace files
 - Streaming files to mobile app
-- Generating file previews
 - Managing file metadata
 
 ### 5.1.5 Agent Manager
 Handles:
 - Listing user's agents
 - Managing agent configurations
-- Scheduling cron jobs
-- Tracking agent status
+- Viewing agent status
 
 ## 5.2 Database Schema
 
-The system uses PostgreSQL with the following core tables:
-
-- **users** - User accounts and profiles
-- **subscriptions** - Tier, billing status, credit limits
-- **vps_instances** - VPS details, status, provider info
-- **agents** - User's Openclaw agent configurations
-- **cron_jobs** - Scheduled tasks
-- **credit_transactions** - Purchase and usage history
-- **api_usage_logs** - Detailed AI API usage
+Core tables:
+- **users** - User accounts
+- **subscriptions** - Tier and billing
+- **vps_instances** - VPS details
+- **agents** - Agent configurations
+- **credit_transactions** - Usage history
 - **conversations** - Chat threads
-- **messages** - Individual messages
-- **files** - Synced project files
-- **user_preferences** - Onboarding and settings
+- **files** - Synced workspace files
 
 ---
 
@@ -367,58 +448,36 @@ The system uses PostgreSQL with the following core tables:
 
 ## 6.1 Technology Stack
 
-| Layer | Technology | Why |
-|-------|------------|-----|
-| **Framework** | React Native (Expo) | Cross-platform, faster development |
-| **Language** | TypeScript | Type safety reduces bugs |
-| **State** | Zustand | Simpler than Redux, excellent performance |
-| **Navigation** | React Navigation | Supports tabs and stacks |
-| **UI Components** | React Native Paper | Material Design 3 components |
-| **HTTP** | Axios | Great interceptors and error handling |
-| **Real-time** | Socket.io | WebSocket connections |
-| **Storage** | MMKV | Very fast key-value storage |
+| Layer | Technology |
+|-------|------------|
+| **Framework** | React Native (Expo) |
+| **Language** | TypeScript |
+| **State** | Zustand |
+| **Navigation** | React Navigation |
+| **Real-time** | Socket.io |
 
-## 6.2 App Structure
-
-The mobile app is organized into these main screens:
+## 6.2 App Screens
 
 ### Home (Mission Control)
-The main dashboard showing:
-- Personalized greetings ("Good morning, [Name]")
-- Quick action buttons (Research, Create, Analyze, Chat)
-- AI-generated insights and recommendations
-- List of active tasks with status
+- Personalized greeting
+- Quick action buttons
+- AI insights and recommendations
+- Active tasks list
 
 ### Chats
-Conversational interface featuring:
-- List of conversations with agents
-- Real-time messaging with typing indicators
-- Agent avatars and status
+- Conversation list with agents
+- Real-time messaging
 - Message history
 
 ### Projects
-File management interface with:
-- Grid/list view of project files
-- File previews and thumbnails
+- File browser for workspace
 - Download and sync status
-- Search and filter options
+- Search and filter
 
 ### Agents
-Agent management hub displaying:
-- All 8 agents with their status
-- Ability to create new agents
-- Configuration options per agent
-- Task assignment interface
-- Cron job scheduling
-
-## 6.3 Real-Time Updates
-
-The app maintains a persistent WebSocket connection to receive:
-- Agent status changes
-- New messages
-- Task completion alerts
-- File sync notifications
-- Credit balance updates
+- Agent list with status
+- Create new agents
+- Configure agent settings
 
 ---
 
@@ -428,7 +487,7 @@ The app maintains a persistent WebSocket connection to receive:
 
 ### 7.1.1 How Credits Work
 
-Each subscription tier includes a monthly credit allowance:
+Each subscription tier includes monthly credits:
 
 | Tier | Monthly Credits | Cost |
 |------|-----------------|------|
@@ -436,69 +495,28 @@ Each subscription tier includes a monthly credit allowance:
 | Pro | 25,000 | $39.99 |
 | Premium | 100,000 | $129.99 |
 
-### 7.1.2 Credit Deduction
+### 7.1.2 Credit Deduction Flow
 
-When an AI agent responds to a user:
+When an AI agent responds:
+1. Count input tokens (user message)
+2. Count output tokens (AI response)
+3. Look up model pricing per million tokens
+4. Calculate cost and subtract from balance
+5. Log transaction
 
-1. Count input tokens (user's message)
-2. Count output tokens (AI's response)
-3. Look up the model's price per million tokens
-4. Calculate cost: (total tokens / 1,000,000) × price
-5. Subtract from user's balance
-6. Log the transaction
+### 7.1.3 Alerts
+- At 80% usage: Show warning
+- At 100%: Block requests until purchase
 
-### 7.1.3 Credit Alerts
+## 7.2 File Synchronization
 
-- At 80% usage: Show warning banner
-- At 100%: Block new AI requests until purchase
+The app syncs workspace files from user's VPS:
 
-### 7.1.4 Purchasing Credits
-
-Users can buy additional credit packs through Stripe:
-- Starter Pack: $9.99 for 5,000 credits
-- Pro Pack: $39.99 for 25,000 credits
-- Premium Pack: $129.99 for 100,000 credits
-
-## 7.2 Cron Job Execution
-
-### 7.2.1 How Cron Jobs Work
-
-Users can schedule recurring tasks:
-
-1. User defines task and schedule (e.g., "Research AI news daily at 8am")
-2. Backend calculates next run time
-3. Background worker checks every minute for due jobs
-4. When due, connects to user's VPS via SSH
-5. Executes Openclaw command with the task
-6. Logs completion and schedules next run
-
-### 7.2.2 Built-in Cron Jobs
-
-Openclaw includes default scheduled tasks:
-- Morning standup (09:00)
-- Evening standup (17:00)
-- Intelligence sweep (08:00)
-- Security report (20:00)
-
-## 7.3 File Synchronization
-
-### 7.3.1 How File Sync Works
-
-The app needs to show files from the user's VPS:
-
-1. Backend SSHs into VPS every few minutes
-2. Lists files modified in workspace
-3. Compares with database records
-4. For new files: add to database, notify app
-5. For changed files: update checksum, notify app
-
-### 7.3.2 File Downloads
-
-When user wants to download a file:
-1. App requests file from backend
-2. Backend streams via SCP through SSH
-3. Progress updates sent to app
-4. File saved to device storage
+1. Backend SSHs into VPS periodically
+2. Lists modified files in workspace
+3. Compares with database
+4. Notifies app of new/changed files
+5. User can download files on demand
 
 ---
 
@@ -506,121 +524,59 @@ When user wants to download a file:
 
 ## 8.1 Authentication
 
-### 8.1.1 JWT-Based Auth
+JWT-based auth with:
+- Access tokens (15 min expiry)
+- Refresh tokens (7 days)
 
-The system uses JSON Web Tokens:
-- **Access Token** - Short-lived (15 minutes), used for API requests
-- **Refresh Token** - Long-lived (7 days), used to get new access tokens
+## 8.2 VPS Security
 
-### 8.1.2 OAuth Support
+Each user's VPS has:
+- Firewall (SSH + HTTPS only)
+- No direct user SSH access
+- All access through app API
 
-Users can sign in with:
-- Email and password
-- Google account
-- Apple ID
-
-## 8.2 API Security
-
-### 8.2.1 Rate Limiting
-
-Different endpoints have different limits:
+## 8.3 Rate Limiting
 
 | Endpoint | Requests/Minute |
 |----------|-----------------|
-| Chat messages | 60 |
-| Agent operations | 30 |
-| File operations | 20 |
-| Credit operations | 10 |
-
-### 8.2.2 Input Validation
-
-All user input is validated:
-- Message length limits
-- Proper data types
-- SQL injection prevention
-- XSS protection
-
-## 8.3 VPS Security
-
-Each user's VPS has:
-- Firewall only allowing SSH and HTTPS
-- All access through the mobile app API
-- No direct user SSH access
-- Docker container isolation
+| Chat | 60 |
+| Agents | 30 |
+| Files | 20 |
 
 ---
 
-# 9. Data Models
-
-## 9.1 User Data
-
-The system stores:
-- Profile information (name, email, avatar)
-- Subscription details (tier, status, period)
-- Credit balance and usage history
-- Onboarding preferences
-
-## 9.2 Agent Data
-
-Each user's Openclaw agents store:
-- Agent name and role
-- System prompt customization
-- Model preferences
-- Temperature and token settings
-- Current status
-
-## 9.3 Conversation Data
-
-Chat history includes:
-- Messages with timestamps
-- Token counts per message
-- Agent attribution
-- Context for continuity
-
-## 9.4 File Data
-
-Project files track:
-- File name and path
-- Size and type
-- Sync status
-- Agent that created it
-
----
-
-# 10. Implementation Roadmap
+# 9. Implementation Roadmap
 
 ## Phase 1: MVP (Weeks 1-4)
 
 | Week | Focus | Deliverables |
 |------|-------|--------------|
-| 1 | Foundation | Project setup, Auth service, Database |
-| 2 | Infrastructure | VPS provisioning, Openclaw Docker setup |
-| 3 | Mobile Core | Auth screens, navigation, basic UI |
-| 4 | Chat | Messaging interface, agent communication |
+| 1 | Foundation | Project setup, Auth, Database |
+| 2 | Infrastructure | VPS provisioning, Openclaw setup |
+| 3 | Mobile Core | Auth screens, navigation |
+| 4 | Chat | Messaging interface |
 
 ## Phase 2: Core Features (Weeks 5-8)
 
 | Week | Focus | Deliverables |
 |------|-------|--------------|
-| 5 | Payments | Credit system, Stripe integration |
-| 6 | Files | File sync, Projects screen |
-| 7 | Automation | Cron jobs, Agent management |
-| 8 | Real-time | Push notifications, live updates |
+| 5 | Payments | Credit system, Stripe |
+| 6 | Files | File sync, Projects |
+| 7 | Agents | Agent management |
+| 8 | Real-time | Push notifications |
 
 ## Phase 3: Polish (Weeks 9-12)
 
 | Week | Focus | Deliverables |
 |------|-------|--------------|
-| 9 | Onboarding | Preference collection, personalization |
-| 10 | Performance | Optimization, caching |
-| 11 | Security | Audit, penetration testing |
-| 12 | Launch | Beta testing, bug fixes, release |
+| 9 | Onboarding | Preferences |
+| 10 | Performance | Optimization |
+| 11 | Security | Audit |
+| 12 | Launch | Beta, release |
 
 ---
 
 # Appendix A: Environment Variables
-
-The system requires these environment variables:
 
 ```bash
 # Backend
@@ -638,60 +594,42 @@ JWT_REFRESH_SECRET=...
 # Cloud Providers
 DO_API_TOKEN=...
 AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
 
 # AI
 OPENROUTER_API_KEY=...
 
-# Mobile App
+# Mobile
 EXPO_PUBLIC_API_URL=https://api.wapple.io
 EXPO_PUBLIC_WS_URL=wss://api.wapple.io
 ```
 
 ---
 
-# Appendix B: Error Handling
-
-| Error Code | Meaning | Resolution |
-|------------|---------|-------------|
-| AUTH_INVALID | Wrong credentials | User should reset password |
-| AUTH_EXPIRED | Token expired | Re-authenticate |
-| CREDITS_INSUFFICIENT | No credits left | Purchase more credits |
-| VPS_NOT_READY | Still provisioning | Wait 10 minutes |
-| AGENT_BUSY | Agent is working | Try again later |
-| FILE_TOO_LARGE | Exceeds limit | Use smaller file |
-
----
-
-# Appendix C: API Endpoints Summary
+# Appendix B: API Endpoints Summary
 
 ## Authentication
-- POST /api/auth/register - Create account
-- POST /api/auth/login - Sign in
-- POST /api/auth/refresh - Get new token
-- GET /api/auth/me - Get current user
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/refresh
 
 ## Chat
-- POST /api/chat/:id/messages - Send message
-- GET /api/chat/:id/messages - Get history
+- POST /api/chat/:id/messages
 
 ## Agents
-- GET /api/agents - List agents
-- POST /api/agents - Create agent
-- PUT /api/agents/:id - Update agent
-- POST /api/agents/:id/task - Assign task
+- GET /api/agents
+- POST /api/agents
+- POST /api/agents/:id/task
 
 ## Credits
-- GET /api/credits/balance - Check balance
-- GET /api/credits/usage - View history
-- POST /api/credits/purchase - Buy credits
+- GET /api/credits/balance
+- POST /api/credits/purchase
 
 ## Files
-- GET /api/files - List files
-- GET /api/files/:id/download - Download file
+- GET /api/files
+- GET /api/files/:id/download
 
 ---
 
 **Document Status:** Ready for Implementation  
-**Version:** 1.1 (Explanation-Based)  
+**Version:** 1.2 (Vanilla Openclaw-based)  
 **Next Review:** After Phase 1 completion
