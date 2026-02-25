@@ -1,7 +1,7 @@
 # Wapple - Mobile AI Agent Superapp
 ## Technical Architecture & Implementation Document
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Date:** 2026-02-25  
 **Author:** Codex (Architecture)  
 **Status:** Production Ready
@@ -11,14 +11,14 @@
 # Table of Contents
 
 1. [Executive Summary](#1-executive-summary)
-2. [System Architecture & Flow](#2-system-architecture--flow)
-3. [Infrastructure & Provisioning](#3-infrastructure--provisioning)
-4. [Backend Architecture](#4-backend-architecture)
-5. [Frontend Architecture](#5-frontend-architecture)
-6. [Core Algorithms & Logic](#6-core-algorithms--logic)
-7. [Security Architecture](#7-security-architecture)
-8. [Data Models & Schemas](#8-data-models--schemas)
-9. [API Reference](#9-api-reference)
+2. [Understanding Openclaw](#2-understanding-openclaw)
+3. [System Architecture & Flow](#3-system-architecture--flow)
+4. [Infrastructure & Provisioning](#4-infrastructure--provisioning)
+5. [Backend Architecture](#5-backend-architecture)
+6. [Frontend Architecture](#6-frontend-architecture)
+7. [Core Algorithms & Logic](#7-core-algorithms--logic)
+8. [Security Architecture](#8-security-architecture)
+9. [Data Models & Schemas](#9-data-models--schemas)
 10. [Implementation Roadmap](#10-implementation-roadmap)
 
 ---
@@ -42,1542 +42,548 @@
 | Deployment | Per-user dedicated VPS instances |
 | AI Engine | OpenRouter (multi-provider) |
 
----
+## 1.4 What This Document Covers
 
-# 2. System Architecture & Flow
-
-## 2.1 High-Level Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              USER LAYER                                     │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
-│  │   Home      │  │   Chats     │  │  Projects   │  │   Agents    │       │
-│  │ (Mission    │  │ (Conver-    │  │  (File      │  │  (Manage-   │       │
-│  │  Control)   │  │  sation)    │  │  Manager)   │  │   ment)     │       │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘       │
-│         │                 │                 │                 │              │
-│         └─────────────────┴────────┬────────┴─────────────────┘              │
-│                                    │                                        │
-│                           ┌────────▼────────┐                                │
-│                           │   React Native  │                                │
-│                           │     Mobile      │                                │
-│                           │      App        │                                │
-│                           └────────┬────────┘                                │
-└────────────────────────────────────┼────────────────────────────────────────┘
-                                     │ HTTPS/WSS
-┌────────────────────────────────────┼────────────────────────────────────────┐
-│                           ┌────────▼────────┐       BACKEND LAYER          │
-│                           │  API Gateway    │                               │
-│                           │  (Node.js/      │                               │
-│                           │   Express)      │                               │
-│                           └────────┬────────┘                               │
-│                                    │                                        │
-│         ┌──────────────────────────┼──────────────────────────┐            │
-│         │                          │                          │            │
-│  ┌──────▼──────┐          ┌───────▼───────┐         ┌───────▼───────┐    │
-│  │  Auth Svc   │          │ Provisioning   │         │   Credit      │    │
-│  │  (JWT)      │          │    Service     │         │   Manager     │    │
-│  └──────┬──────┘          └───────┬───────┘         └───────┬───────┘    │
-│         │                          │                          │            │
-│         │         ┌────────────────┼────────────────┐        │            │
-│         │         │                │                │        │            │
-│  ┌──────▼──────┐  │      ┌────────▼────────┐      │  ┌──────▼──────┐   │
-│  │  Database   │◄─┼──────│   VPS Manager   │◄─────┼─►│  OpenRouter  │   │
-│  │ (PostgreSQL)│  │      │   (Terraform)   │      │  │     API      │   │
-│  └─────────────┘  │      └────────┬────────┘      │  └─────────────┘   │
-│                   │               │                │                    │
-│                   │      ┌────────▼────────┐      │                    │
-│                   │      │  File Sync      │      │                    │
-│                   │      │   Service       │      │                    │
-│                   │      └────────┬────────┘      │                    │
-│                   │               │                │                    │
-│                   └───────────────┼────────────────┘                    │
-│                                   │                                     │
-│                          ┌────────▼────────┐                            │
-│                          │   User's VPS    │◄─ Dedicated Openclaw       │
-│                          │   (Per-User)    │◄─ Instance                 │
-│                          │   DigitalOcean/ │                            │
-│                          │   AWS           │                            │
-│                          └─────────────────┘                            │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-## 2.2 Communication Flows
-
-### 2.2.1 User → Mobile App → Backend
-
-```
-User Action
-    │
-    ▼
-Mobile App (React Native)
-    │
-    ├──► Local State (Zustand/Redux)
-    │
-    └──► API Gateway (HTTPS REST)
-            │
-            ├──► Auth Service (validate JWT)
-            │
-            ├──► Credit Manager (check/quota)
-            │
-            └──► VPS Manager (proxy to user instance)
-                    │
-                    └──► User's Openclaw VPS (SSH/API)
-```
-
-### 2.2.2 Real-Time Agent Updates
-
-```
-User's Openclaw VPS
-    │
-    ├──► WebSocket Connection (Socket.io)
-    │
-    ├──► Mobile App receives:
-    │       ├── Agent status updates
-    │       ├── Task completion notifications
-    │       └── File sync alerts
-    │
-    └──► Backend stores session state
-```
-
-### 2.2.3 Credit Consumption Flow
-
-```
-User invokes AI agent
-    │
-    ▼
-Mobile App → API: /api/chat/message
-    │
-    ▼
-Backend validates:
-    ├── JWT token (valid?)
-    ├── Subscription (active?)
-    └── Credits (sufficient?)
-    │
-    ├──► YES: Forward to Openclaw VPS
-    │           │
-    │           ├──► OpenRouter API (LLM)
-    │           │
-    │           ├──► Track token usage
-    │           │
-    │           └──► Deduct credits
-    │
-    └──► NO: Return error + upsell
-```
+This document provides a comprehensive blueprint for building Wapple, a mobile wrapper around Openclaw. It explains:
+- How Openclaw works (for AI agents unfamiliar with it)
+- How the mobile app communicates with Openclaw instances
+- How to provision and manage user VPS instances
+- How credit systems and billing work
+- How to build the mobile interface
 
 ---
 
-# 3. Infrastructure & Provisioning
+# 2. Understanding Openclaw
 
-## 3.1 VPS Architecture
+This section provides a comprehensive explanation of Openclaw for any AI agent or developer who may not be familiar with it.
 
-### 3.1.1 Per-User Isolation Model
+## 2.1 What is Openclaw?
 
-Each subscriber gets a **dedicated VPS** running:
-- Openclaw instance
-- Docker container for isolation
-- Pre-configured with user's preferences
-- SSH/API access for management
+Openclaw is a multi-agent AI orchestration framework that allows multiple specialized AI agents to work together on complex tasks. Think of it as an "AI team" where each agent has a specific role, and they collaborate to accomplish goals.
 
-### 3.1.2 VPS Specifications by Tier
+## 2.2 Openclaw's Architecture
 
-| Tier | VPS Spec | CPU | RAM | Storage | Cost/Mo |
-|------|----------|-----|-----|---------|---------|
-| **Starter** | DigitalOcean Basic | 1 vCPU | 1GB | 25GB | $5 |
-| **Pro** | DigitalOcean Standard | 2 vCPU | 4GB | 50GB | $15 |
-| **Premium** | AWS t3.medium | 2 vCPU | 4GB | 100GB | $25 |
+### 2.2.1 The Agent Model
 
-## 3.2 Provisioning Workflow
+Openclaw operates with **8 distinct agents**, each with a specialized role:
 
-### 3.2.1 User Subscription Flow
+| Agent | Role | What They Do |
+|-------|------|--------------|
+| **Henry** | Team Lead | Coordinates other agents, runs meetings, facilitates collaboration |
+| **Scout** | Research | Finds information, monitors trends, gathers intelligence |
+| **Pixel** | Creative | Handles visual design, UI/UX, aesthetics |
+| **Echo** | Developer | Writes code, implements features, fixes bugs |
+| **Quill** | Documentation | Writes docs, maintains knowledge base, creates guides |
+| **Codex** | Architecture | Designs systems, plans technical approaches |
+| **Alex** | Security | Monitors safety, enforces policies, handles compliance |
+| **Vega** | Data Analysis | Analyzes metrics, tracks KPIs, generates insights |
 
-```
-1. User subscribes in app
-       │
-2. Payment processed (Stripe)
-       │
-3. Backend triggers provisioning:
-   ┌─────────────────────────────────────────┐
-   │  Provisioning Service                   │
-   │  ├── 1. Select VPS provider (config)    │
-   │  ├── 2. Create droplet/instance          │
-   │  ├── 3. Install Docker                  │
-   │  ├── 4. Pull Openclaw image             │
-   │  ├── 5. Configure environment vars      │
-   │  ├── 6. Generate unique API key         │
-   │  ├── 7. Initialize .md configs           │
-   │  ├── 8. Start Openclaw container        │
-   │  └── 9. Test connectivity              │
-   └─────────────────────────────────────────┘
-       │
-4. Store VPS details in database
-       │
-5. Send welcome email + VPN credentials
-       │
-6. Mobile app updates UI → "Ready"
-```
+### 2.2.2 How Agents Communicate
 
-### 3.2.2 VPS Teardown (Cancellation)
+Agents in Openclaw communicate through several mechanisms:
+
+1. **Direct Messaging** - One agent can send messages to another directly
+2. **Standup Meetings** - Scheduled bi-daily meetings (morning and evening) where all agents discuss progress
+3. **Shared Memory** - All agents can access a shared consciousness system where information is stored
+4. **Sub-agents** - Agents can spawn smaller focused agents for specific tasks
+
+### 2.2.3 The File System Structure
+
+Each Openclaw instance has a standardized workspace structure:
 
 ```
-User cancels subscription
-       │
-30-day grace period (configurable)
-       │
-On expiration:
-   ├── Stop Openclaw container
-   ├── Backup user data (optional)
-   ├── Destroy VPS instance
-   ├── Release IP addresses
-   └── Update database (status: terminated)
+/home/ubuntu/.openclaw/
+├── workspace/
+│   ├── agent-workspaces/
+│   │   ├── henry/      # Henry's personal workspace
+│   │   ├── scout/      # Scout's personal workspace
+│   │   ├── pixel/      # Pixel's personal workspace
+│   │   ├── echo/       # Echo's personal workspace
+│   │   ├── quill/      # Quill's personal workspace
+│   │   ├── codex/      # Codex's personal workspace
+│   │   ├── alex/       # Alex's personal workspace
+│   │   └── vega/       # Vega's personal workspace
+│   │
+│   ├── agent-agency/   # Core system files
+│   │   ├── AGENCY_HANDBOOK.md    # Operating standards
+│   │   ├── immune-system/         # Security policies
+│   │   │   └── policies/
+│   │   │       └── core-policies.yaml
+│   │   ├── feedback-loop.md       # User feedback integration
+│   │   ├── laziness-engine.md     # Self-correction system
+│   │   └── routine-verification.md
+│   │
+│   └── memory/         # Long-term storage
+│
+└── skillbank/          # Skill reinforcement system
+    └── skills.json     # Defines available skills
 ```
 
-## 3.3 Infrastructure as Code
+### 2.2.4 Configuration Files
 
-### 3.3.1 Terraform Configuration
+Each agent's behavior is defined by markdown files in their workspace:
 
-```hcl
-# main.tf (per-user module)
-module "user_vps" {
-  source = "./modules/vps"
-  
-  tier           = var.tier
-  region         = var.region
-  openclaw_version = var.openclaw_version
-  
-  tags = {
-    Environment = "production"
-    ManagedBy   = "wapple"
-    Tenant      = var.user_id
-  }
-}
+| File | Purpose |
+|------|---------|
+| **SOUL.md** | Defines the agent's persona, communication style |
+| **USER.md** | Information about the human user |
+| **IDENTITY.md** | Technical identity (name, role, expertise) |
+| **AGENTS.md** | Reference to team structure and protocols |
+| **HEARTBEAT.md** | Proactive task checklist |
+| **MEMORY.md** | Historical context and past interactions |
+| **SKILLRL.md** | Skill reinforcement learning settings |
 
-# modules/vps/main.tf (DigitalOcean provider)
-resource "digitalocean_droplet" "openclaw" {
-  image    = "docker-20-04"
-  name     = "wapple-${var.user_id}"
-  region   = var.region
-  size     = var.tier == "starter" ? "s-1vcpu-1gb" : "s-2vcpu-4gb"
-  
-  user_data = <<-EOF
-    #!/bin/bash
-    docker run -d \
-      --name openclaw-${var.user_id} \
-      -p ${var.ssh_port}:22 \
-      -e API_KEY=${var.openclaw_api_key} \
-      -e USER_ID=${var.user_id} \
-      openclaw/server:latest
-  EOF
-}
-```
+### 2.2.5 How Tasks Get Done
+
+A typical task flow in Openclaw:
+
+1. **User Request** - Human gives a task (e.g., "Research AI coding tools")
+2. **Wake** - Relevant agent wakes up (Scout for research)
+3. **Skill Selection** - Agent checks skills.json for relevant approaches
+4. **Execution** - Agent performs the task using available tools
+5. **Memory** - Results are stored in shared memory
+6. **Sleep** - Agent returns to idle state
+
+### 2.2.6 The Skill System (SkillRL)
+
+Openclaw uses a **Skill Reinforcement Learning** system where skills improve through usage:
+
+- **General Skills** - Apply to any task (e.g., "Break Down Complex Tasks", "Verify Before Acting")
+- **Task-Specific Skills** - Apply to specific domains (e.g., research skills, coding skills)
+
+Each skill tracks:
+- Usage count (how often applied)
+- Success count (how often effective)
+- Failure count (how often didn't work)
+
+### 2.2.7 Security (The Immune System)
+
+Openclaw has a built-in security system called the "Immune System" that operates on three zones:
+
+| Zone | Risk Level | Behavior |
+|------|-------------|----------|
+| **GREEN** | Low | Agent can proceed with just logging |
+| **YELLOW** | Medium | Agent proceeds but must alert and monitor |
+| **RED** | High | Agent is BLOCKED, must escalate to human |
+
+### 2.2.8 Automation (Cron Jobs)
+
+Openclaw supports scheduled tasks through cron jobs:
+
+- Morning standup at 09:00 TRT
+- Evening standup at 17:00 TRT
+- Intelligence monitoring at 08:00 TRT
+- Security reports at 20:00 TRT
+
+### 2.2.9 How Mobile Apps Connect to Openclaw
+
+To connect a mobile app to Openclaw:
+
+1. **API Server** - Openclaw exposes an API (typically on port 3000)
+2. **WebSocket** - Real-time updates via WebSocket connections
+3. **File Access** - SSH/SCP to access workspace files
+4. **Agent Communication** - Send messages to agents via the API
+
+The mobile app acts as a **remote control and display layer** for Openclaw - it doesn't replace Openclaw's internal architecture, it provides a friendlier interface to it.
 
 ---
 
-# 4. Backend Architecture
+# 3. System Architecture & Flow
 
-## 4.1 Service Architecture
+## 3.1 High-Level Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      API Gateway (Express)                       │
-│  - Rate limiting                                                  │
-│  - Request validation                                            │
-│  - JWT authentication                                            │
-│  - SSL/TLS termination                                           │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │
-    ┌─────────────────────────┼─────────────────────────┐
-    │                         │                         │
-┌───▼────┐            ┌──────▼──────┐           ┌──────▼──────┐
-│  Auth  │            │Provisioning │           │   Credit    │
-│ Service│            │  Service     │           │  Manager    │
-└───┬────┘            └──────┬───────┘           └──────┬──────┘
-    │                         │                         │
-    │            ┌────────────┼────────────┐            │
-    │            │            │            │            │
-┌───▼───────────▼────────────▼────────────▼────────────▼──────┐
-│                     PostgreSQL Database                         │
-│  - users, subscriptions, credits, vps_instances, agents       │
-└─────────────────────────────────────────────────────────────────┘
-```
+Wapple consists of multiple layers working together:
 
-## 4.2 Key Services
+### 3.1.1 User Layer (Mobile App)
+The mobile application provides four main interfaces:
+- **Home (Mission Control)** - Dashboard with AI insights, active tasks, recommendations
+- **Chats** - Direct conversation with agents
+- **Projects** - File management from the VPS
+- **Agents** - Monitor and manage individual agents
 
-### 4.2.1 Auth Service
+### 3.1.2 Backend Layer (API Gateway)
+A central API server that:
+- Authenticates users
+- Manages subscriptions and credits
+- Routes requests to the correct user VPS
+- Handles billing through Stripe
 
-**Responsibilities:**
-- JWT token generation/validation
-- User registration/login
+### 3.1.3 Infrastructure Layer (Per-User VPS)
+Each user gets their own VPS running:
+- A Docker container with Openclaw
+- Their personalized configuration files
+- Isolated from other users
+
+### 3.1.4 External Services
+- **OpenRouter** - Provides AI LLM capabilities
+- **Stripe** - Payment processing
+- **Cloud Providers** - DigitalOcean/AWS for VPS hosting
+
+## 3.2 Communication Flows
+
+### 3.2.1 User Sends a Message
+
+When a user types a message in the mobile app:
+
+1. The mobile app sends the message to the backend API
+2. The backend validates the user's identity and credit balance
+3. The backend forwards the message to the user's Openclaw VPS via SSH/API
+4. Openclaw routes the message to the appropriate agent
+5. The agent processes the task and generates a response
+6. The response flows back through the VPS → backend → mobile app
+
+### 3.2.2 Real-Time Updates
+
+The mobile app maintains a WebSocket connection to receive:
+- Agent status changes (idle → working → idle)
+- Task completion notifications
+- New file alerts
+- Credit balance updates
+
+### 3.2.3 Credit Consumption
+
+Every time an AI agent generates a response:
+- The backend calculates token usage (input + output)
+- Credits are deducted from the user's balance
+- The transaction is logged for billing history
+
+---
+
+# 4. Infrastructure & Provisioning
+
+## 4.1 VPS Architecture
+
+### 4.1.1 Why Per-User VPS?
+
+Each Wapple subscriber gets a dedicated VPS because:
+- **Isolation** - One user's issues don't affect others
+- **Customization** - Each user can have unique agent configurations
+- **Security** - Full control over their data and agents
+- **Performance** - Guaranteed resources, no shared contention
+
+### 4.1.2 Tier Specifications
+
+| Tier | Provider | CPU | RAM | Storage | Monthly Cost |
+|------|----------|-----|-----|---------|--------------|
+| **Starter** | DigitalOcean | 1 vCPU | 1GB | 25GB | $5 |
+| **Pro** | DigitalOcean | 2 vCPU | 4GB | 50GB | $15 |
+| **Premium** | AWS | 2 vCPU | 4GB | 100GB | $25 |
+
+## 4.2 Provisioning Process
+
+When a new user subscribes:
+
+1. **Payment** - Stripe confirms payment
+2. **VPS Creation** - Backend creates a new droplet/instance
+3. **Docker Setup** - Install Docker on the VPS
+4. **Openclaw Deployment** - Pull and run Openclaw container
+5. **Configuration** - Generate user-specific .md files based on onboarding
+6. **API Key Generation** - Create unique key for the user
+7. **Testing** - Verify the instance is reachable
+8. **Activation** - Mark user as "ready" in the database
+
+This entire process takes approximately 5-10 minutes.
+
+## 4.3 Teardown Process
+
+When a user cancels:
+
+1. **Grace Period** - 30 days before actual deletion (configurable)
+2. **Backup** - Offer to download user data
+3. **Container Stop** - Gracefully stop Openclaw
+4. **Instance Destroy** - Delete the VPS
+5. **Database Cleanup** - Mark as terminated
+
+## 4.4 Infrastructure Management
+
+The backend uses Infrastructure as Code principles:
+- VPS creation/deletion is automated
+- Configuration is versioned
+- Health checks run continuously
+- Failed provisioning auto-retries
+
+---
+
+# 5. Backend Architecture
+
+## 5.1 Service Architecture
+
+The backend consists of five main services:
+
+### 5.1.1 Auth Service
+Handles:
+- User registration and login
+- JWT token generation and validation
 - OAuth integration (Google, Apple)
 - Session management
 
-**Endpoints:**
-```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/refresh
-POST   /api/auth/logout
-GET    /api/auth/me
-```
+### 5.1.2 Provisioning Service
+Handles:
+- Creating and destroying VPS instances
+- Monitoring VPS health
+- Managing Docker containers
+- Running Openclaw initialization scripts
 
-### 4.2.2 Provisioning Service
+### 5.1.3 Credit Manager
+Handles:
+- Tracking credit balances
+- Monitoring API usage
+- Enforcing tier limits
+- Processing Stripe payments
 
-**Responsibilities:**
-- VPS lifecycle management
-- Docker container orchestration
-- Openclaw initialization
-- Health monitoring
+### 5.1.4 File Sync Service
+Handles:
+- Polling user VPS for new files
+- Streaming files to mobile app
+- Generating file previews
+- Managing file metadata
 
-**Endpoints:**
-```
-POST   /api/provisioning/create
-GET    /api/provisioning/status/:userId
-POST   /api/provisioning/rebuild
-POST   /api/provisioning/stop
-POST   /api/provisioning/start
-DELETE /api/provisioning/terminate
-```
+### 5.1.5 Agent Manager
+Handles:
+- Listing user's agents
+- Managing agent configurations
+- Scheduling cron jobs
+- Tracking agent status
 
-### 4.2.3 Credit Manager
+## 5.2 Database Schema
 
-**Responsibilities:**
-- Track credit balances
-- Monitor API usage
-- Tier quota enforcement
-- Billing integration
+The system uses PostgreSQL with the following core tables:
 
-**Endpoints:**
-```
-GET    /api/credits/balance
-GET    /api/credits/usage
-POST   /api/credits/purchase
-GET    /api/credits/tiers
-```
-
-### 4.2.4 File Sync Service
-
-**Responsibilities:**
-- Poll user's VPS for new files
-- Stream files to mobile app
-- Manage file metadata
-- Handle file previews
-
-**Endpoints:**
-```
-GET    /api/files/list
-GET    /api/files/:id/download
-GET    /api/files/:id/metadata
-DELETE /api/files/:id
-```
-
-### 4.2.5 Agent Manager
-
-**Responsibilities:**
-- List user's agents
-- Create/update agent configs
-- Cron job management
-- Real-time status
-
-**Endpoints:**
-```
-GET    /api/agents
-GET    /api/agents/:id
-POST   /api/agents
-PUT    /api/agents/:id
-DELETE /api/agents/:id
-GET    /api/agents/:id/status
-POST   /api/agents/:id/task
-```
-
-## 4.3 Database Schema
-
-### 4.3.1 Core Tables
-
-```sql
--- Users table
-CREATE TABLE users (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email           VARCHAR(255) UNIQUE NOT NULL,
-    password_hash   VARCHAR(255),
-    name            VARCHAR(100),
-    avatar_url      TEXT,
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW(),
-    
-    -- Auth
-    provider        VARCHAR(20) DEFAULT 'email', -- 'google', 'apple', 'email'
-    provider_id     VARCHAR(255),
-    
-    -- Status
-    status          VARCHAR(20) DEFAULT 'active', -- 'active', 'suspended', 'deleted'
-    
-    -- Constraints
-    CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
-);
-
--- Subscriptions table
-CREATE TABLE subscriptions (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    tier            VARCHAR(20) NOT NULL, -- 'starter', 'pro', 'premium'
-    stripe_customer_id VARCHAR(255),
-    stripe_subscription_id VARCHAR(255),
-    
-    -- Limits
-    monthly_credits INTEGER DEFAULT 10000,
-    credits_used    INTEGER DEFAULT 0,
-    
-    -- Period
-    current_period_start TIMESTAMP,
-    current_period_end   TIMESTAMP,
-    
-    -- Status
-    status          VARCHAR(20) DEFAULT 'active',
-    created_at      TIMESTAMP DEFAULT NOW(),
-    cancelled_at    TIMESTAMP
-);
-
--- VPS Instances table
-CREATE TABLE vps_instances (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    
-    -- Provider details
-    provider        VARCHAR(20) NOT NULL, -- 'digitalocean', 'aws'
-    provider_id     VARCHAR(255), -- droplet ID / instance ID
-    ip_address      INET,
-    region          VARCHAR(20),
-    
-    -- Specs
-    tier            VARCHAR(20),
-    vcpus           INTEGER,
-    memory_gb       INTEGER,
-    storage_gb      INTEGER,
-    
-    -- Openclaw config
-    openclaw_api_key    VARCHAR(255),
-    ssh_port        INTEGER,
-    container_id    VARCHAR(255),
-    
-    -- Status
-    status          VARCHAR(20) DEFAULT 'provisioning', -- 'provisioning', 'running', 'stopped', 'terminated'
-    
-    created_at      TIMESTAMP DEFAULT NOW(),
-    started_at      TIMESTAMP,
-    terminated_at   TIMESTAMP
-);
-
--- Agents table (user's Openclaw agents)
-CREATE TABLE agents (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    vps_id          UUID REFERENCES vps_instances(id) ON DELETE CASCADE,
-    
-    -- Agent definition
-    name            VARCHAR(50) NOT NULL,
-    role            VARCHAR(50), -- 'research', 'developer', 'creative', etc.
-    emoji           VARCHAR(10),
-    system_prompt   TEXT,
-    
-    -- Configuration
-    model_preference VARCHAR(50),
-    temperature     FLOAT DEFAULT 0.7,
-    max_tokens      INTEGER DEFAULT 2048,
-    
-    -- Status
-    status          VARCHAR(20) DEFAULT 'idle', -- 'idle', 'working', 'sleeping'
-    last_active_at  TIMESTAMP,
-    
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW()
-);
-
--- Cron Jobs table
-CREATE TABLE cron_jobs (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    agent_id        UUID REFERENCES agents(id) ON DELETE CASCADE,
-    
-    -- Job definition
-    name            VARCHAR(100),
-    schedule        VARCHAR(100), -- cron expression
-    task            TEXT NOT NULL,
-    
-    -- Status
-    enabled         BOOLEAN DEFAULT TRUE,
-    last_run_at     TIMESTAMP,
-    next_run_at     TIMESTAMP,
-    status          VARCHAR(20) DEFAULT 'active',
-    
-    created_at      TIMESTAMP DEFAULT NOW()
-);
-
--- Credit Transactions table
-CREATE TABLE credit_transactions (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    
-    -- Transaction details
-    type            VARCHAR(20) NOT NULL, -- 'purchase', 'usage', 'refund', 'bonus'
-    amount          INTEGER NOT NULL,
-    balance_after   INTEGER NOT NULL,
-    
-    -- Source
-    stripe_payment_id VARCHAR(255),
-    
-    -- Metadata
-    description     TEXT,
-    
-    created_at      TIMESTAMP DEFAULT NOW()
-);
-
--- API Usage Log table
-CREATE TABLE api_usage_logs (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    
-    -- Usage details
-    provider        VARCHAR(20) NOT NULL, -- 'openrouter'
-    model           VARCHAR(50) NOT NULL,
-    input_tokens    INTEGER DEFAULT 0,
-    output_tokens   INTEGER DEFAULT 0,
-    total_tokens    INTEGER GENERATED ALWAYS AS (input_tokens + output_tokens) STORED,
-    
-    -- Cost
-    cost_cents      INTEGER DEFAULT 0,
-    
-    -- Context
-    agent_id        UUID REFERENCES agents(id) ON DELETE SET NULL,
-    conversation_id UUID,
-    
-    created_at      TIMESTAMP DEFAULT NOW()
-);
-
--- Conversations table
-CREATE TABLE conversations (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    agent_id        UUID REFERENCES agents(id) ON DELETE SET NULL,
-    
-    -- Chat details
-    title           VARCHAR(200),
-    message_count   INTEGER DEFAULT 0,
-    
-    -- Context
-    context         JSONB,
-    
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW()
-);
-
--- Messages table
-CREATE TABLE messages (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
-    role            VARCHAR(20) NOT NULL, -- 'user', 'assistant', 'system'
-    content         TEXT NOT NULL,
-    tokens          INTEGER,
-    
-    created_at      TIMESTAMP DEFAULT NOW()
-);
-
--- Files table (user's project files)
-CREATE TABLE files (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-    vps_id          UUID REFERENCES vps_instances(id) ON DELETE CASCADE,
-    
-    -- File details
-    name            VARCHAR(255) NOT NULL,
-    path            TEXT NOT NULL,
-    size_bytes      BIGINT,
-    mime_type       VARCHAR(100),
-    
-    -- Metadata
-    agent_id        UUID REFERENCES agents(id) ON DELETE SET NULL,
-    checksum        VARCHAR(64),
-    
-    -- Sync status
-    synced_at       TIMESTAMP,
-    local_path      TEXT,
-    
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW()
-);
-
--- User Preferences table
-CREATE TABLE user_preferences (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id         UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
-    
-    -- Onboarding completed
-    onboarding_complete BOOLEAN DEFAULT FALSE,
-    
-    -- Preference categories (JSONB)
-    communication   JSONB DEFAULT '{"tone": "balanced", "format": "mixed"}',
-    ai_behavior     JSONB DEFAULT '{"creativity": 0.7, "verbosity": "medium"}',
-    notifications   JSONB DEFAULT '{"push": true, "email": true, "frequency": "instant"}',
-    privacy         JSONB DEFAULT '{"share_analytics": true, "data_retention": "90_days"}',
-    
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW()
-);
-```
-
-## 4.4 Openclaw .md File Management
-
-### 4.4.1 Dynamic Configuration Files
-
-When a user completes onboarding, the backend generates these files on their VPS:
-
-```
-/home/ubuntu/.openclaw/workspace/
-├── USER.md          # User identity & preferences
-├── SOUL.md          # User persona & communication style
-├── AGENTS.md        # Agent team structure
-└── config/
-    ├── tier.json    # Credit limits & quotas
-    └── providers.json # API providers enabled
-```
-
-### 4.4.2 File Generation Service
-
-```typescript
-// services/config-generator.ts
-class ConfigGenerator {
-    
-    async generateUserFiles(userId: string, preferences: UserPreferences): Promise<void> {
-        const files = {
-            'USER.md': this.generateUSERMd(preferences),
-            'SOUL.md': this.generateSOULMd(preferences),
-            'AGENTS.md': this.generateAGENTSMd(preferences),
-            'config/tier.json': this.generateTierJson(userId),
-            'config/providers.json': this.generateProvidersJson(userId)
-        };
-        
-        // Upload to user's VPS via SSH
-        for (const [filename, content] of Object.entries(files)) {
-            await this.scpToVps(userId, filename, content);
-        }
-    }
-    
-    private generateUSERMd(prefs: UserPreferences): string {
-        return `# USER.md - User Profile
-        
-**Name:** ${prefs.name}
-**Timezone:** ${prefs.timezone}
-**Language:** ${prefs.language}
-
-## Communication Preferences
-- Tone: ${pref.communication.tone}
-- Detail level: ${pref.communication.verbosity}
-- Format: ${pref.communication.format}
-
-## Interests
-${prefs.interests.map(i => `- ${i}`).join('\n')}
-
-## Goals
-${prefs.goals.map(g => `- ${g}`).join('\n')}
-
-_Last Updated: ${new Date().toISOString()}_
-`;
-    }
-    
-    private generateSOULMd(prefs: UserPreferences): string {
-        return `# SOUL.md - User Persona
-
-**You are talking to:** ${prefs.name}
-
-## Communication Style
-- Tone: ${pref.tone}
-- Be ${pref.detailLevel}
-- Use ${pref.format}
-
-## What They Care About
-${prefs.careAbout.map(c => `- ${c}`).join('\n')}
-
-## What They Don't Like
-${prefs.dislike.map(d => `- ${d}`).join('\n')}
-
-_Last Updated: ${new Date().toISOString()}_
-`;
-    }
-}
-```
+- **users** - User accounts and profiles
+- **subscriptions** - Tier, billing status, credit limits
+- **vps_instances** - VPS details, status, provider info
+- **agents** - User's Openclaw agent configurations
+- **cron_jobs** - Scheduled tasks
+- **credit_transactions** - Purchase and usage history
+- **api_usage_logs** - Detailed AI API usage
+- **conversations** - Chat threads
+- **messages** - Individual messages
+- **files** - Synced project files
+- **user_preferences** - Onboarding and settings
 
 ---
 
-# 5. Frontend Architecture
+# 6. Frontend Architecture
 
-## 5.1 Technology Stack
+## 6.1 Technology Stack
 
-| Layer | Technology | Rationale |
-|-------|------------|-----------|
-| **Framework** | React Native (Expo) | Cross-platform, faster dev |
-| **Language** | TypeScript | Type safety |
-| **State** | Zustand | Simpler than Redux, performant |
-| **Navigation** | React Navigation 6 | Tab + Stack hybrid |
-| **UI Components** | React Native Paper | Material Design 3 |
-| **HTTP Client** | Axios | Interceptors, error handling |
-| **WebSocket** | Socket.io-client | Real-time updates |
-| **Storage** | MMKV | Fast key-value storage |
-| **Forms** | React Hook Form | Performance |
+| Layer | Technology | Why |
+|-------|------------|-----|
+| **Framework** | React Native (Expo) | Cross-platform, faster development |
+| **Language** | TypeScript | Type safety reduces bugs |
+| **State** | Zustand | Simpler than Redux, excellent performance |
+| **Navigation** | React Navigation | Supports tabs and stacks |
+| **UI Components** | React Native Paper | Material Design 3 components |
+| **HTTP** | Axios | Great interceptors and error handling |
+| **Real-time** | Socket.io | WebSocket connections |
+| **Storage** | MMKV | Very fast key-value storage |
 
-## 5.2 App Structure
+## 6.2 App Structure
 
-```
-src/
-├── App.tsx                    # Root component
-├── navigation/
-│   ├── RootNavigator.tsx      # Main navigation
-│   ├── MainTabs.tsx           # Bottom tab navigator
-│   └── types.ts               # Navigation types
-├── screens/
-│   ├── onboarding/
-│   │   ├── WelcomeScreen.tsx
-│   │   ├── PreferencesScreen.tsx
-│   │   └── CompleteScreen.tsx
-│   ├── home/
-│   │   └── HomeScreen.tsx     # Mission Control
-│   ├── chats/
-│   │   ├── ChatsListScreen.tsx
-│   │   └── ChatScreen.tsx
-│   ├── projects/
-│   │   ├── ProjectsListScreen.tsx
-│   │   └── ProjectDetailScreen.tsx
-│   └── agents/
-│       ├── AgentsListScreen.tsx
-│       ├── AgentDetailScreen.tsx
-│       └── CreateAgentScreen.tsx
-├── components/
-│   ├── common/
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   └── Input.tsx
-│   ├── agents/
-│   │   ├── AgentCard.tsx
-│   │   ├── AgentStatusBadge.tsx
-│   │   └── TaskInput.tsx
-│   ├── chats/
-│   │   ├── MessageBubble.tsx
-│   │   └── TypingIndicator.tsx
-│   └── home/
-│       ├── TaskCard.tsx
-│       ├── InsightCard.tsx
-│       └── QuickAction.tsx
-├── services/
-│   ├── api.ts                 # Axios instance
-│   ├── auth.ts                # Auth methods
-│   ├── socket.ts             # WebSocket manager
-│   └── credits.ts             # Credit operations
-├── stores/
-│   ├── authStore.ts           # User auth state
-│   ├── chatStore.ts           # Chat messages
-│   ├── agentsStore.ts         # Agent list/status
-│   ├── creditsStore.ts       # Credit balance
-│   └── filesStore.ts          # Project files
-├── hooks/
-│   ├── useAuth.ts
-│   ├── useSocket.ts
-│   ├── useCredits.ts
-│   └── useAgents.ts
-├── utils/
-│   ├── format.ts
-│   ├── validators.ts
-│   └── constants.ts
-└── types/
-    ├── user.ts
-    ├── agent.ts
-    ├── message.ts
-    └── file.ts
-```
+The mobile app is organized into these main screens:
 
-## 5.3 State Management (Zustand)
+### Home (Mission Control)
+The main dashboard showing:
+- Personalized greetings ("Good morning, [Name]")
+- Quick action buttons (Research, Create, Analyze, Chat)
+- AI-generated insights and recommendations
+- List of active tasks with status
 
-```typescript
-// stores/chatStore.ts
-import { create } from 'zustand';
+### Chats
+Conversational interface featuring:
+- List of conversations with agents
+- Real-time messaging with typing indicators
+- Agent avatars and status
+- Message history
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: Date;
-  agentId?: string;
-}
+### Projects
+File management interface with:
+- Grid/list view of project files
+- File previews and thumbnails
+- Download and sync status
+- Search and filter options
 
-interface ChatState {
-  conversations: Map<string, Message[]>;
-  activeConversationId: string | null;
-  
-  // Actions
-  sendMessage: (content: string) => Promise<void>;
-  receiveMessage: (message: Message) => void;
-  loadConversation: (id: string) => Promise<void>;
-  clearConversation: (id: string) => void;
-}
+### Agents
+Agent management hub displaying:
+- All 8 agents with their status
+- Ability to create new agents
+- Configuration options per agent
+- Task assignment interface
+- Cron job scheduling
 
-export const useChatStore = create<ChatState>((set, get) => ({
-  conversations: new Map(),
-  activeConversationId: null,
-  
-  sendMessage: async (content: string) => {
-    const { activeConversationId } = get();
-    if (!activeConversationId) return;
-    
-    // Add user message locally
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content,
-      timestamp: new Date()
-    };
-    
-    set(state => {
-      const conv = state.conversations.get(activeConversationId) || [];
-      state.conversations.set(activeConversationId, [...conv, userMessage]);
-    });
-    
-    // Send to API
-    await api.post(`/chat/${activeConversationId}/messages`, { content });
-  },
-  
-  receiveMessage: (message: Message) => {
-    set(state => {
-      const { activeConversationId } = state;
-      if (!activeConversationId) return state;
-      
-      const conv = state.conversations.get(activeConversationId) || [];
-      state.conversations.set(activeConversationId, [...conv, message]);
-    });
-  },
-  
-  loadConversation: async (id: string) => {
-    const messages = await api.get(`/chat/${id}/messages`);
-    set(state => {
-      state.conversations.set(id, messages);
-      state.activeConversationId = id;
-    });
-  },
-  
-  clearConversation: (id: string) => {
-    set(state => state.conversations.delete(id));
-  }
-}));
-```
+## 6.3 Real-Time Updates
 
-## 5.4 Real-Time Updates (Socket.io)
-
-```typescript
-// services/socket.ts
-import { io, Socket } from 'socket.io-client';
-import { useChatStore } from '../stores/chatStore';
-import { useAgentsStore } from '../stores/agentsStore';
-
-class SocketManager {
-  private socket: Socket | null = null;
-  
-  connect(userId: string, token: string): void {
-    this.socket = io(SOCKET_URL, {
-      auth: { token },
-      query: { userId }
-    });
-    
-    this.setupListeners();
-  }
-  
-  private setupListeners(): void {
-    if (!this.socket) return;
-    
-    // Agent status updates
-    this.socket.on('agent:status', (data) => {
-      useAgentsStore.getState().updateAgentStatus(data);
-    });
-    
-    // New messages
-    this.socket.on('chat:message', (message) => {
-      useChatStore.getState().receiveMessage(message);
-    });
-    
-    // Task completion
-    this.socket.on('task:completed', (task) => {
-      // Show notification
-      Notifications.show({
-        title: 'Task Complete',
-        body: task.description
-      });
-    });
-    
-    // File synced
-    this.socket.on('file:synced', (file) => {
-      useFilesStore.getState().addFile(file);
-    });
-  }
-  
-  disconnect(): void {
-    this.socket?.disconnect();
-  }
-}
-
-export const socketManager = new SocketManager();
-```
-
-## 5.5 UI Mockup Analysis
-
-Based on the attached mockups, the app has these key screens:
-
-### Screen 1: Home (Mission Control)
-- **Header:** "Good morning, [Name]" with date
-- **Greeting:** "How can I help you today?"
-- **Action buttons:** Quick actions (Research, Create, Analyze, Chat)
-- **Cards:** AI-powered insights and recommendations
-- **Active tasks:** List of ongoing agent tasks with status
-- **Bottom nav:** Home, Chats, Projects, Agents icons
-
-### Screen 2: Chats
-- **Header:** "Chats" with search icon
-- **Chat list:** Avatar, name, last message preview, timestamp, unread badge
-- **FAB:** New chat button (bottom right)
-- **Agent icons:** Each agent has distinct emoji/avatar
-
-### Screen 3: Projects
-- **Header:** "Projects" with filter/sort options
-- **Project cards:** Thumbnail, title, description, file count, last modified
-- **Status indicators:** Syncing, synced, error states
-- **FAB:** Create new project
-
-### Screen 4: Agents
-- **Header:** "Agents" with add button
-- **Agent cards:** Avatar/emoji, name, role, status (active/idle/sleeping)
-- **Status colors:** Green (active), Yellow (working), Gray (idle)
-- **Actions:** Tap to view details, long-press for quick actions
+The app maintains a persistent WebSocket connection to receive:
+- Agent status changes
+- New messages
+- Task completion alerts
+- File sync notifications
+- Credit balance updates
 
 ---
 
-# 6. Core Algorithms & Logic
+# 7. Core Algorithms & Logic
 
-## 6.1 Credit Management System
+## 7.1 Credit Management
 
-### 6.1.1 Credit Deduction Logic
+### 7.1.1 How Credits Work
 
-```typescript
-// services/credit-manager.ts
-class CreditManager {
-  
-  /**
-   * Deduct credits for API usage
-   * Called after each LLM response
-   */
-  async deductForLLMUsage(
-    userId: string,
-    inputTokens: number,
-    outputTokens: number,
-    model: string
-  ): Promise<{ success: boolean; remaining: number }> {
-    
-    // Get model's cost per 1M tokens
-    const costPerM = MODEL_COSTS[model];
-    const totalCost = ((inputTokens + outputTokens) / 1_000_000) * costPerM;
-    
-    // Get user's subscription tier
-    const subscription = await db.subscriptions.findOne({ userId });
-    
-    // Check if user has enough credits
-    const available = subscription.monthly_credits - subscription.credits_used;
-    
-    if (available < totalCost) {
-      // Insufficient credits
-      await this.handleInsufficientCredits(userId);
-      return { success: false, remaining: available };
-    }
-    
-    // Deduct credits
-    await db.subscriptions.update(
-      { userId },
-      { 
-        credits_used: subscription.credits_used + Math.ceil(totalCost)
-      }
-    );
-    
-    // Log transaction
-    await db.credit_transactions.create({
-      userId,
-      type: 'usage',
-      amount: -Math.ceil(totalCost),
-      balance_after: subscription.monthly_credits - subscription.credits_used - Math.ceil(totalCost),
-      description: `LLM: ${model} (${inputTokens + outputTokens} tokens)`
-    });
-    
-    return { 
-      success: true, 
-      remaining: available - Math.ceil(totalCost) 
-    };
-  }
-  
-  /**
-   * Calculate if user is approaching limit
-   */
-  async checkQuota(userId: string): Promise<{
-    available: number;
-    limit: number;
-    percentage: number;
-    shouldAlert: boolean;
-  }> {
-    const sub = await db.subscriptions.findOne({ userId });
-    const available = sub.monthly_credits - sub.credits_used;
-    const percentage = (sub.credits_used / sub.monthly_credits) * 100;
-    
-    return {
-      available,
-      limit: sub.monthly_credits,
-      percentage: Math.round(percentage),
-      shouldAlert: percentage >= 80
-    };
-  }
-}
+Each subscription tier includes a monthly credit allowance:
 
-// Model pricing (per 1M tokens)
-const MODEL_COSTS: Record<string, number> = {
-  'anthropic/claude-3.5-sonnet': 3.00,
-  'openai/gpt-4o': 15.00,
-  'google/gemini-pro': 1.25,
-  'mistralai/mixtral-8x7b': 0.24,
-  // Default fallback
-  'default': 5.00
-};
-```
+| Tier | Monthly Credits | Cost |
+|------|-----------------|------|
+| Starter | 10,000 | $9.99 |
+| Pro | 25,000 | $39.99 |
+| Premium | 100,000 | $129.99 |
 
-### 6.1.2 Credit Purchase Flow
+### 7.1.2 Credit Deduction
 
-```typescript
-// Stripe checkout session creation
-async function createCreditPurchaseSession(
-  userId: string,
-  packageId: string
-): Promise<string> {
-  
-  const pkg = CREDIT_PACKAGES[packageId];
-  
-  const session = await stripe.checkout.sessions.create({
-    customer: await getStripeCustomerId(userId),
-    payment_method_types: ['card'],
-    line_items: [{
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: pkg.name,
-          description: `${pkg.credits} AI Credits`
-        },
-        unit_amount: Math.round(pkg.price * 100)
-      },
-      quantity: 1
-    }],
-    mode: 'payment',
-    success_url: `${APP_URL}/credits/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${APP_URL}/credits/cancel`,
-    metadata: {
-      userId,
-      credits: pkg.credits.toString(),
-      packageId
-    }
-  });
-  
-  return session.url;
-}
+When an AI agent responds to a user:
 
-const CREDIT_PACKAGES = {
-  starter: { name: 'Starter Pack', credits: 5000, price: 9.99 },
-  pro: { name: 'Pro Pack', credits: 25000, price: 39.99 },
-  premium: { name: 'Premium Pack', credits: 100000, price: 129.99 }
-};
-```
+1. Count input tokens (user's message)
+2. Count output tokens (AI's response)
+3. Look up the model's price per million tokens
+4. Calculate cost: (total tokens / 1,000,000) × price
+5. Subtract from user's balance
+6. Log the transaction
 
-## 6.2 Cron Job Execution
+### 7.1.3 Credit Alerts
 
-### 6.2.1 User Cron Job Scheduling
+- At 80% usage: Show warning banner
+- At 100%: Block new AI requests until purchase
 
-```typescript
-// services/cron-scheduler.ts
-class CronScheduler {
-  
-  /**
-   * Parse cron expression and calculate next run
-   */
-  parseCron(expression: string): { nextRun: Date; interval: string } {
-    const cron = parser.parseExpression(expression);
-    const nextRun = cron.next().toDate();
-    
-    return {
-      nextRun,
-      interval: this.getHumanInterval(expression)
-    };
-  }
-  
-  /**
-   * Execute a user's cron job on their VPS
-   */
-  async executeCronJob(jobId: string): Promise<void> {
-    const job = await db.cron_jobs.findOne({ id: jobId });
-    const vps = await db.vps_instances.findOne({ id: job.vps_id });
-    
-    // Connect to user's VPS via SSH
-    const ssh = await this.getSSHConnection(vps);
-    
-    // Execute the Openclaw command
-    const result = await ssh.exec(
-      `docker exec openclaw-${job.user_id} openclaw run --task "${job.task}"`
-    );
-    
-    // Log execution
-    await db.cron_jobs.update(jobId, {
-      last_run_at: new Date(),
-      next_run_at: this.calculateNextRun(job.schedule)
-    });
-    
-    // Notify user if configured
-    if (job.notify_on_complete) {
-      await notifications.send(job.user_id, {
-        title: 'Scheduled Task Complete',
-        body: job.name
-      });
-    }
-  }
-  
-  /**
-   * Background worker that checks and executes due cron jobs
-   */
-  startCronWorker(): void {
-    setInterval(async () => {
-      const dueJobs = await db.cron_jobs.find({
-        enabled: true,
-        next_run_at: { $lte: new Date() }
-      });
-      
-      for (const job of dueJobs) {
-        this.executeCronJob(job.id).catch(err => {
-          console.error(`Cron job ${job.id} failed:`, err);
-        });
-      }
-    }, 60000); // Check every minute
-  }
-}
-```
+### 7.1.4 Purchasing Credits
 
-## 6.3 File Synchronization
+Users can buy additional credit packs through Stripe:
+- Starter Pack: $9.99 for 5,000 credits
+- Pro Pack: $39.99 for 25,000 credits
+- Premium Pack: $129.99 for 100,000 credits
 
-### 6.3.1 VPS to Mobile File Sync
+## 7.2 Cron Job Execution
 
-```typescript
-// services/file-sync.ts
-class FileSyncService {
-  
-  /**
-   * Poll user's VPS for new/modified files
-   */
-  async syncFiles(userId: string): Promise<File[]> {
-    const vps = await db.vps_instances.findOne({ userId });
-    const ssh = await this.getSSHConnection(vps);
-    
-    // List files in workspace
-    const remoteFiles = await ssh.exec(
-      `docker exec openclaw-${userId} find /home/ubuntu/.openclaw/workspace -type f -mmin -60`
-    );
-    
-    const fileList = remoteFiles.stdout.split('\n').filter(Boolean);
-    const newFiles: File[] = [];
-    
-    for (const filePath of fileList) {
-      // Check if file exists in our DB
-      const existing = await db.files.findOne({ 
-        userId, 
-        path: filePath 
-      });
-      
-      if (!existing) {
-        // New file - add to database
-        const fileInfo = await this.getFileInfo(ssh, filePath);
-        const file = await db.files.create({
-          userId,
-          vps_id: vps.id,
-          ...fileInfo
-        });
-        newFiles.push(file);
-      } else {
-        // Check if modified
-        const currentChecksum = await this.getChecksum(ssh, filePath);
-        if (currentChecksum !== existing.checksum) {
-          await db.files.update(existing.id, {
-            checksum: currentChecksum,
-            synced_at: new Date()
-          });
-        }
-      }
-    }
-    
-    return newFiles;
-  }
-  
-  /**
-   * Stream file download from VPS to mobile
-   */
-  async downloadFile(fileId: string, onProgress: (percent: number) => void): Promise<Blob> {
-    const file = await db.files.findOne({ id: fileId });
-    const vps = await db.vps_instances.findOne({ id: file.vps_id });
-    
-    // Create SSH tunnel for streaming
-    const ssh = await this.getSSHConnection(vps);
-    
-    return new Promise((resolve, reject) => {
-      const stream = ssh.scp.read(file.path, (err, stream) => {
-        if (err) return reject(err);
-        
-        const chunks: Buffer[] = [];
-        let downloaded = 0;
-        
-        stream.on('data', (chunk: Buffer) => {
-          chunks.push(chunk);
-          downloaded += chunk.length;
-          onProgress((downloaded / file.size_bytes) * 100);
-        });
-        
-        stream.on('end', () => {
-          resolve(Buffer.concat(chunks));
-        });
-      });
-    });
-  }
-}
-```
+### 7.2.1 How Cron Jobs Work
+
+Users can schedule recurring tasks:
+
+1. User defines task and schedule (e.g., "Research AI news daily at 8am")
+2. Backend calculates next run time
+3. Background worker checks every minute for due jobs
+4. When due, connects to user's VPS via SSH
+5. Executes Openclaw command with the task
+6. Logs completion and schedules next run
+
+### 7.2.2 Built-in Cron Jobs
+
+Openclaw includes default scheduled tasks:
+- Morning standup (09:00)
+- Evening standup (17:00)
+- Intelligence sweep (08:00)
+- Security report (20:00)
+
+## 7.3 File Synchronization
+
+### 7.3.1 How File Sync Works
+
+The app needs to show files from the user's VPS:
+
+1. Backend SSHs into VPS every few minutes
+2. Lists files modified in workspace
+3. Compares with database records
+4. For new files: add to database, notify app
+5. For changed files: update checksum, notify app
+
+### 7.3.2 File Downloads
+
+When user wants to download a file:
+1. App requests file from backend
+2. Backend streams via SCP through SSH
+3. Progress updates sent to app
+4. File saved to device storage
 
 ---
 
-# 7. Security Architecture
+# 8. Security Architecture
 
-## 7.1 Authentication & Authorization
+## 8.1 Authentication
 
-### 7.1.1 JWT Token Flow
+### 8.1.1 JWT-Based Auth
 
-```
-User Login
-    │
-    ▼
-Backend validates credentials
-    │
-    ▼
-Generate JWT tokens:
-├── Access Token (15 min expiry)
-│   └── Used for API requests
-└── Refresh Token (7 days expiry)
-    └── Used to get new access tokens
-    │
-    ▼
-Store refresh token in httpOnly cookie
-    │
-    ▼
-Client stores access token in memory (Zustand)
-```
+The system uses JSON Web Tokens:
+- **Access Token** - Short-lived (15 minutes), used for API requests
+- **Refresh Token** - Long-lived (7 days), used to get new access tokens
 
-### 7.1.2 Token Structure
+### 8.1.2 OAuth Support
 
-```typescript
-// Access Token Payload
-interface AccessToken {
-  sub: string;        // userId
-  email: string;
-  tier: 'starter' | 'pro' | 'premium';
-  iat: number;
-  exp: number;
-}
+Users can sign in with:
+- Email and password
+- Google account
+- Apple ID
 
-// Refresh Token Payload
-interface RefreshToken {
-  sub: string;
-  type: 'refresh';
-  iat: number;
-  exp: number;
-}
-```
+## 8.2 API Security
 
-## 7.2 API Security
+### 8.2.1 Rate Limiting
 
-### 7.2.1 Rate Limiting
+Different endpoints have different limits:
 
-| Endpoint | Limit | Window |
-|----------|-------|--------|
-| `/api/chat/*` | 60 | 1 minute |
-| `/api/agents/*` | 30 | 1 minute |
-| `/api/files/*` | 20 | 1 minute |
-| `/api/credits/*` | 10 | 1 minute |
+| Endpoint | Requests/Minute |
+|----------|-----------------|
+| Chat messages | 60 |
+| Agent operations | 30 |
+| File operations | 20 |
+| Credit operations | 10 |
 
-### 7.2.2 Request Validation
+### 8.2.2 Input Validation
 
-```typescript
-// middleware/validate.ts
-const chatMessageSchema = z.object({
-  content: z.string()
-    .min(1, 'Message cannot be empty')
-    .max(10000, 'Message too long'),
-  agentId: z.string().uuid().optional(),
-  conversationId: z.string().uuid().optional()
-});
+All user input is validated:
+- Message length limits
+- Proper data types
+- SQL injection prevention
+- XSS protection
 
-function validateChatMessage(req: Request, res: Response, next: NextFunction) {
-  const result = chatMessageSchema.safeParse(req.body);
-  
-  if (!result.success) {
-    return res.status(400).json({
-      error: 'Validation failed',
-      details: result.error.issues
-    });
-  }
-  
-  req.validated = result.data;
-  next();
-}
-```
+## 8.3 VPS Security
 
-## 7.3 VPS Security
-
-### 7.3.1 Network Isolation
-
-```
-User's VPS
-    │
-    ├── Firewall (UFW)
-    │       ├── 22   (SSH) - Limited to backend IP
-    │       ├── 443  (HTTPS) - Openclaw API
-    │       └── 80   (HTTP) - Redirect to HTTPS
-    │
-    ├── Container isolation (Docker)
-    │       └── Each user in separate container
-    │
-    └── No direct SSH for users
-            └── All access via mobile app API
-```
+Each user's VPS has:
+- Firewall only allowing SSH and HTTPS
+- All access through the mobile app API
+- No direct user SSH access
+- Docker container isolation
 
 ---
 
-# 8. Data Models & Schemas
+# 9. Data Models
 
-## 8.1 API Response Types
+## 9.1 User Data
 
-```typescript
-// src/types/api.ts
+The system stores:
+- Profile information (name, email, avatar)
+- Subscription details (tier, status, period)
+- Credit balance and usage history
+- Onboarding preferences
 
-// Generic API Response
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
-  };
-}
+## 9.2 Agent Data
 
-// User
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatarUrl?: string;
-  createdAt: Date;
-  subscription: Subscription;
-  credits: CreditInfo;
-}
+Each user's Openclaw agents store:
+- Agent name and role
+- System prompt customization
+- Model preferences
+- Temperature and token settings
+- Current status
 
-// Subscription
-interface Subscription {
-  tier: 'starter' | 'pro' | 'premium';
-  status: 'active' | 'cancelled' | 'past_due';
-  currentPeriodEnd: Date;
-  creditsRemaining: number;
-  creditsUsed: number;
-}
+## 9.3 Conversation Data
 
-// Agent
-interface Agent {
-  id: string;
-  name: string;
-  role: string;
-  emoji: string;
-  status: 'idle' | 'working' | 'sleeping';
-  currentTask?: Task;
-  lastActiveAt: Date;
-  modelPreference: string;
-  config: AgentConfig;
-}
+Chat history includes:
+- Messages with timestamps
+- Token counts per message
+- Agent attribution
+- Context for continuity
 
-// Conversation
-interface Conversation {
-  id: string;
-  agentId: string;
-  agentName: string;
-  agentEmoji: string;
-  lastMessage: string;
-  lastMessageAt: Date;
-  unreadCount: number;
-}
+## 9.4 File Data
 
-// Message
-interface Message {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: Date;
-  agentId?: string;
-  tokens?: number;
-}
-
-// Project File
-interface ProjectFile {
-  id: string;
-  name: string;
-  path: string;
-  size: number;
-  mimeType: string;
-  agentId?: string;
-  syncedAt: Date;
-  status: 'synced' | 'syncing' | 'error';
-}
-
-// Task
-interface Task {
-  id: string;
-  agentId: string;
-  description: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  result?: string;
-  createdAt: Date;
-  completedAt?: Date;
-}
-```
-
----
-
-# 9. API Reference
-
-## 9.1 Authentication
-
-### POST /api/auth/register
-Create a new user account.
-
-**Request:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword",
-  "name": "John Doe"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "name": "John Doe"
-    },
-    "accessToken": "eyJ...",
-    "refreshToken": "eyJ..."
-  }
-}
-```
-
-### POST /api/auth/login
-Authenticate user.
-
-**Request:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-
-## 9.2 Chat
-
-### POST /api/chat/:conversationId/messages
-Send a message to an agent.
-
-**Request:**
-```json
-{
-  "content": "Research the latest AI developments",
-  "agentId": "agent-uuid"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "message": {
-      "id": "msg-uuid",
-      "role": "assistant",
-      "content": "I'll research that for you...",
-      "timestamp": "2026-02-25T12:00:00Z"
-    },
-    "creditsUsed": 150
-  }
-}
-```
-
-## 9.3 Agents
-
-### GET /api/agents
-List user's agents.
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "agents": [
-      {
-        "id": "uuid",
-        "name": "Scout",
-        "role": "Research",
-        "emoji": "🔍",
-        "status": "idle"
-      }
-    ]
-  }
-}
-```
-
-### POST /api/agents/:id/task
-Assign task to agent.
-
-**Request:**
-```json
-{
-  "task": "Find information about X",
-  "schedule": "now" | "cron: 0 9 * * *"
-}
-```
-
-## 9.4 Credits
-
-### GET /api/credits/balance
-Get current credit balance.
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "balance": 8500,
-    "limit": 10000,
-    "percentageUsed": 15,
-    "resetDate": "2026-03-01T00:00:00Z"
-  }
-}
-```
+Project files track:
+- File name and path
+- Size and type
+- Sync status
+- Agent that created it
 
 ---
 
@@ -1585,41 +591,40 @@ Get current credit balance.
 
 ## Phase 1: MVP (Weeks 1-4)
 
-| Week | Tasks |
-|------|-------|
-| 1 | Project setup, Auth service, Database schema |
-| 2 | VPS provisioning, Openclaw Docker image |
-| 3 | Mobile app - Auth screens, basic navigation |
-| 4 | Mobile app - Chat interface, agent list |
+| Week | Focus | Deliverables |
+|------|-------|--------------|
+| 1 | Foundation | Project setup, Auth service, Database |
+| 2 | Infrastructure | VPS provisioning, Openclaw Docker setup |
+| 3 | Mobile Core | Auth screens, navigation, basic UI |
+| 4 | Chat | Messaging interface, agent communication |
 
 ## Phase 2: Core Features (Weeks 5-8)
 
-| Week | Tasks |
-|------|-------|
-| 5 | Credit system, Stripe integration |
-| 6 | File sync, Projects screen |
-| 7 | Cron jobs, Agent management |
-| 8 | Push notifications, Real-time updates |
+| Week | Focus | Deliverables |
+|------|-------|--------------|
+| 5 | Payments | Credit system, Stripe integration |
+| 6 | Files | File sync, Projects screen |
+| 7 | Automation | Cron jobs, Agent management |
+| 8 | Real-time | Push notifications, live updates |
 
 ## Phase 3: Polish (Weeks 9-12)
 
-| Week | Tasks |
-|------|-------|
-| 9 | Onboarding flow, Preferences |
-| 10 | Performance optimization |
-| 11 | Security audit |
-| 12 | Beta testing, Bug fixes |
+| Week | Focus | Deliverables |
+|------|-------|--------------|
+| 9 | Onboarding | Preference collection, personalization |
+| 10 | Performance | Optimization, caching |
+| 11 | Security | Audit, penetration testing |
+| 12 | Launch | Beta testing, bug fixes, release |
 
 ---
 
-# Appendices
+# Appendix A: Environment Variables
 
-## A. Environment Variables
+The system requires these environment variables:
 
 ```bash
 # Backend
 NODE_ENV=production
-PORT=3000
 DATABASE_URL=postgresql://...
 
 # Stripe
@@ -1630,12 +635,12 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 JWT_SECRET=...
 JWT_REFRESH_SECRET=...
 
-# VPS Providers
+# Cloud Providers
 DO_API_TOKEN=...
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
 
-# OpenRouter
+# AI
 OPENROUTER_API_KEY=...
 
 # Mobile App
@@ -1643,39 +648,50 @@ EXPO_PUBLIC_API_URL=https://api.wapple.io
 EXPO_PUBLIC_WS_URL=wss://api.wapple.io
 ```
 
-## B. Docker Configuration (Openclaw VPS)
+---
 
-```dockerfile
-# Dockerfile for user Openclaw instance
-FROM node:20-alpine
+# Appendix B: Error Handling
 
-WORKDIR /app
+| Error Code | Meaning | Resolution |
+|------------|---------|-------------|
+| AUTH_INVALID | Wrong credentials | User should reset password |
+| AUTH_EXPIRED | Token expired | Re-authenticate |
+| CREDITS_INSUFFICIENT | No credits left | Purchase more credits |
+| VPS_NOT_READY | Still provisioning | Wait 10 minutes |
+| AGENT_BUSY | Agent is working | Try again later |
+| FILE_TOO_LARGE | Exceeds limit | Use smaller file |
 
-# Install Openclaw
-RUN npm install -g openclaw
+---
 
-# Copy user-specific config
-COPY config/ ./config/
+# Appendix C: API Endpoints Summary
 
-# Expose API port
-EXPOSE 3000
+## Authentication
+- POST /api/auth/register - Create account
+- POST /api/auth/login - Sign in
+- POST /api/auth/refresh - Get new token
+- GET /api/auth/me - Get current user
 
-CMD ["openclaw", "start"]
-```
+## Chat
+- POST /api/chat/:id/messages - Send message
+- GET /api/chat/:id/messages - Get history
 
-## C. Error Codes
+## Agents
+- GET /api/agents - List agents
+- POST /api/agents - Create agent
+- PUT /api/agents/:id - Update agent
+- POST /api/agents/:id/task - Assign task
 
-| Code | Description | HTTP Status |
-|------|-------------|-------------|
-| AUTH_INVALID | Invalid credentials | 401 |
-| AUTH_EXPIRED | Token expired | 401 |
-| CREDITS_INSUFFICIENT | Not enough credits | 402 |
-| VPS_NOT_READY | VPS still provisioning | 503 |
-| AGENT_BUSY | Agent is currently busy | 409 |
-| FILE_TOO_LARGE | File exceeds size limit | 413 |
+## Credits
+- GET /api/credits/balance - Check balance
+- GET /api/credits/usage - View history
+- POST /api/credits/purchase - Buy credits
+
+## Files
+- GET /api/files - List files
+- GET /api/files/:id/download - Download file
 
 ---
 
 **Document Status:** Ready for Implementation  
-**Next Review:** After Phase 1 completion  
-**Questions:** Reference this document or contact Architecture team
+**Version:** 1.1 (Explanation-Based)  
+**Next Review:** After Phase 1 completion
