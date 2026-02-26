@@ -52,10 +52,12 @@ This document provides a comprehensive blueprint for building Wapple - a mobile 
 
 | Service | Purpose | What It Replaces |
 |---------|---------|------------------|
-| **Supabase** | Auth, Database, Realtime, Storage | Building our own auth system, WebSocket server |
+| **Supabase** | Auth, Database, Realtime, Storage (research/analytics only) | Building our own auth system, WebSocket server |
 | **Stripe** | Payments, Subscriptions | Building billing from scratch |
 | **OpenRouter** | AI/LLM Access | Direct integration with Anthropic/OpenAI |
 | **DigitalOcean** | VPS Hosting | Manual server provisioning |
+
+> **Note on Storage:** User files stay on their VPS. Supabase Storage is only for our internal research/analytics data.
 
 ### Why This Approach?
 
@@ -747,7 +749,7 @@ ${user.goals.map(g => `- ${g}`).join('\n')}
 | **User Auth** | Supabase Auth (Email/Password + OAuth: Google, Apple) |
 | **Database** | PostgreSQL with Row Level Security (RLS) |
 | **Real-time** | Supabase Realtime for WebSocket connections |
-| **File Storage** | Supabase Storage for avatars, uploads |
+| **Storage** | Supabase Storage (research/analytics data only) |
 | **Edge Functions** | Supabase Edge Functions for simple APIs |
 
 ### 5.2.2 Database Schema (Supabase)
@@ -1109,7 +1111,7 @@ CREATE TABLE conversations (
 | **Auth** | Supabase Auth | Email + OAuth (Google, Apple) |
 | **Database** | Supabase PostgreSQL | With RLS security |
 | **Real-time** | Supabase Realtime | WebSocket push to app |
-| **Storage** | Supabase Storage | Avatars, file uploads |
+| **Storage** | Supabase Storage | Research/analytics data only (user files stay on VPS) |
 | **Payments** | Stripe | Subscription billing |
 | **AI** | OpenRouter | Unified LLM API |
 | **Hosting** | DigitalOcean/AWS | VPS per user |
