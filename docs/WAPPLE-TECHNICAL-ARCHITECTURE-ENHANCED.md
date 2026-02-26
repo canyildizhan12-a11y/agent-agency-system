@@ -1,11 +1,12 @@
 # Wapple - Mobile AI Agent Superapp
 ## Technical Architecture & Implementation Document
 
-**Version:** 1.3 (Enhanced)  
+**Version:** 1.5 (Supabase + Proactive AI Agents)  
 **Date:** 2026-02-25  
 **Original Author:** Codex (Architecture)  
 **Enhanced By:** Quill (Documentation)  
-**Status:** Production Ready
+**Status:** Production Ready  
+**Owner:** Can (Founder/Builder)
 
 ---
 
@@ -44,6 +45,24 @@ This document provides a comprehensive blueprint for building Wapple - a mobile 
 - How the mobile app communicates with Openclaw instances
 - How to provision and manage user VPS instances
 - How credit systems and billing work
+
+## 1.4 Third-Party Services Strategy
+
+> **Philosophy:** Use production-ready third-party services wherever possible. We build only what differentiates us.
+
+| Service | Purpose | What It Replaces |
+|---------|---------|------------------|
+| **Supabase** | Auth, Database, Realtime, Storage | Building our own auth system, WebSocket server |
+| **Stripe** | Payments, Subscriptions | Building billing from scratch |
+| **OpenRouter** | AI/LLM Access | Direct integration with Anthropic/OpenAI |
+| **DigitalOcean** | VPS Hosting | Manual server provisioning |
+
+### Why This Approach?
+
+- **Faster time-to-market**: Don't reinvent auth, payments, databases
+- **Production-tested**: Millions of users rely on these services
+- **Less maintenance**: Security updates handled by specialists
+- **Focus on what matters**: Our differentiator is the **proactive AI agent**, not auth systems
 
 ## 1.4 Architecture Diagram
 
@@ -98,9 +117,65 @@ This document provides a comprehensive blueprint for building Wapple - a mobile 
 
 ## 2.1 What is Openclaw?
 
-Openclaw is a **self-hosted gateway** that connects chat applications (WhatsApp, Telegram, Discord, iMessage, and more) to AI coding agents. It bridges messaging apps and always-available AI assistants.
+Openclaw is **NOT a message just forwarder**. It's a **proactive AI agent system** that gives your AI assistant direct access to a full computer (VPS). Think of it as giving your AI "hands and eyes" on a real server.
 
-### 2.1.1 Core Components
+**The key difference:**
+- Traditional chatbots: You ask → AI responds → Done
+- Openclaw: You ask → AI acts → It executes tasks on your VPS → Returns results
+
+### 2.1.2 What Openclaw Actually Does
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                   OPENCLAW = AI WITH COMPUTER ACCESS                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+Your AI Agent can:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧  RUN COMMANDS        → Execute any terminal command on VPS
+                          (git, npm, docker, curl, python, etc.)
+
+📁  READ/WRITE FILES    → Access entire filesystem
+                          (configs, code, documents, logs)
+
+🌐  BROWSER CONTROL     → Browse the web, scrape sites, automate UI
+                          (headless Chrome via Puppeteer/Playwright)
+
+📧  EMAIL INTEGRATION   → Send/receive emails via SMTP/IMAP
+                          (Gmail, Outlook, custom SMTP)
+
+🔗  API CALLS           → Call any external API
+                          (REST, GraphQL, webhooks)
+
+📊  DATABASE ACCESS     → Query/modify databases
+                          (PostgreSQL, MySQL, MongoDB)
+
+⏰  SCHEDULED TASKS     → Run tasks on cron schedule
+                          (daily reports, monitoring, automation)
+
+📱  MOBILE NODES        → Access phone camera, location, notifications
+                          (iOS/Android paired devices)
+
+🔔  SEND MESSAGES       → Push notifications to Telegram/WhatsApp/Discord
+                          (proactive alerts, reports)
+```
+
+### 2.1.3 Example: Instead of Just Talking, It ACTS
+
+| User Request | What Happens |
+|--------------|--------------|
+| "What's the weather?" | AI calls weather API, returns forecast |
+| "Deploy my app" | AI runs `git pull && npm build && pm2 restart` |
+| "Check my emails" | AI connects to Gmail IMAP, reads recent emails |
+| "Find info about X" | AI uses browser to search, scrapes results |
+| "Run my tests" | AI executes `npm test`, returns results |
+| "Monitor server" | AI runs `htop`, `df -h`, reports status |
+| "Send report to team" | AI generates report, emails to team |
+
+**This is a paradigm shift:** The AI isn't just answering questions—it's **doing work** on your behalf.
+
+### 2.1.4 Core Components
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -620,152 +695,391 @@ ${user.goals.map(g => `- ${g}`).join('\n')}
 
 # 5. Backend Architecture
 
-## 5.1 Service Architecture
+## 5.1 Third-Party Services Strategy
+
+> **Philosophy:** Use production-ready third-party services wherever possible to minimize development overhead and ensure reliability.
+
+| Service | Purpose | Why |
+|---------|---------|-----|
+| **Supabase** | Auth, Database, Realtime, Storage | Complete backend-as-a-service |
+| **Stripe** | Payments, Subscriptions | Industry-standard billing |
+| **OpenRouter** | AI/LLM Access | Unified API for multiple providers |
+| **DigitalOcean/AWS** | VPS Hosting | Infrastructure |
+
+## 5.2 Supabase Integration
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        BACKEND SERVICES                              │
+│                    SUPABASE SERVICES                                 │
 └─────────────────────────────────────────────────────────────────────┘
 
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│    Auth     │  │Provisioning │  │    Credit   │  │    File     │
-│   Service   │  │   Service   │  │   Manager   │  │   Sync      │
-│             │  │             │  │             │  │   Service   │
-│ - Register  │  │ - VPS CRUD  │  │ - Balance   │  │ - Polling   │
-│ - Login     │  │ - Docker    │  │ - Deduction │  │ - Streaming │
-│ - JWT       │  │ - Config    │  │ - Alerts    │  │ - Metadata  │
-└──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘
-       │                │                │                │
-       └────────────────┴────────────────┴────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                     SUPABASE DASHBOARD                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
+│  │   Auth      │  │  Database   │  │  Storage    │                 │
+│  │  (JWT)      │  │(PostgreSQL) │  │  (S3)       │                 │
+│  └─────────────┘  └─────────────┘  └─────────────┘                 │
+│                                                                     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
+│  │  Realtime   │  │  Edge       │  │  Functions  │                 │
+│  │ (WebSocket) │  │  Functions  │  │ (Serverless)│                 │
+│  └─────────────┘  └─────────────┘  └─────────────┘                 │
+└─────────────────────────────────────────────────────────────────────┘
                               │
-                    ┌─────────┴─────────┐
-                    │  API Gateway      │
-                    │  (Express.js)    │
-                    └─────────┬─────────┘
-                              │
-         ┌────────────────────┼────────────────────┐
-         │                    │                    │
-         ▼                    ▼                    ▼
-   ┌──────────┐        ┌──────────┐        ┌──────────┐
-   │PostgreSQL│        │  Redis   │        │   S3/    │
-   │   DB     │        │  Cache   │        │  Storage │
-   └──────────┘        └──────────┘        └──────────┘
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    WAPPLE BACKEND                                    │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │  Lightweight Node.js/Express API (only business logic)      │    │
+│  │                                                              │    │
+│  │  - VPS Provisioning & Management                            │    │
+│  │  - Credit/Debit Operations                                  │    │
+│  │  - Stripe Webhook Handling                                  │    │
+│  │  - Agent Health Monitoring                                  │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 5.1.1 Auth Service
+### 5.2.1 What Supabase Handles
 
-**Responsibilities:**
-- User registration and login
-- JWT token generation/validation
-- OAuth integration (Google, Apple)
-- Session management
+| Feature | Implementation |
+|---------|---------------|
+| **User Auth** | Supabase Auth (Email/Password + OAuth: Google, Apple) |
+| **Database** | PostgreSQL with Row Level Security (RLS) |
+| **Real-time** | Supabase Realtime for WebSocket connections |
+| **File Storage** | Supabase Storage for avatars, uploads |
+| **Edge Functions** | Supabase Edge Functions for simple APIs |
 
-**Endpoints:**
-```
-POST /api/auth/register     - Create account
-POST /api/auth/login        - Login
-POST /api/auth/refresh     - Refresh token
-POST /api/auth/logout      - Invalidate token
-GET  /api/auth/me          - Get current user
-```
-
-### 5.1.2 Provisioning Service
-
-**Responsibilities:**
-- VPS lifecycle management
-- Docker container orchestration
-- Openclaw installation and configuration
-- Health monitoring
-
-**Endpoints:**
-```
-POST /api/provisioning/create    - Create user VPS
-GET  /api/provisioning/status    - Check status
-POST /api/provisioning/destroy   - Tear down
-POST /api/provisioning/rebuild   - Rebuild instance
-```
-
-### 5.1.3 Credit Manager
-
-**Responsibilities:**
-- Track credit balances
-- Monitor API usage (OpenRouter)
-- Enforce tier limits
-- Handle billing events
-
-**Endpoints:**
-```
-GET  /api/credits/balance        - Get balance
-POST /api/credits/purchase      - Buy credits
-GET  /api/credits/usage         - Get usage history
-POST /api/credits/webhook       - Stripe webhook
-```
-
-### 5.1.4 File Sync Service
-
-**Responsibilities:**
-- Poll VPS for workspace changes
-- Stream files to mobile app
-- Manage file metadata
-- Handle sync conflicts
-
-### 5.1.5 Agent Manager
-
-**Responsibilities:**
-- List user's agents
-- Manage agent configurations
-- View agent status
-- Handle agent lifecycle
-
-## 5.2 Database Schema
-
-### 5.2.1 Core Tables
+### 5.2.2 Database Schema (Supabase)
 
 ```sql
--- Users table
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255),
-    name VARCHAR(255),
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    stripe_customer_id VARCHAR(255),
-    subscription_tier VARCHAR(50) DEFAULT 'starter'
+-- Users (extends Supabase auth.users)
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT,
+  avatar_url TEXT,
+  subscription_tier TEXT DEFAULT 'starter',
+  credits_balance INTEGER DEFAULT 1000,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- VPS Instances
-CREATE TABLE vps_instances (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id),
-    provider VARCHAR(50),          -- 'digitalocean', 'aws'
-    instance_id VARCHAR(255),      -- Provider's ID
-    ip_address VARCHAR(45),
-    status VARCHAR(50),            -- 'provisioning', 'active', 'failed'
-    tier VARCHAR(20),
-    created_at TIMESTAMP DEFAULT NOW()
+CREATE TABLE public.vps_instances (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  provider TEXT NOT NULL,           -- 'digitalocean', 'aws'
+  instance_id TEXT NOT NULL,
+  ip_address INET,
+  status TEXT DEFAULT 'provisioning',
+  tier TEXT DEFAULT 'starter',
+  openclaw_api_key TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Agents
-CREATE TABLE agents (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id),
-    vps_id UUID REFERENCES vps_instances(id),
-    name VARCHAR(255),
-    model VARCHAR(255),
-    config JSONB,
-    status VARCHAR(50) DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT NOW()
+-- Agents per user
+CREATE TABLE public.agents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  vps_id UUID REFERENCES public.vps_instances(id),
+  name TEXT NOT NULL,
+  model TEXT DEFAULT 'anthropic/claude-sonnet-4-20250514',
+  config JSONB DEFAULT '{}',
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Credit Transactions
-CREATE TABLE credit_transactions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id),
-    amount INTEGER,
-    type VARCHAR(50),             -- 'purchase', 'usage', 'refund'
-    description TEXT,
-    created_at TIMESTAMP DEFAULT NOW()
+CREATE TABLE public.credit_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  amount INTEGER NOT NULL,
+  type TEXT NOT NULL,              -- 'purchase', 'usage', 'bonus'
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Conversations
+CREATE TABLE public.conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  agent_id UUID REFERENCES public.agents(id),
+  channel TEXT,
+  peer_id TEXT,
+  last_message_at TIMESTAMPTZ
+);
+
+-- Enable RLS
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vps_instances ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.credit_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+CREATE POLICY "Users can view own profile" 
+  ON public.profiles FOR SELECT 
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can view own VPS" 
+  ON public.vps_instances FOR ALL 
+  USING (user_id = (SELECT id FROM public.profiles WHERE auth.uid() = id));
+```
+
+### 5.2.3 Supabase Client Usage
+
+```typescript
+// lib/supabase.ts
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Auth
+export const signUp = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  return { data, error };
+};
+
+export const signIn = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  return { data, error };
+};
+
+export const signInWithOAuth = async (provider: 'google' | 'apple') => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: 'wapple://auth/callback' }
+  });
+  return { data, error };
+};
+
+// Database
+export const getUserCredits = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('credits_balance')
+    .eq('id', userId)
+    .single();
+  return { data, error };
+};
+
+export const deductCredits = async (userId: string, amount: number) => {
+  const { data, error } = await supabase.rpc('deduct_credits', { 
+    user_id: userId, 
+    amount 
+  });
+  return { data, error };
+};
+
+// Real-time subscription
+export const subscribeToMessages = (agentId: string, callback: (msg) => void) => {
+  return supabase
+    .channel(`agent:${agentId}`)
+    .on('postgres_changes', { 
+      event: 'INSERT', 
+      schema: 'public', 
+      table: 'messages',
+      filter: `agent_id=eq.${agentId}`
+    }, callback)
+    .subscribe();
+};
+```
+
+## 5.3 Custom Backend (Minimal)
+
+> **Only implement what's NOT available in Supabase**
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│               CUSTOM BACKEND (Node.js/Express)                      │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    Business Logic Only                       │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  What we build:              What Supabase handles:                 │
+│  ─────────────────           ──────────────────────                │
+│  • VPS Provisioning          • Auth (JWT, OAuth)                   │
+│  • Credit/Debit Logic         • Database (PostgreSQL)               │
+│  • Stripe Webhooks            • Real-time (WebSocket)                │
+│  • Agent Health Checks        • File Storage                         │
+│  • Openclaw API Proxy        • Edge Functions                       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 5.3.1 Backend Services
+
+```javascript
+// services/vpsProvisioner.js
+class VPSProvisioner {
+  async createVPS(userId, tier) {
+    // 1. Create droplet on DigitalOcean/AWS
+    const droplet = await this.createDroplet(tier);
+    
+    // 2. Wait for SSH to be available
+    await this.waitForSSH(droplet.ip);
+    
+    // 3. Install Docker & Openclaw
+    await this.installOpenclaw(droplet.ip, userId);
+    
+    // 4. Configure user workspace
+    await this.configureWorkspace(droplet.ip, userId);
+    
+    // 5. Store in Supabase
+    await supabase.from('vps_instances').insert({
+      user_id: userId,
+      provider: 'digitalocean',
+      instance_id: droplet.id,
+      ip_address: droplet.ip,
+      status: 'active',
+      tier
+    });
+    
+    return droplet;
+  }
+}
+
+// services/creditManager.js
+class CreditManager {
+  async deductForLLM(userId, inputTokens, outputTokens) {
+    const cost = this.calculateCost(inputTokens, outputTokens);
+    
+    // Use Supabase RPC function for atomic deduction
+    const { data, error } = await supabase.rpc('deduct_credits', {
+      user_id: userId,
+      amount: Math.ceil(cost * 1000) // Convert to credits
+    });
+    
+    if (error) throw error;
+    return data;
+  }
+  
+  calculateCost(inputTokens, outputTokens) {
+    const RATE_PER_1K = 0.003; // Claude Sonnet
+    return ((inputTokens + outputTokens) / 1000) * RATE_PER_1K;
+  }
+}
+```
+
+## 5.4 Stripe Integration
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        STRIPE BILLING                               │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│   Mobile     │      │   Backend    │      │   Stripe     │
+│     App      │─────►│   (Node)    │─────►│   API        │
+└──────────────┘      └──────┬───────┘      └──────────────┘
+                             │
+                             ▼
+                      ┌──────────────┐
+                      │  Supabase    │
+                      │  (Update     │
+                      │   credits)   │
+                      └──────────────┘
+```
+
+### 5.4.1 Stripe Products
+
+| Tier | Price | Credits/Month | Overage |
+|------|-------|--------------|---------|
+| Starter | $9.99/mo | 10,000 | $0.002/credit |
+| Pro | $39.99/mo | 25,000 | $0.0015/credit |
+| Premium | $129.99/mo | 100,000 | $0.001/credit |
+
+### 5.4.2 Stripe Webhook Handler
+
+```javascript
+// routes/stripe.js
+app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+  
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      await handleSubscriptionCreated(session);
+      break;
+      
+    case 'customer.subscription.updated':
+      const subscription = event.data.object;
+      await handleSubscriptionUpdated(subscription);
+      break;
+      
+    case 'customer.subscription.deleted':
+      const deleted = event.data.object;
+      await handleSubscriptionCanceled(deleted);
+      break;
+  }
+  
+  res.json({ received: true });
+});
+
+async function handleSubscriptionCreated(session) {
+  const userId = session.metadata.user_id;
+  const tier = getTierFromPriceId(session.price_id);
+  
+  await supabase
+    .from('profiles')
+    .update({ subscription_tier: tier })
+    .eq('id', userId);
+}
+```
+
+## 5.5 Database Schema Summary
+
+> **All tables are in Supabase PostgreSQL** — see Section 5.2.2 for full schema with Row Level Security (RLS) policies.
+
+### Tables Overview
+
+| Table | Purpose | Managed By |
+|-------|---------|------------|
+| `profiles` | User data (extends Supabase auth) | Supabase |
+| `vps_instances` | User VPS instances | Custom Backend |
+| `agents` | User's AI agents | Custom Backend |
+| `credit_transactions` | Credit purchase/usage history | Custom Backend |
+| `conversations` | Chat history | Supabase |
+
+### RPC Functions
+
+```sql
+-- Atomic credit deduction (prevents negative balance)
+CREATE OR REPLACE FUNCTION deduct_credits(user_id UUID, amount INTEGER)
+RETURNS BOOLEAN AS $$
+DECLARE
+  current_balance INTEGER;
+BEGIN
+  SELECT credits_balance INTO current_balance
+  FROM profiles WHERE id = user_id;
+  
+  IF current_balance < amount THEN
+    RETURN FALSE;
+  END IF;
+  
+  UPDATE profiles 
+  SET credits_balance = credits_balance - amount 
+  WHERE id = user_id;
+  
+  -- Log transaction
+  INSERT INTO credit_transactions (user_id, amount, type, description)
+  VALUES (user_id, -amount, 'usage', 'LLM usage');
+  
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;
+```
 );
 
 -- Conversations
@@ -783,17 +1097,22 @@ CREATE TABLE conversations (
 
 # 6. Frontend Architecture
 
-## 6.1 Technology Stack
+## 6.1 Technology Stack (Third-Party Optimized)
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| Framework | React Native (Expo) | Cross-platform mobile |
-| Language | TypeScript | Type safety |
-| State | Zustand | Lightweight state management |
-| Navigation | React Navigation | Tab + stack navigation |
-| Real-time | Socket.io-client | Live updates |
-| HTTP | Axios | API requests |
-| Storage | AsyncStorage | Local persistence |
+| Layer | Technology | Why |
+|-------|------------|-----|
+| **Framework** | React Native (Expo) | Cross-platform (iOS/Android) |
+| **Language** | TypeScript | Type safety |
+| **State** | Zustand | Lightweight, simple |
+| **Navigation** | React Navigation | Tab + stack navigation |
+| **Backend** | Supabase | Auth + DB + Realtime all-in-one |
+| **Auth** | Supabase Auth | Email + OAuth (Google, Apple) |
+| **Database** | Supabase PostgreSQL | With RLS security |
+| **Real-time** | Supabase Realtime | WebSocket push to app |
+| **Storage** | Supabase Storage | Avatars, file uploads |
+| **Payments** | Stripe | Subscription billing |
+| **AI** | OpenRouter | Unified LLM API |
+| **Hosting** | DigitalOcean/AWS | VPS per user |
 
 ## 6.2 Screen Structure
 
@@ -868,34 +1187,56 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 }));
 ```
 
-## 6.4 Real-Time Connection
+## 6.4 Real-Time Connection (Supabase)
 
 ```typescript
-// services/socket.ts
-import { io } from 'socket.io-client';
+// services/realtime.ts - Using Supabase Realtime
+import { supabase } from './supabase';
 
-const SOCKET_URL = process.env.EXPO_PUBLIC_WS_URL;
+export const subscribeToMessages = (agentId: string, callback: (message) => void) => {
+  // Subscribe to new messages for this agent
+  const channel = supabase
+    .channel(`messages:${agentId}`)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: `agent_id=eq.${agentId}`
+    }, (payload) => {
+      callback(payload.new);
+    })
+    .subscribe();
+  
+  return channel;
+};
 
-export const socket = io(SOCKET_URL, {
-  auth: {
-    token: AsyncStorage.getItem('token')
-  },
-  transports: ['websocket']
-});
+export const subscribeToCredits = (userId: string, callback: (balance) => void) => {
+  // Subscribe to credit balance changes
+  const channel = supabase
+    .channel(`credits:${userId}`)
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'profiles',
+      filter: `id=eq.${userId}`
+    }, (payload) => {
+      callback(payload.new.credits_balance);
+    })
+    .subscribe();
+  
+  return channel;
+};
 
-socket.on('connect', () => {
-  console.log('Connected to real-time server');
-});
-
-socket.on('message', (message) => {
-  // Add to chat store
-  chatStore.getState().addMessage(message);
-});
-
-socket.on('task_complete', (task) => {
-  // Update task list
-  taskStore.getState().updateTask(task);
-});
+// Usage in React component
+useEffect(() => {
+  const channel = subscribeToMessages(agentId, (message) => {
+    setMessages(prev => [...prev, message]);
+  });
+  
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, [agentId]);
 ```
 
 ---
